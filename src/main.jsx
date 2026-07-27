@@ -1,5 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import NexusAcademyTour from './NexusAcademyTour.jsx';
+import NexusAcademy from './NexusAcademy.jsx';
 
-createRoot(document.getElementById('root')).render(<NexusAcademyTour />);
+createRoot(document.getElementById('root')).render(<NexusAcademy />);
