@@ -1,14 +1,21 @@
 import * as THREE from 'three';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 /**
  * First-person walkthrough: WASD to move, mouse to look, shift to sprint,
  * space to jump.
  *
+ * Look control owns the camera rotation directly rather than delegating to
+ * PointerLockControls, because pointer lock is not always available — inside a
+ * sandboxed iframe the request is refused, and a lock-only implementation then
+ * silently does nothing. Two input paths share one rotation model:
+ *
+ *   - pointer locked: every mouse move turns the view (the usual FPS feel)
+ *   - drag: hold the left button and drag, for when lock is refused
+ *
  * Ground height comes from a downward raycast against the walkable meshes, so
  * the stair, terrace, podium and mezzanine galleries are all climbable without
- * any special-casing. Horizontal blocking uses axis-aligned boxes, resolved one
- * axis at a time so sliding along a wall works instead of sticking.
+ * special-casing. Horizontal blocking uses axis-aligned boxes, resolved one axis
+ * at a time so sliding along a wall works instead of sticking.
  */
 
 const EYE_HEIGHT = 1.68;
@@ -18,24 +25,103 @@ const GRAVITY = 22;
 const JUMP_SPEED = 6.4;
 const RADIUS = 0.42; // player capsule radius, for wall clearance
 const STEP_UP = 0.72; // tallest ledge that can be walked straight up
+const LOOK_SENSITIVITY = 0.0022;
+const DRAG_SENSITIVITY = 0.0042; // drag covers less distance, so turn faster
+const PITCH_LIMIT = Math.PI / 2 - 0.05;
 
-export function createWalker(camera, domElement, { walkables, colliders, start }) {
-  const controls = new PointerLockControls(camera, domElement);
+export function createWalker(camera, domElement, { walkables, colliders, start, onLookMode }) {
+  const position = new THREE.Vector3(start?.[0] ?? 0, start?.[1] ?? EYE_HEIGHT, start?.[2] ?? 90);
+  const look = new THREE.Euler(0, 0, 0, 'YXZ');
+
+  let verticalVelocity = 0;
+  let grounded = true;
+  let pointerLocked = false;
+  let dragging = false;
 
   const keys = new Set();
+  const applyLook = () => camera.quaternion.setFromEuler(look);
+
+  const turn = (dx, dy, sensitivity) => {
+    look.y -= dx * sensitivity;
+    look.x = THREE.MathUtils.clamp(look.x - dy * sensitivity, -PITCH_LIMIT, PITCH_LIMIT);
+    applyLook();
+  };
+
+  // ---- Input -------------------------------------------------------------
   const onKeyDown = (event) => {
     keys.add(event.code);
     // Space would otherwise scroll the page behind the canvas.
     if (event.code === 'Space') event.preventDefault();
   };
   const onKeyUp = (event) => keys.delete(event.code);
+
+  const onMouseMove = (event) => {
+    if (pointerLocked) {
+      turn(event.movementX ?? 0, event.movementY ?? 0, LOOK_SENSITIVITY);
+    } else if (dragging) {
+      turn(event.movementX ?? 0, event.movementY ?? 0, DRAG_SENSITIVITY);
+    }
+  };
+  const onMouseDown = () => {
+    if (!pointerLocked) dragging = true;
+  };
+  const onMouseUp = () => {
+    dragging = false;
+  };
+
+  // Touch drag, so the walkthrough is usable on a tablet.
+  let lastTouch = null;
+  const onTouchStart = (event) => {
+    if (event.touches.length === 1) {
+      lastTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }
+  };
+  const onTouchMove = (event) => {
+    if (!lastTouch || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    turn(touch.clientX - lastTouch.x, touch.clientY - lastTouch.y, DRAG_SENSITIVITY);
+    lastTouch = { x: touch.clientX, y: touch.clientY };
+    event.preventDefault();
+  };
+  const onTouchEnd = () => {
+    lastTouch = null;
+  };
+
+  const onPointerLockChange = () => {
+    pointerLocked = document.pointerLockElement === domElement;
+    onLookMode?.(pointerLocked ? 'pointer' : 'drag');
+  };
+
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+  domElement.addEventListener('mousedown', onMouseDown);
+  domElement.addEventListener('touchstart', onTouchStart, { passive: true });
+  domElement.addEventListener('touchmove', onTouchMove, { passive: false });
+  domElement.addEventListener('touchend', onTouchEnd);
+  document.addEventListener('pointerlockchange', onPointerLockChange);
 
-  const position = new THREE.Vector3(start?.[0] ?? 0, start?.[1] ?? EYE_HEIGHT, start?.[2] ?? 90);
-  let verticalVelocity = 0;
-  let grounded = true;
+  /**
+   * Ask for pointer lock. Refusal is expected in sandboxed frames and is not an
+   * error — drag-to-look remains available either way.
+   */
+  const requestLook = () => {
+    if (!domElement.requestPointerLock) return;
+    try {
+      const result = domElement.requestPointerLock();
+      if (result?.catch) result.catch(() => onLookMode?.('drag'));
+    } catch {
+      onLookMode?.('drag');
+    }
+  };
 
+  const releaseLook = () => {
+    dragging = false;
+    if (document.pointerLockElement === domElement) document.exitPointerLock();
+  };
+
+  // ---- Movement ----------------------------------------------------------
   const raycaster = new THREE.Raycaster();
   raycaster.far = 60;
   const down = new THREE.Vector3(0, -1, 0);
@@ -73,6 +159,7 @@ export function createWalker(camera, domElement, { walkables, colliders, start }
   const forward = new THREE.Vector3();
   const right = new THREE.Vector3();
   const step = new THREE.Vector3();
+  const up = new THREE.Vector3(0, 1, 0);
 
   const update = (delta) => {
     const dt = Math.min(delta, 0.05); // clamp so a stalled frame can't tunnel
@@ -81,7 +168,7 @@ export function createWalker(camera, domElement, { walkables, colliders, start }
     forward.y = 0;
     if (forward.lengthSq() < 1e-6) forward.set(0, 0, -1);
     forward.normalize();
-    right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize().negate();
+    right.crossVectors(up, forward).normalize().negate();
 
     step.set(0, 0, 0);
     if (keys.has('KeyW') || keys.has('ArrowUp')) step.add(forward);
@@ -99,7 +186,6 @@ export function createWalker(camera, domElement, { walkables, colliders, start }
     if (step.x !== 0 && !blocked(position.x + step.x, feetY, position.z)) position.x += step.x;
     if (step.z !== 0 && !blocked(position.x, feetY, position.z + step.z)) position.z += step.z;
 
-    // Vertical: snap to ground when falling onto it, otherwise integrate.
     const ground = groundAt(position.x, position.z, feetY);
     if (keys.has('Space') && grounded) {
       verticalVelocity = JUMP_SPEED;
@@ -131,26 +217,35 @@ export function createWalker(camera, domElement, { walkables, colliders, start }
     verticalVelocity = 0;
     camera.position.copy(position);
     if (yaw !== undefined) {
-      camera.rotation.set(0, yaw, 0);
+      look.set(0, yaw, 0);
+      applyLook();
     }
   };
 
   const dispose = () => {
+    releaseLook();
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('keyup', onKeyUp);
-    controls.disconnect();
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
+    domElement.removeEventListener('mousedown', onMouseDown);
+    domElement.removeEventListener('touchstart', onTouchStart);
+    domElement.removeEventListener('touchmove', onTouchMove);
+    domElement.removeEventListener('touchend', onTouchEnd);
+    document.removeEventListener('pointerlockchange', onPointerLockChange);
   };
 
   return {
-    controls,
     update,
     teleport,
+    requestLook,
+    releaseLook,
     dispose,
     get position() {
       return position;
     },
-    get isLocked() {
-      return controls.isLocked;
+    get isPointerLocked() {
+      return pointerLocked;
     },
   };
 }

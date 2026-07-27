@@ -25,7 +25,9 @@ const NexusAcademy = () => {
 
   const [mode, setMode] = useState('tour'); // 'tour' | 'walk'
   const [stop, setStop] = useState(0);
-  const [locked, setLocked] = useState(false);
+  // 'pointer' once the cursor is captured, 'drag' when lock is unavailable
+  // (sandboxed frames refuse it) and looking falls back to click-and-drag.
+  const [lookMode, setLookMode] = useState('drag');
   const [ready, setReady] = useState(false);
 
   // The render loop reads the mode every frame, so mirror it into a ref.
@@ -51,13 +53,9 @@ const NexusAcademy = () => {
       walkables,
       colliders,
       start: [0, 0, 92],
+      onLookMode: setLookMode,
     });
     const tour = createTour(engine.camera);
-
-    const onLock = () => setLocked(true);
-    const onUnlock = () => setLocked(false);
-    walker.controls.addEventListener('lock', onLock);
-    walker.controls.addEventListener('unlock', onUnlock);
 
     // A framing override is for stills only — it suppresses both camera modes.
     const still = vectorParam('cam');
@@ -87,7 +85,7 @@ const NexusAcademy = () => {
         if (modeRef.current === 'walk') {
           walker.update(delta);
           window.__nexus.position = walker.position.toArray();
-          window.__nexus.locked = walker.isLocked;
+          window.__nexus.pointerLocked = walker.isPointerLocked;
         } else {
           const next = tour.update(performance.now());
           if (next !== null) {
@@ -106,8 +104,6 @@ const NexusAcademy = () => {
 
     return () => {
       window.removeEventListener('resize', onResize);
-      walker.controls.removeEventListener('lock', onLock);
-      walker.controls.removeEventListener('unlock', onUnlock);
       if (frameId) cancelAnimationFrame(frameId);
       walker.dispose();
       people.dispose();
@@ -128,13 +124,13 @@ const NexusAcademy = () => {
     const standing = Math.max(position.y, TERRACE_Y + 0.2);
     world.walker.teleport(position.x, standing - 1.68, position.z, yaw);
     setMode('walk');
-    world.walker.controls.lock();
+    world.walker.requestLook();
   }, []);
 
   const enterTour = useCallback((index = 0) => {
     const world = worldRef.current;
     if (!world) return;
-    world.walker.controls.unlock();
+    world.walker.releaseLook();
     world.tour.goTo(index, { instant: true });
     setStop(index);
     setMode('tour');
@@ -199,34 +195,41 @@ const NexusAcademy = () => {
             NEXUS ACADEMY · FREE ROAM
           </div>
           <div style={{ marginTop: '9px', fontSize: '12.5px', lineHeight: 1.7, opacity: 0.9 }}>
-            <b>W A S D</b> move · <b>Mouse</b> look · <b>Shift</b> sprint · <b>Space</b> jump
+            <b>W A S D</b> move · <b>Shift</b> sprint · <b>Space</b> jump
             <br />
-            <b>Esc</b> releases the cursor
+            {lookMode === 'pointer' ? (
+              <>
+                <b>Mouse</b> look · <b>Esc</b> releases the cursor
+              </>
+            ) : (
+              <>
+                <b>Drag</b> to look around
+              </>
+            )}
           </div>
         </div>
       )}
 
-      {mode === 'walk' && !locked && (
+      {mode === 'walk' && lookMode !== 'pointer' && (
         <button
-          onClick={() => worldRef.current?.walker.controls.lock()}
+          onClick={() => worldRef.current?.walker.requestLook()}
           style={{
             ...chrome,
-            top: '50%',
+            bottom: '86px',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
-            padding: '18px 30px',
-            fontSize: '14px',
-            fontWeight: 600,
-            letterSpacing: '1px',
+            transform: 'translateX(-50%)',
+            padding: '9px 16px',
+            fontSize: '11px',
+            letterSpacing: '0.6px',
             cursor: 'pointer',
             font: 'inherit',
           }}
         >
-          CLICK TO LOOK AROUND
+          Drag to look — or click here to capture the cursor
         </button>
       )}
 
-      {mode === 'walk' && locked && (
+      {mode === 'walk' && (
         <div
           style={{
             position: 'absolute',

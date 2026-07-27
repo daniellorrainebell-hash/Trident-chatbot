@@ -37,6 +37,23 @@ npm run preview  # serve the built bundle
 | `Space` | jump |
 | `Esc` | release the cursor |
 
+Looking works two ways. Where the browser grants pointer lock you get the usual
+captured-cursor mouselook; where it doesn't — a sandboxed iframe refuses the
+request outright — the view falls back to click-and-drag, and the on-screen hint
+changes to match. Touch drag works too. A lock-only implementation looks fine in
+a tab and does nothing at all when embedded, which is why both paths exist.
+
+### Publishing it as a single page
+
+```bash
+npm run bundle   # builds, then folds everything into artifact/nexus-academy.html
+```
+
+That produces one self-contained HTML fragment (~770 kB) with the JavaScript
+inlined, for hosts that apply a strict CSP and block every external request. It
+is a fragment rather than a document — no doctype or `<html>`/`<head>`/`<body>`
+— because the host supplies the surrounding skeleton.
+
 ### Verifying it
 
 `scripts/verify.mjs` drives a headless browser against a running server and
