@@ -6,10 +6,7 @@ fs.mkdirSync(OUT, { recursive: true })
 
 const BASE = process.argv[2] || 'http://127.0.0.1:4173/'
 const TIER = process.argv[3] || 'A'
-const MARKS = [
-  1.2, 4.0, 5.4, 8.0, 9.8, 11.8, 14.5, 18, 21, 25.5, 29, 32.5, 36, 39.5, 41.5,
-  43.5, 46, 48, 50.5, 55, 58, 61,
-]
+const MARKS = (process.env.MARKS || '5.4,12,21,29,36,46,50.5,61').split(',').map(Number)
 
 const browser = await chromium.launch({
   // Falls back to Playwright's own browser when CHROME_PATH isn't set.
