@@ -126,6 +126,15 @@ single self-contained file under a policy that blocks external hosts, and a
 fallback face flashing mid-recording would be unusable. Re-run that script
 only if you change which faces are used.
 
+**The environment** is a 2D canvas starfield behind the WebGL layer —
+parallax star layers, a baked nebula, and a constellation of connecting
+lines with travelling pulses. It is sized to the 9:16 stage rather than the
+window, so it is part of what a screen recording captures. Star sprites are
+baked once at startup rather than built per frame; it shares a frame budget
+with a WebGL scene doing transmission, depth of field and bloom, so per-frame
+gradient allocation is not affordable. Counts and resolution follow the
+quality tier, and tier C drops the connection pass entirely.
+
 **Text glow** is three `:root` tokens — `--glow-faint`, `--glow-soft`,
 `--glow-strong`. Each layers a tight near-white halo (which keeps the glyph
 edge crisp and legible) under two wide low-opacity blooms (which supply the
@@ -163,7 +172,7 @@ src/
 ├─ state/       useExperience.ts
 ├─ sequence/    stageState.ts · director.ts
 ├─ scene/
-│  ├─ Stage · Studio · CameraRig · PostFX · layout
+│  ├─ Stage · Studio · StarfieldBackground · CameraRig · PostFX · layout
 │  ├─ core/     CoreStack · Wafer · Die · ViaBeams · traceTexture
 │  ├─ flow/     Packet
 │  └─ fx/       Motes

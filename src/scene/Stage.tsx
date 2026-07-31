@@ -2,7 +2,6 @@ import { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { AmbientRig, Studio } from './Studio'
-import { Backdrop } from './Backdrop'
 import { CameraRig } from './CameraRig'
 import { PostFX } from './PostFX'
 import { CoreStack } from './core/CoreStack'
@@ -85,16 +84,19 @@ export function Stage() {
       dpr={tier.dpr}
       gl={{
         antialias: false,
-        alpha: false,
+        // Transparent: the starfield canvas underneath is the environment,
+        // so this layer composites over it instead of clearing to a colour.
+        alpha: true,
         powerPreference: 'high-performance',
         stencil: false,
       }}
       camera={{ fov: 30, near: 0.05, far: 60, position: [0, 0, 1.4] }}
       onCreated={({ scene }) => {
-        scene.background = new THREE.Color('#01030a')
-        // Fog tint matches the backdrop's lower gradient, so distant motes
-        // dissolve into the environment instead of into a different black.
-        scene.fog = new THREE.FogExp2('#020714', 0.03)
+        // No background: the starfield shows through.
+        scene.background = null
+        // Fog tint matches the starfield's base, so anything receding
+        // dissolves into the environment rather than into a different black.
+        scene.fog = new THREE.FogExp2('#020818', 0.03)
       }}
     >
       <RendererSetup />
@@ -102,7 +104,6 @@ export function Stage() {
       <AutoQuality />
 
       <Suspense fallback={null}>
-        <Backdrop />
         <Studio />
         <AmbientRig />
         <Motes />

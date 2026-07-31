@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { Stage } from './scene/Stage'
+import { StarfieldBackground } from './scene/StarfieldBackground'
 import { Preloader } from './ui/Preloader'
 import { StartScreen } from './ui/StartScreen'
 import { CinematicLogo } from './ui/CinematicLogo'
@@ -147,6 +148,7 @@ export default function App() {
   return (
     <div className="viewport">
       <div className="stage" ref={stageRef}>
+        <StarfieldBackground />
         <Stage />
 
         <CinematicLogo />
