@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { AmbientRig, Studio } from './Studio'
+import { Backdrop } from './Backdrop'
 import { CameraRig } from './CameraRig'
 import { PostFX } from './PostFX'
 import { CoreStack } from './core/CoreStack'
@@ -90,10 +91,10 @@ export function Stage() {
       }}
       camera={{ fov: 30, near: 0.05, far: 60, position: [0, 0, 1.4] }}
       onCreated={({ scene }) => {
-        scene.background = new THREE.Color('#02040a')
-        // Exponential fog does the heavy lifting on depth — it's why the
-        // motes recede instead of floating on a flat black card.
-        scene.fog = new THREE.FogExp2('#02040a', 0.028)
+        scene.background = new THREE.Color('#01030a')
+        // Fog tint matches the backdrop's lower gradient, so distant motes
+        // dissolve into the environment instead of into a different black.
+        scene.fog = new THREE.FogExp2('#020714', 0.03)
       }}
     >
       <RendererSetup />
@@ -101,6 +102,7 @@ export function Stage() {
       <AutoQuality />
 
       <Suspense fallback={null}>
+        <Backdrop />
         <Studio />
         <AmbientRig />
         <Motes />
