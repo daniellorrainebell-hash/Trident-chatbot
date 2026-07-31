@@ -71,16 +71,24 @@ export const COPY = {
   coreReveal: 'Living Intelligence Core',
   workflowOpen: 'One connected system',
   workflowClose: 'Working when your team logs off',
-  statement: 'Custom-built AI systems.\nDesigned around your business.',
+  // Matches the wording on the business card rather than my own phrasing —
+  // "Custom built AI systems" is how the brand already says it.
+  statement: 'Custom built AI systems.\nDesigned around your business.',
   end: {
     person: 'Daniel Bell',
     role: 'Founder, Nexus IQ Systems',
     /**
-     * TODO — supply these and they appear automatically.
-     * Empty strings are skipped, so the frame stays composed either way.
+     * Any empty field is skipped rather than rendered as a placeholder, so
+     * the frame stays composed whatever it's given.
+     *
+     * Numbers are spaced for legibility at a glance — the end frame gets
+     * read off a moving story, not studied. The `tel:` links strip the
+     * spaces automatically, so dialling is unaffected.
      */
-    mobile: '',
-    office: '',
-    website: '',
+    mobile: '07858 188645',
+    office: '0800 193 5055',
+    /** Display text. `websiteUrl` is what the link actually points at. */
+    website: 'nexus-iq.co.uk',
+    websiteUrl: 'https://www.nexus-iq.co.uk',
   },
 }

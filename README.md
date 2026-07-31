@@ -8,23 +8,28 @@ system, and it lands on a brand payoff frame built to be screen-recorded.
 
 ---
 
-## Before you publish — one thing to fill in
+## Contact details
 
-Contact details are deliberately blank. Open `src/config/brand.ts` and fill
-in `COPY.end`:
+Taken from the business card and live in `src/config/brand.ts` → `COPY.end`:
 
 ```ts
 end: {
-  person: 'Daniel Bell',
-  role: 'Founder, Nexus IQ Systems',
-  mobile:  '',   // ← e.g. '07700 900123'
-  office:  '',   // ← e.g. '0161 000 0000'
-  website: '',   // ← e.g. 'nexusiqsystems.com'
+  person:  'Daniel Bell',
+  role:    'Founder, Nexus IQ Systems',
+  mobile:  '07858 188645',
+  office:  '0800 193 5055',
+  website: 'nexus-iq.co.uk',                 // what's displayed
+  websiteUrl: 'https://www.nexus-iq.co.uk',  // where it links
 }
 ```
 
-Empty fields are **skipped**, not rendered as placeholders, so the end frame
-stays composed either way. Filled-in numbers become tap-to-call links.
+Numbers are spaced for legibility — the end frame gets read off a moving
+story, not studied. The `tel:` links strip the spaces, so dialling is
+unaffected. The website shows without `www.` but links to the `www` host,
+which is the one guaranteed to resolve.
+
+Any field left empty is **skipped** rather than rendered as a placeholder, so
+the frame stays composed whatever it's given.
 
 ---
 

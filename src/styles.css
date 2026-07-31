@@ -469,9 +469,9 @@ body {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    62% 44% at 50% 42%,
-    rgba(2, 4, 10, 0.88) 0%,
-    rgba(2, 4, 10, 0.72) 45%,
+    78% 52% at 50% 46%,
+    rgba(2, 4, 10, 0.95) 0%,
+    rgba(2, 4, 10, 0.86) 52%,
     transparent 100%
   );
   z-index: -1;
@@ -500,7 +500,7 @@ body {
 }
 
 .endframe__statement {
-  margin-top: 7cqw;
+  margin-top: 6cqw;
   max-width: 78cqw;
   opacity: 0;
   animation: fade-up 1200ms var(--ease-out) 1000ms forwards;
@@ -511,7 +511,7 @@ body {
   height: 1px;
   flex: none;
   background: linear-gradient(90deg, transparent, var(--hairline), transparent);
-  margin: 9cqw 0 8cqw;
+  margin: 7cqw 0 6cqw;
   opacity: 0;
   animation: fade-up 900ms var(--ease-out) 1800ms forwards;
 }
@@ -536,8 +536,8 @@ body {
   font-size: clamp(9px, 2.7cqw, 13px);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-bottom: 3cqw;
+  color: var(--ink-dim);
+  margin-bottom: 3.5cqw;
 }
 
 .endframe__line {

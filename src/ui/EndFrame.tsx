@@ -17,14 +17,16 @@ export function EndFrame() {
 
   if (!visible) return null
 
-  const { person, role, mobile, office, website } = COPY.end
+  const { person, role, mobile, office, website, websiteUrl } = COPY.end
   const lines = [
     mobile && { key: 'mobile', value: mobile, href: `tel:${mobile.replace(/\s+/g, '')}` },
     office && { key: 'office', value: office, href: `tel:${office.replace(/\s+/g, '')}` },
     website && {
       key: 'web',
       value: website.replace(/^https?:\/\//, ''),
-      href: website.startsWith('http') ? website : `https://${website}`,
+      // The displayed address stays clean; the link keeps the www host the
+      // brand actually publishes, which is the one guaranteed to resolve.
+      href: websiteUrl || (website.startsWith('http') ? website : `https://${website}`),
     },
   ].filter(Boolean) as { key: string; value: string; href: string }[]
 

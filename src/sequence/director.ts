@@ -262,8 +262,8 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(S, { vignette: 1.05, duration: B.recede.dur * 1.3, ease: 'power2.inOut' }, B.recede.at)
   // Dim the world right down. The object has to stop competing with the
   // lockup — on the payoff frame the type is the subject, not the core.
-  tl.to(S, { envIntensity: 0.3, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
-  tl.to(S, { ignition: 0.45, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
+  tl.to(S, { envIntensity: 0.16, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
+  tl.to(S, { ignition: 0.24, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
 
   // The object withdraws into depth and drops out of the type's way.
   // Raising the look-at target pushes it into the lower third rather than
@@ -273,7 +273,7 @@ export function buildCinematic(cut: CutId): DirectorHandle {
     {
       radius: 16,
       phi: 0.1,
-      targetY: 0.62,
+      targetY: 0.9,
       theta: `+=${Math.PI * 0.1}`,
       fov: 26,
       handheld: 0.3,
