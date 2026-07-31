@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { NOISE_GLSL } from '../shaders/noise'
 import { S } from '../../sequence/stageState'
@@ -75,7 +76,7 @@ export function Die() {
       new THREE.MeshStandardMaterial({
         color: new THREE.Color('#161f2d'),
         metalness: 1,
-        roughness: 0.16,
+        roughness: 0.22,
         envMapIntensity: 3,
       }),
     [],
@@ -130,10 +131,15 @@ export function Die() {
 
   return (
     <group ref={group} visible={false}>
-      {/* Machined casing — dark, sharp specular, reads as a milled part. */}
-      <mesh material={shellMaterial}>
-        <boxGeometry args={[DIE_SIZE, DIE_SIZE * 0.34, DIE_SIZE]} />
-      </mesh>
+      {/* Machined casing. Chamfered rather than a hard box — a raw cube
+          edge is the most obviously synthetic shape there is, and the
+          chamfer gives a highlight line that reads as milled metal. */}
+      <RoundedBox
+        args={[DIE_SIZE, DIE_SIZE * 0.34, DIE_SIZE]}
+        radius={DIE_SIZE * 0.045}
+        smoothness={4}
+        material={shellMaterial}
+      />
 
       {/* The lit face of the die. A surface rather than a volume — a glowing
           box at this scale just becomes a white blob under bloom. */}

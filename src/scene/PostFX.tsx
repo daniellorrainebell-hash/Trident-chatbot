@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import {
   Bloom,
   ChromaticAberration,
+  DepthOfField,
   EffectComposer,
   Noise,
   Vignette,
@@ -51,6 +52,22 @@ export function PostFX() {
        leaking its edge-detection buffer through as the final image; MSAA is
        one buffer setting and cannot fail that way. */
     <EffectComposer multisampling={tier.msaa}>
+      {/* Depth of field. The single strongest cue separating a cinematic
+          render from a 1990s one: old hardware could not defocus, so
+          everything-in-focus reads as retro no matter what is being drawn.
+          Focus is pinned to the die, so the near and far layers of the stack
+          fall away and the object gains real physical depth. */}
+      {tier.dof ? (
+        <DepthOfField
+          target={[0, 0, 0]}
+          focalLength={0.055}
+          bokehScale={1.9}
+          height={tier.id === 'A' ? 700 : 440}
+        />
+      ) : (
+        <></>
+      )}
+
       <Bloom
         ref={bloom as never}
         intensity={0.5}

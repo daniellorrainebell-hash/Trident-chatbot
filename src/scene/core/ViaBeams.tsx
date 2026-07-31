@@ -47,7 +47,7 @@ void main() {
   // stopping dead at a hard edge.
   float taper = smoothstep(0.0, 0.12, vUv.y) * smoothstep(1.0, 0.88, vUv.y);
 
-  float a = (0.012 + pulse * 1.15) * uEnergy * taper;
+  float a = (0.008 + pulse * 0.8) * uEnergy * taper;
   if (a <= 0.002) discard;
 
   gl_FragColor = vec4(mix(uColor, uHot, pulse), a);

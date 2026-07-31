@@ -40,7 +40,7 @@ export function Studio() {
         {/* Key — broad, soft, above and slightly forward. */}
         <Lightformer
           form="rect"
-          intensity={0.85}
+          intensity={1.5}
           color="#dbeaff"
           scale={[7, 3.5, 1]}
           position={[0, 5.5, 2.5]}
@@ -78,11 +78,23 @@ export function Studio() {
         {/* A whisper of bounce from below so the underside isn't dead black. */}
         <Lightformer
           form="rect"
-          intensity={0.5}
+          intensity={0.75}
           color="#14304d"
           scale={[6, 3, 1]}
           position={[0, -4, 1]}
           rotation={[Math.PI / 2, 0, 0]}
+        />
+
+        {/* A broad soft wash purely for the copper to reflect. Polished metal
+            renders as an image of its surroundings, so with nothing around it
+            it just reads black however bright the scene is. */}
+        <Lightformer
+          form="rect"
+          intensity={1.1}
+          color="#8fbfe8"
+          scale={[9, 9, 1]}
+          position={[0, 3.2, -1.5]}
+          rotation={[-Math.PI / 3, 0, 0]}
         />
       </group>
     </Environment>

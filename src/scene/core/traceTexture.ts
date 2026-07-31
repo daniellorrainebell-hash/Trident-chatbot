@@ -100,7 +100,7 @@ function polylineLength(pts: Pt[]) {
 }
 
 export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture {
-  const size = opts.size ?? 1024
+  const size = opts.size ?? 2048
   const grid = opts.grid ?? 40
   // Per quadrant — the drawn total is four times this.
   const netCount = opts.nets ?? 7
@@ -162,57 +162,93 @@ export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture
 
     // Per-net phase offset, so pulses on different nets never march in step.
     const phase = rand()
-    const width = rand() < 0.22 ? 5.5 : 3.2
+    // Wider than a real board's ratio on purpose: a hairline trace does
+    // not survive minification, and a broken-up trace reads as beads.
+    const width = (rand() < 0.22 ? 8.5 : 5.4) * (size / 1024)
     const viaIndex = rand() < 0.5 && pts.length > 3
       ? 1 + Math.floor(rand() * (pts.length - 2))
       : -1
 
     for (let k = 0; k < 4; k++) {
-    let travelled = 0
-    for (let i = 1; i < pts.length; i++) {
-      const a = rot(pts[i - 1], k)
-      const b = rot(pts[i], k)
-      const segLen = Math.hypot(b.x - a.x, b.y - a.y)
+      let travelled = 0
 
-      // Subdivide so the progress channel varies smoothly along the run.
-      const steps = Math.max(2, Math.ceil(segLen / 12))
-      for (let s = 0; s < steps; s++) {
-        const t0 = s / steps
-        const t1 = (s + 1) / steps
-        const p0 = { x: a.x + (b.x - a.x) * t0, y: a.y + (b.y - a.y) * t0 }
-        const p1 = { x: a.x + (b.x - a.x) * t1, y: a.y + (b.y - a.y) * t1 }
+      for (let i = 1; i < pts.length; i++) {
+        const a = rot(pts[i - 1], k)
+        const b = rot(pts[i], k)
+        const segLen = Math.hypot(b.x - a.x, b.y - a.y)
+        if (segLen < 0.5) continue
 
-        const progress = (travelled + segLen * t1) / total
-        const g = Math.round((((progress + phase) % 1) * 255))
+        const p0 = travelled / total
+        const p1 = (travelled + segLen) / total
+        travelled += segLen
 
-        ctx.strokeStyle = `rgb(255, ${g}, 0)`
-        ctx.lineWidth = width
-        ctx.beginPath()
-        ctx.moveTo(p0.x, p0.y)
-        ctx.lineTo(p1.x, p1.y)
-        ctx.stroke()
+        /**
+         * Stroke the whole run in one pass with a gradient carrying the
+         * progress value, rather than as a chain of short constant-value
+         * strokes.
+         *
+         * Short strokes fail two ways at once: with round caps, any segment
+         * shorter than its own width renders as a dot, and a constant value
+         * per segment quantises the progress channel into visible blocks, so
+         * the charge moves along the trace in steps instead of flowing.
+         */
+        const drawRun = (
+          from: Pt,
+          to: Pt,
+          gFrom: number,
+          gTo: number,
+        ) => {
+          const grad = ctx.createLinearGradient(from.x, from.y, to.x, to.y)
+          grad.addColorStop(0, `rgb(255, ${Math.round(gFrom * 255)}, 0)`)
+          grad.addColorStop(1, `rgb(255, ${Math.round(gTo * 255)}, 0)`)
+          ctx.strokeStyle = grad
+          ctx.lineWidth = width
+          ctx.beginPath()
+          ctx.moveTo(from.x, from.y)
+          ctx.lineTo(to.x, to.y)
+          ctx.stroke()
+        }
+
+        const g0 = (p0 + phase) % 1
+        const g1raw = p1 + phase
+        const g1 = g1raw % 1
+
+        if (g1 >= g0) {
+          drawRun(a, b, g0, g1)
+        } else {
+          // The value wraps inside this run. Split it at the wrap point so
+          // the gradient never sweeps backwards through the whole range.
+          const t = (1 - g0) / (g1raw - Math.floor(g1raw) + (1 - g0))
+          const mid = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }
+          drawRun(a, mid, g0, 1)
+          drawRun(mid, b, 0, g1)
+        }
       }
-      travelled += segLen
-    }
 
-    // Termination pad at the edge, and a via where the net reaches the die.
-    const drawNode = (p: Pt, r: number) => {
-      ctx.fillStyle = 'rgb(255,255,255)'
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
-      ctx.fill()
-    }
-    drawNode(rot(pts[0], k), width * 1.9)
-    drawNode(rot(pts[pts.length - 1], k), width * 1.5)
+      // Termination pad at the edge, and a via where the net reaches the die.
+      const drawNode = (p: Pt, r: number) => {
+        ctx.fillStyle = 'rgb(255,255,255)'
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
+        ctx.fill()
+      }
 
-    // Occasional inline via — the detail that says "this board has layers".
-    if (viaIndex >= 0) drawNode(rot(pts[viaIndex], k), width * 1.3)
+      // Pads stay close to the trace width. Oversized ones read as lumps
+      // strung along the routing rather than as terminations.
+      drawNode(rot(pts[0], k), width * 1.15)
+      drawNode(rot(pts[pts.length - 1], k), width * 0.95)
+
+      // Occasional inline via — the detail that says "this board has layers".
+      if (viaIndex >= 0) drawNode(rot(pts[viaIndex], k), width * 0.85)
     }
   }
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.NoColorSpace
-  texture.anisotropy = 4
+  texture.anisotropy = 16
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.generateMipmaps = true
   texture.needsUpdate = true
   return texture
 }
