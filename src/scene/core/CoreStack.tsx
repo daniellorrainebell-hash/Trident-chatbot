@@ -3,11 +3,13 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { SERVICES } from '../../config/brand'
 import { useExperience } from '../../state/useExperience'
-import { LAYER_Y, WAFER_SIZE } from '../layout'
+import { DIE_Y, LAYER_Y, WAFER_SIZE } from '../layout'
 import { Wafer } from './Wafer'
 import { Die } from './Die'
 import { Packet } from '../flow/Packet'
 import { ViaBeams } from './ViaBeams'
+import { Components } from './Components'
+import { Bokeh } from '../fx/Bokeh'
 
 /**
  * The Living Intelligence Core: a stack of glass circuit wafers around a
@@ -48,6 +50,11 @@ export function CoreStack() {
       {SERVICES.map((service, i) => (
         <group key={service.id} onPointerDown={tapLayer(i)}>
           <Wafer index={i} y={LAYER_Y[i]} seed={1471 + i * 977} accent={service.accent} />
+          {/* Parts sitting on the board. Without volume on the surface, a
+              board is only a drawing of a board. */}
+          <group position={[0, LAYER_Y[i] + 0.022, 0]}>
+            <Components index={i} seed={5501 + i * 613} accent={service.accent} />
+          </group>
           {/* An invisible slab per layer, so tapping a wafer in interactive
               mode has something with real thickness to hit. Copper alone is
               thin lines and nearly impossible to hit on a phone. */}
@@ -56,11 +63,14 @@ export function CoreStack() {
           </mesh>
         </group>
       ))}
-      <Die />
+      <group position={[0, DIE_Y, 0]}>
+        <Die />
+      </group>
       <ViaBeams />
       {/* Inside the rotating group: the signal has to travel the board, not
           across a board that is turning underneath it. */}
       <Packet />
+      <Bokeh />
     </group>
   )
 }

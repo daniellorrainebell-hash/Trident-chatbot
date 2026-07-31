@@ -55,12 +55,12 @@ void main() {
   float fres = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.0);
 
   vec3 col = mix(uDeep, uMid, smoothstep(0.15, 0.55, e));
-  col = mix(col, uHot, smoothstep(0.62, 1.0, e + uPulse * 0.35));
+  col = mix(col, uHot, smoothstep(0.35, 0.9, e + uPulse * 0.35));
 
-  // Kept deliberately low. Viewed straight down, a bright emissive face on
-  // a flat chip blows out and washes the top plate's circuitry away — and
-  // the circuitry is the thing worth looking at.
-  float a = (e * 0.2 + fres * 0.16) * uIgnition * (0.5 + uPulse * 0.6);
+  // The die is the hero. Bright, but weighted toward the fresnel so the
+  // brightness collects at the edges of the face rather than blowing out
+  // as one flat disc in the middle.
+  float a = (0.35 + e * 0.95 + fres * 0.7) * uIgnition * (0.85 + uPulse * 0.7);
   if (a <= 0.002) discard;
   gl_FragColor = vec4(col * (1.0 + uPulse * 0.5), a);
 }
@@ -125,8 +125,8 @@ export function Die() {
     }
 
     shellMaterial.envMapIntensity = 2.4 + ignition * 1.6
-    seamMaterial.opacity = ignition * (0.35 + S.pulse * 0.5 + S.confirm * 0.7)
-    if (light.current) light.current.intensity = (0.5 + S.pulse * 2.2 + S.confirm * 3) * ignition
+    seamMaterial.opacity = ignition * (1.0 + S.pulse * 0.7 + S.confirm * 0.9)
+    if (light.current) light.current.intensity = (1.6 + S.pulse * 3 + S.confirm * 4) * ignition
   })
 
   return (
@@ -135,7 +135,7 @@ export function Die() {
           edge is the most obviously synthetic shape there is, and the
           chamfer gives a highlight line that reads as milled metal. */}
       <RoundedBox
-        args={[DIE_SIZE, DIE_SIZE * 0.34, DIE_SIZE]}
+        args={[DIE_SIZE, DIE_SIZE * 0.3, DIE_SIZE]}
         radius={DIE_SIZE * 0.045}
         smoothness={4}
         material={shellMaterial}
@@ -143,8 +143,8 @@ export function Die() {
 
       {/* The lit face of the die. A surface rather than a volume — a glowing
           box at this scale just becomes a white blob under bloom. */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, DIE_SIZE * 0.172, 0]}>
-        <planeGeometry args={[DIE_SIZE * 0.74, DIE_SIZE * 0.74]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, DIE_SIZE * 0.153, 0]}>
+        <planeGeometry args={[DIE_SIZE * 0.82, DIE_SIZE * 0.82]} />
         <shaderMaterial
           ref={mat}
           vertexShader={vert}
@@ -160,7 +160,7 @@ export function Die() {
       {/* A hairline seam around the casing — the detail that says the light
           is coming from inside a machined part. */}
       <mesh material={seamMaterial}>
-        <boxGeometry args={[DIE_SIZE * 1.02, DIE_SIZE * 0.06, DIE_SIZE * 1.02]} />
+        <boxGeometry args={[DIE_SIZE * 1.03, DIE_SIZE * 0.05, DIE_SIZE * 1.03]} />
       </mesh>
 
       <pointLight ref={light} color="#7fd8ff" distance={4} decay={2} intensity={0} />

@@ -70,8 +70,8 @@ export function PostFX() {
 
       <Bloom
         ref={bloom as never}
-        intensity={0.5}
-        luminanceThreshold={0.85}
+        intensity={0.85}
+        luminanceThreshold={0.62}
         luminanceSmoothing={0.22}
         mipmapBlur
         kernelSize={KernelSize.MEDIUM}

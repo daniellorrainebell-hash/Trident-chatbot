@@ -82,7 +82,7 @@ export const createStageState = (): StageState => ({
   packetGain: 0,
   confirm: 0,
   recede: 0,
-  bloom: 0.5,
+  bloom: 0.85,
   vignette: 0.55,
   envIntensity: 0,
   cam: {

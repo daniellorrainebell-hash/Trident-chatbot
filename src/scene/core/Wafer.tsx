@@ -80,7 +80,7 @@ export function Wafer({
   const group = useRef<THREE.Group>(null)
 
   const traces = useMemo(
-    () => createTraceTexture({ seed, nets: 4 + (index % 3), grid: 30 + index * 2 }),
+    () => createTraceTexture({ seed, nets: 5 + (index % 2), grid: 34 + index * 3 }),
     [seed, index],
   )
 
@@ -192,9 +192,13 @@ export function Wafer({
           float wave = smoothstep(0.09, 0.0, abs(rad - uWave)) * step(0.001, uWave);
 
           float lit = uEnergy;
+          // A continuous base glow under the travelling charge. The metal
+          // beneath still does the shading, so this reads as lit copper
+          // rather than a line drawn in light.
+          float base = 0.16 + lit * 0.85;
           totalEmissiveRadiance +=
-              uAccent * (charge * 3.4 * lit + spark * 1.4 * lit + uFlare * 0.8)
-            + vec3(0.82, 0.93, 1.0) * wave * 3.0;
+              uAccent * (base + charge * 3.2 * lit + spark * 1.6 * lit + uFlare * 1.0)
+            + vec3(0.82, 0.93, 1.0) * wave * 3.2;
           `,
         )
     }

@@ -164,7 +164,7 @@ export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture
     const phase = rand()
     // Wider than a real board's ratio on purpose: a hairline trace does
     // not survive minification, and a broken-up trace reads as beads.
-    const width = (rand() < 0.22 ? 8.5 : 5.4) * (size / 1024)
+    const width = (rand() < 0.22 ? 5.4 : 3.4) * (size / 1024)
     const viaIndex = rand() < 0.5 && pts.length > 3
       ? 1 + Math.floor(rand() * (pts.length - 2))
       : -1

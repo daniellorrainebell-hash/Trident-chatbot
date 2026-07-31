@@ -259,7 +259,7 @@ export function buildCinematic(cut: CutId): DirectorHandle {
      ══════════════════════════════════════════════════════════════ */
 
   tl.to(S, { recede: 1, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
-  tl.to(S, { bloom: 0.3, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
+  tl.to(S, { bloom: 0.5, duration: B.recede.dur, ease: 'power2.inOut' }, B.recede.at)
   tl.to(S, { vignette: 1.05, duration: B.recede.dur * 1.3, ease: 'power2.inOut' }, B.recede.at)
   // Dim the world right down. The object has to stop competing with the
   // lockup — on the payoff frame the type is the subject, not the core.
@@ -330,7 +330,7 @@ export function enterInteractive() {
     ringSpeed: 1,
     systems: 1,
     recede: 0,
-    bloom: 0.5,
+    bloom: 0.85,
     vignette: 0.62,
     envIntensity: 1,
     duration: 1.4,

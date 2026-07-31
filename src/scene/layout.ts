@@ -15,10 +15,10 @@ export const WAFER_SIZE = 1.5
 export const WAFER_CORNER = 0.12
 
 /** Vertical gap between layers. Wide enough to read as separate plates. */
-export const LAYER_GAP = 0.19
+export const LAYER_GAP = 0.25
 
 /** The die at the centre of the stack. */
-export const DIE_SIZE = 0.2
+export const DIE_SIZE = 0.3
 
 /** Which layer each service occupies, top to bottom. */
 export const LAYER_Y = SERVICES.map(
@@ -27,6 +27,14 @@ export const LAYER_Y = SERVICES.map(
 
 /** Total height of the assembled stack. */
 export const STACK_HEIGHT = (SERVICES.length - 1) * LAYER_GAP
+
+/**
+ * The die sits *on top of* the stack, the way a processor is mounted on a
+ * board, rather than buried in the middle of it. At the raised camera
+ * angles this piece uses, a die inside the stack is permanently occluded by
+ * the layers above it — and it is meant to be the hero of the frame.
+ */
+export const DIE_Y = LAYER_Y[0] + 0.055
 
 /**
  * The workflow path — the route a real enquiry travels.
@@ -40,9 +48,12 @@ export function buildWorkflowCurve() {
   const pts: THREE.Vector3[] = []
   const reach = WAFER_SIZE * 0.42
 
-  // Arrives from beyond the top layer.
-  pts.push(new THREE.Vector3(-reach * 2.4, LAYER_Y[0] + 0.5, reach * 1.1))
+  // Arrives from beyond the board and lands on the processor.
+  pts.push(new THREE.Vector3(-reach * 2.4, DIE_Y + 0.55, reach * 1.1))
+  pts.push(new THREE.Vector3(-reach * 0.5, DIE_Y + 0.12, reach * 0.3))
+  pts.push(new THREE.Vector3(0, DIE_Y + 0.02, 0))
 
+  // Then propagates down through every layer in turn.
   LAYER_Y.forEach((y, i) => {
     // Alternate which side each layer is entered from, so the descent reads
     // as routing rather than a straight drop.
@@ -55,9 +66,8 @@ export function buildWorkflowCurve() {
     pts.push(new THREE.Vector3(reach * 0.18 * side, y + lift, -reach * 0.12 * side))
   })
 
-  // Lands in the die.
-  pts.push(new THREE.Vector3(0, LAYER_Y[LAYER_Y.length - 1] - 0.05, 0))
-  pts.push(new THREE.Vector3(0, 0, 0))
+  // Settles at the base of the stack.
+  pts.push(new THREE.Vector3(0, LAYER_Y[LAYER_Y.length - 1] - 0.04, 0))
 
   return new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.12)
 }
