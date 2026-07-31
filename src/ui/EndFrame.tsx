@@ -19,38 +19,55 @@ export function EndFrame() {
 
   const { person, role, mobile, office, website, websiteUrl } = COPY.end
   const lines = [
-    mobile && { key: 'mobile', value: mobile, href: `tel:${mobile.replace(/\s+/g, '')}` },
-    office && { key: 'office', value: office, href: `tel:${office.replace(/\s+/g, '')}` },
+    mobile && {
+      key: 'mobile',
+      label: 'Mobile',
+      value: mobile,
+      href: `tel:${mobile.replace(/\s+/g, '')}`,
+    },
+    office && {
+      key: 'office',
+      label: 'Office',
+      value: office,
+      href: `tel:${office.replace(/\s+/g, '')}`,
+    },
     website && {
       key: 'web',
+      label: 'Web',
       value: website.replace(/^https?:\/\//, ''),
       // The displayed address stays clean; the link keeps the www host the
       // brand actually publishes, which is the one guaranteed to resolve.
       href: websiteUrl || (website.startsWith('http') ? website : `https://${website}`),
     },
-  ].filter(Boolean) as { key: string; value: string; href: string }[]
+  ].filter(Boolean) as { key: string; label: string; value: string; href: string }[]
 
   return (
     <div className="endframe chrome" data-hidden={uiHidden}>
       <img className="endframe__logo" src={LOGO_SRC} alt="Nexus IQ Systems" draggable={false} />
 
-      <div className="endframe__statement statement">{COPY.statement}</div>
+      <div className="endframe__statement">
+        {COPY.statement}{' '}
+        <span className="endframe__statement-accent">{COPY.statementAccent}</span>
+      </div>
 
       <div className="endframe__divider" />
 
       <div className="endframe__contact">
         <div className="endframe__name">{person}</div>
         <div className="endframe__role">{role}</div>
-        {lines.map((l) => (
-          <a
-            key={l.key}
-            className="endframe__line"
-            href={l.href}
-            style={{ color: 'inherit', textDecoration: 'none', pointerEvents: 'auto' }}
-          >
-            {l.value}
-          </a>
-        ))}
+
+        {/* Labelled rows rather than a stack of bare numbers: on a payoff
+            frame the label is what tells someone which one to call. */}
+        <div className="endframe__rows">
+          {lines.map((l) => (
+            <div className="endframe__row" key={l.key}>
+              <span className="endframe__label">{l.label}</span>
+              <a className="endframe__line" href={l.href}>
+                {l.value}
+              </a>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -23,13 +23,17 @@ export const SERVICES = [
   {
     id: 'voice',
     label: 'AI Voice Receptionists',
+    eyebrow: 'Always answered',
+    status: 'Call answered · Nothing missed',
     summary: 'Answers every call, day or night, in your brand’s voice.',
     glyph: 'voice',
     accent: '#7fdcff',
   },
   {
     id: 'speed',
-    label: 'Speed to Lead Agents',
+    label: 'Speed to Lead',
+    eyebrow: 'Immediate response',
+    status: 'Lead contacted · No delay',
     summary: 'Responds to new enquiries in seconds, not hours.',
     glyph: 'speed',
     accent: '#5cc8ff',
@@ -37,6 +41,8 @@ export const SERVICES = [
   {
     id: 'chat',
     label: 'Intelligent Chatbots',
+    eyebrow: 'Intelligent support',
+    status: 'Enquiry qualified · Next step opened',
     summary: 'Qualifies, books and routes without a human touch.',
     glyph: 'chat',
     accent: '#8ae8ff',
@@ -44,6 +50,8 @@ export const SERVICES = [
   {
     id: 'reputation',
     label: 'Reputation Management',
+    eyebrow: 'Customer follow-up',
+    status: 'Review request scheduled · Relationship continued',
     summary: 'Requests, monitors and protects your reviews automatically.',
     glyph: 'reputation',
     accent: '#6ad6ff',
@@ -51,6 +59,8 @@ export const SERVICES = [
   {
     id: 'automation',
     label: 'Custom Automation',
+    eyebrow: 'Built around you',
+    status: 'Systems connected · Work handled',
     summary: 'Connects the systems your business already runs on.',
     glyph: 'automation',
     accent: '#4fb8ff',
@@ -61,6 +71,8 @@ export type ServiceId = (typeof SERVICES)[number]['id']
 
 /** On-screen captions. Keep these short — the restraint is the point. */
 export const COPY = {
+  /** Sits top-right through the whole film, beside the mark. */
+  tagline: 'Custom AI systems',
   start: {
     cta: 'Initialise Nexus Intelligence',
     secondary: 'Explore interactively',
@@ -69,7 +81,10 @@ export const COPY = {
   workflowClose: 'Working when your team logs off',
   // Matches the wording on the business card rather than my own phrasing —
   // "Custom built AI systems" is how the brand already says it.
-  statement: 'Custom built AI systems.\nDesigned around your business.',
+  /* Split so the second half can carry the accent colour, the way the
+     strongest line in a brand film usually does. */
+  statement: 'Making businesses respond faster,',
+  statementAccent: 'convert more and run smarter.',
   end: {
     person: 'Daniel Bell',
     role: 'Founder, Nexus IQ Systems',

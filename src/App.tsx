@@ -8,6 +8,7 @@ import { CinematicLogo } from './ui/CinematicLogo'
 import { Caption } from './ui/Caption'
 import { EndFrame } from './ui/EndFrame'
 import { Controls, RecordingHint } from './ui/Controls'
+import { BrandFrame } from './ui/BrandFrame'
 import { ServiceSheet } from './ui/ServiceSheet'
 import { useStageGestures } from './ui/useStageGestures'
 import { useExperience } from './state/useExperience'
@@ -79,6 +80,10 @@ export default function App() {
     workflow.current?.kill()
     workflow.current = playWorkflowOnce()
   }, [])
+
+  /** Read straight off the director's timeline — the brand frame's progress
+   *  bar must track the sequence, not run a clock of its own. */
+  const getProgress = useCallback(() => director.current?.timeline.progress() ?? 0, [])
 
   const replay = useCallback(() => {
     startCinematic(useExperience.getState().cut)
@@ -152,6 +157,7 @@ export default function App() {
         <Stage />
 
         <CinematicLogo />
+        <BrandFrame getProgress={getProgress} />
         <Caption />
         <EndFrame />
         <ServiceSheet />

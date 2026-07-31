@@ -100,12 +100,12 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(
     S.cam,
     {
-      radius: 4.6,
+      radius: 3.6,
       // Held square to the lens. Any azimuth away from zero breaks the
       // four-fold symmetry the board is built around.
       theta: 0,
-      phi: 0.34,
-      targetY: -0.3,
+      phi: 0.3,
+      targetY: -0.18,
       duration: B.coreCaption.at - B.ignite.at,
       ease: 'power2.inOut',
     },
@@ -120,7 +120,7 @@ export function buildCinematic(cut: CutId): DirectorHandle {
 
   tl.to(
     S.cam,
-    { radius: 6.6, phi: 0.42, targetY: -0.38, duration: B.systemsReveal.dur * 1.6, ease: 'power2.inOut' },
+    { radius: 4.9, phi: 0.4, targetY: -0.24, duration: B.systemsReveal.dur * 1.6, ease: 'power2.inOut' },
     B.systemsReveal.at,
   )
 
@@ -133,8 +133,8 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(
     S.cam,
     {
-      phi: 0.64,
-      radius: 5.9,
+      phi: 0.6,
+      radius: 4.5,
       duration: lastSubEnd - B.subFirst + 1.2,
       ease: 'sine.inOut',
     },
@@ -160,7 +160,9 @@ export function buildCinematic(cut: CutId): DirectorHandle {
     tl.set(S.wave, { [i]: 0 }, at + B.subDur * 1.15)
     caption(tl, at + 0.35, B.captionHold, {
       key: `svc-${service.id}`,
+      eyebrow: service.eyebrow,
       text: service.label,
+      status: service.status,
       variant: 'service',
       index: i,
     })
@@ -192,9 +194,9 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(
     S.cam,
     {
-      radius: 6.2,
-      phi: 0.2,
-      targetY: -0.2,
+      radius: 4.1,
+      phi: 0.18,
+      targetY: -0.12,
       fov: 27,
       duration: B.packet.dur * 0.55,
       ease: 'power2.inOut',
@@ -203,7 +205,7 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   )
   tl.to(
     S.cam,
-    { radius: 6.8, phi: 0.38, targetY: -0.3, fov: 30, duration: B.packet.dur * 0.5, ease: 'power2.inOut' },
+    { radius: 4.8, phi: 0.36, targetY: -0.2, fov: 30, duration: B.packet.dur * 0.5, ease: 'power2.inOut' },
     B.packet.at + B.packet.dur * 0.55,
   )
 
@@ -272,7 +274,7 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(
     S.cam,
     {
-      radius: 12,
+      radius: 10,
       phi: 0.34,
       targetY: 0.9,
       fov: 26,
@@ -343,9 +345,9 @@ export function enterInteractive() {
   })
 
   gsap.to(S.cam, {
-    radius: 6.6,
+    radius: 5.0,
     theta: 0,
-    phi: 0.5,
+    phi: 0.48,
     targetY: -0.34,
     fov: 30,
     handheld: 0.55,

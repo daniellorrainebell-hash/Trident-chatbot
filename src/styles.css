@@ -488,74 +488,178 @@ body {
   box-shadow: inset 0 1px 0 rgba(200, 238, 255, 0.2);
 }
 
-/* ── Caption layer ───────────────────────────────────────────────── */
+/* ── Brand frame ─────────────────────────────────────────────────
+   Held for the entire film. A 3D scene with titles on it is not a brand
+   film; most of the running time carried no brand at all before this.  */
+
+.brandframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 18;
+  pointer-events: none;
+  transition: opacity 500ms var(--ease);
+}
+
+.brandframe[data-hidden='true'] {
+  opacity: 0;
+}
+
+.brandframe__progress {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.brandframe__progress-fill {
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+  box-shadow: 0 0 12px rgba(127, 216, 255, 0.5);
+  will-change: transform;
+}
+
+.brandframe__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4cqw;
+  padding: 5cqw 6cqw 0;
+}
+
+.brandframe__mark {
+  width: 34cqw;
+  max-width: 190px;
+  height: auto;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 18px rgba(70, 160, 230, 0.3));
+}
+
+.brandframe__tagline {
+  font-family: var(--font-display);
+  font-size: clamp(8px, 2.4cqw, 12px);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--ink-faint);
+  text-align: right;
+  text-shadow: var(--glow-faint);
+}
+
+/* ── Caption layer ───────────────────────────────────────────────
+   Lower left, three tiers. Centred tracked uppercase was safe and read
+   as timid — it neither commanded the frame nor said anything.        */
 
 .caption {
   position: absolute;
   left: 0;
   right: 0;
-  /* Sits clear of the control cluster, which can be two tiers tall. */
-  bottom: 21cqh;
-  display: grid;
-  justify-items: center;
-  gap: 2.4cqw;
-  text-align: center;
-  padding: 0 9cqw;
+  bottom: 15cqh;
+  display: flex;
+  align-items: flex-start;
+  gap: 4cqw;
+  padding: 0 7cqw;
   z-index: 10;
+  text-align: left;
 }
 
-.caption__rule {
-  width: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  animation: rule-in 900ms var(--ease-out) forwards;
+.caption--out {
+  animation: caption-out 460ms var(--ease) both;
 }
 
-@keyframes rule-in {
+@keyframes caption-out {
   to {
-    width: 12cqw;
+    opacity: 0;
+    transform: translateY(-6px);
+    filter: blur(4px);
   }
 }
 
-.caption__text {
-  animation: caption-in 900ms var(--ease-out) both;
+/* The step marker runs vertically up the left edge, which keeps it out of
+   the text's way while still counting the sequence. */
+.caption__step {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-display);
+  font-size: clamp(8px, 2.3cqw, 11px);
+  letter-spacing: 0.3em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  opacity: 0.8;
+  padding-top: 1cqw;
+  text-shadow: var(--glow-faint);
+  animation: caption-in 700ms var(--ease-out) both;
 }
 
-.caption--out .caption__text {
-  animation: caption-out 500ms var(--ease) both;
+.caption__step-total {
+  color: var(--ink-faint);
+}
+
+.caption__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2cqw;
+  min-width: 0;
+}
+
+.caption__eyebrow {
+  font-family: var(--font-display);
+  font-size: clamp(9px, 2.6cqw, 13px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--ink-faint);
+  text-shadow: var(--glow-faint);
+  animation: caption-in 700ms var(--ease-out) both;
+}
+
+/* The line that has to read at a glance while someone is scrolling. */
+.caption__name {
+  font-family: var(--font-body);
+  font-size: clamp(30px, 10cqw, 58px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  text-wrap: balance;
+  text-shadow: var(--glow-soft);
+  animation: caption-in 800ms var(--ease-out) 60ms both;
+}
+
+.caption__headline {
+  font-family: var(--font-body);
+  font-size: clamp(22px, 7.4cqw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  text-wrap: balance;
+  text-shadow: var(--glow-soft);
+  animation: caption-in 800ms var(--ease-out) 60ms both;
+}
+
+.caption__status {
+  font-family: var(--font-display);
+  font-size: clamp(9px, 2.7cqw, 13px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: rgba(234, 242, 251, 0.8);
+  text-shadow: var(--glow-faint);
+  animation: caption-in 800ms var(--ease-out) 160ms both;
 }
 
 @keyframes caption-in {
   from {
     opacity: 0;
-    transform: translateY(9px);
-    letter-spacing: 0.34em;
-    filter: blur(5px);
+    transform: translateY(14px);
+    filter: blur(6px);
   }
   to {
     opacity: 1;
     transform: none;
     filter: blur(0);
   }
-}
-
-@keyframes caption-out {
-  to {
-    opacity: 0;
-    transform: translateY(-5px);
-    filter: blur(4px);
-  }
-}
-
-.caption__index {
-  font-family: var(--font-display);
-  font-size: clamp(8px, 2.3cqw, 11px);
-  letter-spacing: 0.34em;
-  font-weight: 400;
-  color: var(--accent);
-  opacity: 0.72;
-  font-variant-numeric: tabular-nums;
-  text-shadow: var(--glow-faint);
 }
 
 /* ── End frame ───────────────────────────────────────────────────── */
@@ -568,10 +672,10 @@ body {
      one tight, centred lockup. */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 10cqw 9cqw;
-  text-align: center;
+  padding: 10cqw 8cqw;
+  text-align: left;
   z-index: 20;
 }
 
@@ -591,7 +695,7 @@ body {
 }
 
 .endframe__logo {
-  width: 64cqw;
+  width: 72cqw;
   max-width: 350px;
   height: auto;
   opacity: 0;
@@ -613,14 +717,26 @@ body {
 }
 
 .endframe__statement {
-  margin-top: 6cqw;
-  max-width: 78cqw;
+  font-family: var(--font-body);
+  font-size: clamp(24px, 8.2cqw, 46px);
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  line-height: 1.12;
+  margin-top: 7cqw;
+  text-wrap: balance;
+  text-shadow: var(--glow-soft);
   opacity: 0;
-  animation: fade-up 1200ms var(--ease-out) 1000ms forwards;
+  animation: fade-up 1200ms var(--ease-out) 900ms forwards;
+}
+
+/* The accent lands on the half of the sentence that carries the promise. */
+.endframe__statement-accent {
+  color: var(--accent);
+  text-shadow: var(--glow-strong);
 }
 
 .endframe__divider {
-  width: 14cqw;
+  width: 100%;
   height: 1px;
   flex: none;
   background: linear-gradient(90deg, transparent, var(--hairline), transparent);
@@ -632,18 +748,18 @@ body {
 .endframe__contact {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1.8cqw;
+  align-items: flex-start;
+  width: 100%;
+  gap: 1.6cqw;
   opacity: 0;
   animation: fade-up 1200ms var(--ease-out) 2100ms forwards;
 }
 
 .endframe__name {
-  font-family: var(--font-display);
-  font-size: clamp(13px, 4cqw, 22px);
-  letter-spacing: 0.2em;
-  font-weight: 300;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: clamp(15px, 4.6cqw, 26px);
+  letter-spacing: -0.005em;
+  font-weight: 700;
   text-shadow: var(--glow-soft);
 }
 
@@ -658,6 +774,30 @@ body {
   text-shadow: var(--glow-faint);
 }
 
+.endframe__rows {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1.4cqw;
+  margin-top: 2cqw;
+}
+
+.endframe__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6cqw;
+  width: 100%;
+}
+
+.endframe__label {
+  font-family: var(--font-display);
+  font-size: clamp(8px, 2.4cqw, 12px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
 .endframe__line {
   font-family: var(--font-body);
   font-size: clamp(11px, 3.4cqw, 17px);
@@ -666,6 +806,8 @@ body {
   color: rgba(234, 242, 251, 0.72);
   font-variant-numeric: tabular-nums;
   text-shadow: var(--glow-faint);
+  text-decoration: none;
+  pointer-events: auto;
   transition: color 300ms var(--ease), text-shadow 300ms var(--ease);
 }
 

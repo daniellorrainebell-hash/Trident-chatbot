@@ -7,8 +7,13 @@ export type Phase = 'boot' | 'ready' | 'cinematic' | 'ended' | 'interactive'
 /** What the caption layer is currently showing. */
 export interface Caption {
   key: string
+  /** The large line — a service name, or a headline. */
   text: string
-  /** 'service' captions get the small index marker; 'statement' is larger. */
+  /** Small tracked line above. */
+  eyebrow?: string
+  /** What the system just did, below. */
+  status?: string
+  /** 'service' captions carry the step marker. */
   variant: 'service' | 'title' | 'statement'
   index?: number
 }
