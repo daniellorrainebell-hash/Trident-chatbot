@@ -11,7 +11,6 @@ export const LOGO_SRC = '/brand/nexus-iq-logo.png'
 export const BRAND = {
   name: 'NEXUS IQ',
   suffix: 'SYSTEMS',
-  productTitle: 'Living Intelligence Core',
 }
 
 /**
@@ -63,12 +62,9 @@ export type ServiceId = (typeof SERVICES)[number]['id']
 /** On-screen captions. Keep these short — the restraint is the point. */
 export const COPY = {
   start: {
-    eyebrow: 'Nexus IQ Systems',
-    title: 'Living Intelligence Core',
     cta: 'Initialise Nexus Intelligence',
     secondary: 'Explore interactively',
   },
-  coreReveal: 'Living Intelligence Core',
   workflowOpen: 'One connected system',
   workflowClose: 'Working when your team logs off',
   // Matches the wording on the business card rather than my own phrasing —

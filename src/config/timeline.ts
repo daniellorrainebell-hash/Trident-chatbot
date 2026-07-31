@@ -49,7 +49,7 @@ export interface Beats {
 }
 
 export const FULL: Beats = {
-  total: 62,
+  total: 59,
 
   motesIn: { at: 0.6, dur: 3.4 },
   logoIn: { at: 3.0, dur: 1.8 },
@@ -65,24 +65,24 @@ export const FULL: Beats = {
   coreCaption: { at: 20.0, dur: 3.4 },
 
   systemsReveal: { at: 24.0, dur: 1.8 },
-  subFirst: 25.6,
-  subStride: 3.3,
-  subDur: 1.4,
+  subFirst: 25.0,
+  subStride: 2.7,
+  subDur: 1.3,
   threadOffset: 0.7,
   threadDur: 1.3,
-  captionHold: 2.5,
-  systemPulse: { at: 41.0, dur: 1.6 },
+  captionHold: 2.2,
+  systemPulse: { at: 39.0, dur: 1.6 },
 
-  workflowCaption: { at: 42.2, dur: 3.0 },
-  packet: { at: 42.9, dur: 9.6 },
-  memoryPulse: { at: 47.4, dur: 1.5 },
-  workflowCaption2: { at: 49.2, dur: 3.2 },
+  workflowCaption: { at: 40.0, dur: 2.8 },
+  packet: { at: 40.6, dur: 9.0 },
+  memoryPulse: { at: 45.0, dur: 1.5 },
+  workflowCaption2: { at: 46.6, dur: 3.0 },
 
-  recede: { at: 54.0, dur: 3.2 },
-  endLogo: { at: 56.2, dur: 1.8 },
-  endStatement: { at: 57.9, dur: 1.6 },
-  endContact: { at: 59.3, dur: 1.6 },
-  controls: 62.4,
+  recede: { at: 51.0, dur: 3.2 },
+  endLogo: { at: 53.2, dur: 1.8 },
+  endStatement: { at: 54.9, dur: 1.6 },
+  endContact: { at: 56.3, dur: 1.6 },
+  controls: 59.4,
 }
 
 export const SHORT: Beats = {

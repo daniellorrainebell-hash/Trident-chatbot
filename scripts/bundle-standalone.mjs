@@ -39,7 +39,7 @@ const inlinedJs = js.split(LOGO_TOKEN).join(logoDataUri)
 // </script> anywhere in the bundle would close the tag early.
 const safeJs = inlinedJs.replace(/<\/script>/gi, '<\\/script>')
 
-const title = 'Nexus IQ — Living Intelligence Core'
+const title = 'Nexus IQ Systems'
 
 const styleTag = `<style>\n${css}\n</style>`
 const scriptTag = `<script type="module">\n${safeJs}\n</script>`

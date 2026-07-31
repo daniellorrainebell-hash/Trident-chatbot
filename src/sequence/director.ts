@@ -101,8 +101,10 @@ export function buildCinematic(cut: CutId): DirectorHandle {
     S.cam,
     {
       radius: 4.6,
-      theta: 0.42,
-      phi: 0.42,
+      // Held square to the lens. Any azimuth away from zero breaks the
+      // four-fold symmetry the board is built around.
+      theta: 0,
+      phi: 0.34,
       targetY: -0.3,
       duration: B.coreCaption.at - B.ignite.at,
       ease: 'power2.inOut',
@@ -112,31 +114,27 @@ export function buildCinematic(cut: CutId): DirectorHandle {
 
   pulse(tl, B.firstPulse.at, B.firstPulse.dur, 1)
 
-  caption(tl, B.coreCaption.at, B.coreCaption.dur, {
-    key: 'core',
-    text: COPY.coreReveal,
-    variant: 'title',
-  })
-
   /* ══════════════════════════════════════════════════════════════
      SEQUENCE C — SERVICE SYSTEMS ACTIVATE
      ══════════════════════════════════════════════════════════════ */
 
   tl.to(
     S.cam,
-    { radius: 6.9, phi: 0.5, targetY: -0.38, duration: B.systemsReveal.dur * 1.6, ease: 'power2.inOut' },
+    { radius: 6.6, phi: 0.42, targetY: -0.38, duration: B.systemsReveal.dur * 1.6, ease: 'power2.inOut' },
     B.systemsReveal.at,
   )
 
   const lastSubEnd = B.subFirst + (SERVICES.length - 1) * B.subStride + B.subDur
 
-  // A continuous lateral orbit through the whole activation run. Each
-  // capsule swings through the compositional sweet spot exactly as it
-  // lights, which is why this reads as choreography rather than a queue.
+  // The camera climbs toward a near top-down hero angle as the layers come
+  // online — a symmetric board is at its most striking seen square-on from
+  // above, and rising into it gives the run somewhere to build to. Azimuth
+  // stays at zero throughout so the symmetry never breaks.
   tl.to(
     S.cam,
     {
-      theta: `+=${Math.PI * 0.34}`,
+      phi: 0.64,
+      radius: 5.9,
       duration: lastSubEnd - B.subFirst + 1.2,
       ease: 'sine.inOut',
     },
@@ -151,6 +149,15 @@ export function buildCinematic(cut: CutId): DirectorHandle {
       { [i]: 1, duration: B.subDur, ease: 'power2.out' },
       at,
     )
+    // A charge front sweeping out from the die to the edge of the layer.
+    // Runs past 1 so it clears the corners rather than stopping at them.
+    tl.fromTo(
+      S.wave,
+      { [i]: 0.001 },
+      { [i]: 1.45, duration: B.subDur * 1.15, ease: 'power2.out' },
+      at,
+    )
+    tl.set(S.wave, { [i]: 0 }, at + B.subDur * 1.15)
     caption(tl, at + 0.35, B.captionHold, {
       key: `svc-${service.id}`,
       text: service.label,
@@ -160,7 +167,15 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   })
 
   // Everything alive at once — the first time it reads as one machine.
-  pulse(tl, B.systemPulse.at, B.systemPulse.dur, 1.15)
+  // A surge runs bottom-to-top through the layers rather than flashing them
+  // together: the stack answering as a single system, in order.
+  SERVICES.forEach((_, i) => {
+    const layer = SERVICES.length - 1 - i
+    const at = B.systemPulse.at + i * 0.085
+    tl.to(S.flare, { [layer]: 1, duration: 0.22, ease: 'power2.out' }, at)
+    tl.to(S.flare, { [layer]: 0, duration: 1.1, ease: 'power2.in' }, at + 0.22)
+  })
+  pulse(tl, B.systemPulse.at + 0.3, B.systemPulse.dur, 1.15)
 
   /* ══════════════════════════════════════════════════════════════
      SEQUENCE D — WORKFLOW
@@ -177,9 +192,9 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(
     S.cam,
     {
-      radius: 5.8,
-      phi: 0.34,
-      targetY: -0.34,
+      radius: 6.2,
+      phi: 0.2,
+      targetY: -0.2,
       fov: 27,
       duration: B.packet.dur * 0.55,
       ease: 'power2.inOut',
@@ -188,7 +203,7 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   )
   tl.to(
     S.cam,
-    { radius: 7.0, phi: 0.46, targetY: -0.38, fov: 30, duration: B.packet.dur * 0.5, ease: 'power2.inOut' },
+    { radius: 6.8, phi: 0.38, targetY: -0.3, fov: 30, duration: B.packet.dur * 0.5, ease: 'power2.inOut' },
     B.packet.at + B.packet.dur * 0.55,
   )
 
@@ -257,10 +272,9 @@ export function buildCinematic(cut: CutId): DirectorHandle {
   tl.to(
     S.cam,
     {
-      radius: 13,
-      phi: 0.5,
+      radius: 12,
+      phi: 0.34,
       targetY: 0.9,
-      theta: `+=${Math.PI * 0.1}`,
       fov: 26,
       handheld: 0.3,
       duration: B.recede.dur * 1.5,
@@ -329,8 +343,8 @@ export function enterInteractive() {
   })
 
   gsap.to(S.cam, {
-    radius: 6.9,
-    theta: 0.5,
+    radius: 6.6,
+    theta: 0,
     phi: 0.5,
     targetY: -0.34,
     fov: 30,

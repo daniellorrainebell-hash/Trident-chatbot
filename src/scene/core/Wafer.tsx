@@ -33,6 +33,7 @@ uniform float uTime;
 uniform float uEnergy;
 uniform float uFlare;
 uniform float uIdle;
+uniform float uWave;
 uniform vec3  uDim;
 uniform vec3  uLit;
 uniform vec3  uHot;
@@ -47,21 +48,42 @@ void main() {
   float progress = t.g;
   float node = smoothstep(0.55, 0.95, t.b);
 
-  // A signal running along the actual route. Sharp head, exponential trail —
-  // it reads as current, not as a moving highlight.
-  float d = fract(progress - uTime * 0.09);
-  float pulse = pow(1.0 - d, 26.0);
+  // Current. Several charges per net, moving fast enough to read as
+  // electricity rather than a highlight drifting along a wire. A second,
+  // slower train at a different rate stops it looking metronomic.
+  float d = fract(progress * 3.0 - uTime * 0.55);
+  float pulse = pow(1.0 - d, 14.0);
 
-  // Unlit copper is still faintly visible, so the board reads as a real
-  // object before it powers up rather than appearing from nothing.
-  float level = uIdle + uEnergy * 0.85;
+  float d2 = fract(progress * 2.0 - uTime * 0.23 + 0.37);
+  pulse += pow(1.0 - d2, 22.0) * 0.55;
+
+  // Nodes flicker as charge passes through them.
+  float spark = pow(1.0 - fract(progress * 7.0 - uTime * 0.9), 40.0) * node;
+
+  // Activation: a wavefront sweeping out from the die across this layer.
+  float rad = length(vUv - 0.5) * 1.4142;
+  float wave = smoothstep(0.10, 0.0, abs(rad - uWave)) * step(0.001, uWave);
+
+  // Lit copper sits well below full brightness on purpose. If the trace is
+  // already near-white there is no headroom left for the charge running
+  // along it, and the whole thing reads as a static glowing pattern.
+  float level = uIdle + uEnergy * 0.34;
+
+  float hot = clamp(pulse * uEnergy + spark * 1.5 + wave * 1.2 + uFlare, 0.0, 1.0);
 
   vec3 col = mix(uDim, uLit, uEnergy);
-  col = mix(col, uHot, clamp(pulse * uEnergy + node * uEnergy * 0.55 + uFlare, 0.0, 1.0));
+  col = mix(col, uHot, hot);
 
-  float a = copper * (level + pulse * uEnergy * 0.9 + node * uEnergy * 0.5 + uFlare * 0.6);
+  float a = copper * (
+      level
+    + pulse * uEnergy * 1.9
+    + spark * 1.6
+    + wave * 1.6
+    + node * uEnergy * 0.5
+    + uFlare * 0.6
+  );
 
-  gl_FragColor = vec4(col * (1.0 + pulse * uEnergy * 1.6), a);
+  gl_FragColor = vec4(col * (1.0 + (pulse * uEnergy + wave) * 1.5), a);
 }
 `
 
@@ -113,7 +135,7 @@ export function Wafer({
   const mat = useRef<THREE.ShaderMaterial>(null)
 
   const traces = useMemo(
-    () => createTraceTexture({ seed, nets: 22 + (index % 3) * 4, grid: 36 + index * 3 }),
+    () => createTraceTexture({ seed, nets: 4 + (index % 3), grid: 30 + index * 2 }),
     [seed, index],
   )
 
@@ -145,6 +167,7 @@ export function Wafer({
       uEnergy: { value: 0 },
       uFlare: { value: 0 },
       uIdle: { value: 0.06 },
+      uWave: { value: 0 },
       uDim: { value: new THREE.Color('#123a63') },
       uLit: { value: new THREE.Color(accent) },
       uHot: { value: new THREE.Color('#cfeeff') },
@@ -174,7 +197,8 @@ export function Wafer({
       m.uniforms.uTime.value += dt
       m.uniforms.uEnergy.value = energy * (1 - S.recede * 0.7)
       m.uniforms.uFlare.value = flare
-      m.uniforms.uIdle.value = 0.05 * reveal * (1 - S.recede * 0.8)
+      m.uniforms.uIdle.value = 0.1 * reveal * (1 - S.recede * 0.8)
+      m.uniforms.uWave.value = S.wave[index]
     }
   })
 

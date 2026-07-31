@@ -36,9 +36,9 @@ export function StartScreen({
     <div className="start layer--interactive" data-leaving={leaving}>
       <div />
 
+      {/* The mark alone. A strapline under it only competed with it. */}
       <div className="start__mark">
         <img className="start__logo" src={LOGO_SRC} alt="Nexus IQ Systems" draggable={false} />
-        <div className="eyebrow">{COPY.start.title}</div>
       </div>
 
       <div className="start__actions">

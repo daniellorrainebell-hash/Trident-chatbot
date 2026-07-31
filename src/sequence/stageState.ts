@@ -50,6 +50,8 @@ export interface StageState {
   /** Sequence C */
   systems: number
   sub: number[]
+  /** Per-layer activation wavefront, 0 → past 1 as it clears the edge. */
+  wave: number[]
   /** Per-subsystem momentary flare, used during the workflow. */
   flare: number[]
   /** Sequence D */
@@ -74,6 +76,7 @@ export const createStageState = (): StageState => ({
   pulse: 0,
   systems: 0,
   sub: [0, 0, 0, 0, 0],
+  wave: [0, 0, 0, 0, 0],
   flare: [0, 0, 0, 0, 0],
   packet: -1,
   packetGain: 0,
@@ -102,6 +105,7 @@ export function resetStageState() {
   const fresh = createStageState()
   Object.assign(S, fresh, {
     sub: [...fresh.sub],
+    wave: [...fresh.wave],
     flare: [...fresh.flare],
     logo: S.logo,
     cam: S.cam,

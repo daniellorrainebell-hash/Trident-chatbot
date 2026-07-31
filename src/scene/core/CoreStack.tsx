@@ -7,6 +7,7 @@ import { LAYER_Y, WAFER_SIZE } from '../layout'
 import { Wafer } from './Wafer'
 import { Die } from './Die'
 import { Packet } from '../flow/Packet'
+import { ViaBeams } from './ViaBeams'
 
 /**
  * The Living Intelligence Core: a stack of glass circuit wafers around a
@@ -27,11 +28,13 @@ export function CoreStack() {
   useFrame(({ clock }) => {
     if (!group.current) return
     const t = clock.elapsedTime
-    // One slow rotation and a shallow nod, so the wafer edges keep sweeping
-    // through the light rather than holding a static highlight.
-    group.current.rotation.y = t * 0.055
-    group.current.rotation.x = Math.sin(t * 0.19) * 0.022
-    group.current.rotation.z = Math.cos(t * 0.15) * 0.014
+    // Deliberately almost still, and square to the lens. A continuously
+    // turning object is never symmetric, and symmetry is what makes this
+    // read as engineered. The motion budget goes to the current running
+    // through the copper and to the camera instead.
+    group.current.rotation.y = Math.sin(t * 0.11) * 0.05
+    group.current.rotation.x = Math.sin(t * 0.19) * 0.012
+    group.current.rotation.z = Math.cos(t * 0.15) * 0.008
   })
 
   const tapLayer = (index: number) => (e: ThreeEvent<MouseEvent>) => {
@@ -54,6 +57,7 @@ export function CoreStack() {
         </group>
       ))}
       <Die />
+      <ViaBeams />
       {/* Inside the rotating group: the signal has to travel the board, not
           across a board that is turning underneath it. */}
       <Packet />

@@ -55,7 +55,6 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="preloader" data-done={done}>
-      <div className="eyebrow">Nexus IQ Systems</div>
       <div className="preloader__bar">
         <div className="preloader__fill" style={{ width: `${progress * 100}%` }} />
       </div>

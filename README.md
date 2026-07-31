@@ -1,13 +1,14 @@
-# NEXUS IQ — LIVING INTELLIGENCE CORE
+# NEXUS IQ SYSTEMS — BRAND CINEMATIC
 
 A 9:16, phone-first, real-time 3D brand cinematic for **Nexus IQ Systems**.
 
-The Living Intelligence Core is a stack of five glass circuit wafers around
-a machined die. Each layer is one service system, so a service coming online
-*is* a layer of the object lighting up rather than a separate thing orbiting
-it — five layers, one machine. A real enquiry then routes across the copper
-and drops through the stack to the die, and it lands on a brand payoff frame
-built to be screen-recorded.
+The core is a stack of five glass circuit wafers around a machined die, held
+square to the lens and four-fold symmetric. Each layer is one service system,
+so a service coming online *is* a layer of the object lighting up rather than
+a separate thing orbiting it — five layers, one machine. Charge runs through
+the copper and up the via columns throughout. A real enquiry then routes
+across the board and drops through the stack to the die, and it lands on a
+brand payoff frame built to be screen-recorded.
 
 ---
 
@@ -137,6 +138,12 @@ else — no orbiting elements, no connecting lines, no suspended geometry. Five
 layers of visible circuitry is already a lot of detail, and detail only reads
 as expensive when there is empty space around it.
 
+**The object holds still; the light and the lens move.** Azimuth stays at
+zero for the whole film because any rotation away from it breaks the
+four-fold symmetry the board is built around. The motion budget goes to
+charge running through the copper, the activation wavefronts, and the
+camera's climb and descent instead.
+
 ```
 src/
 ├─ config/      brand.ts · timeline.ts · quality.ts
@@ -144,7 +151,7 @@ src/
 ├─ sequence/    stageState.ts · director.ts
 ├─ scene/
 │  ├─ Stage · Studio · CameraRig · PostFX · layout
-│  ├─ core/     CoreStack · Wafer · Die · traceTexture
+│  ├─ core/     CoreStack · Wafer · Die · ViaBeams · traceTexture
 │  ├─ flow/     Packet
 │  └─ fx/       Motes
 └─ ui/          Preloader · StartScreen · CinematicLogo · Caption ·

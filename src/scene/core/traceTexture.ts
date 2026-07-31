@@ -11,6 +11,11 @@ import * as THREE from 'three'
  * engineered rather than decorative: random curves look generative, right
  * angles and 45s look designed.
  *
+ * Every net is routed once in a single quadrant and then stamped four times
+ * at 90° rotations. Four-fold rotational symmetry is how real dies are laid
+ * out, and it is what makes the board read as deliberate rather than
+ * scattered — the eye finds the centre immediately.
+ *
  * Three channels do three jobs, which is what lets one cheap texture drive
  * everything the shader needs:
  *   R — copper mask (is this pixel a trace?)
@@ -97,7 +102,8 @@ function polylineLength(pts: Pt[]) {
 export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture {
   const size = opts.size ?? 1024
   const grid = opts.grid ?? 40
-  const netCount = opts.nets ?? 26
+  // Per quadrant — the drawn total is four times this.
+  const netCount = opts.nets ?? 7
   const rand = mulberry32(opts.seed ?? 1)
   const cell = size / grid
   const coreRadius = (opts.coreRadius ?? 0.14) * size
@@ -115,23 +121,33 @@ export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture
   const centre = { x: size / 2, y: size / 2 }
   const margin = cell * 2
 
+  const cx = size / 2
+  const cy = size / 2
+  /** Rotate a point about the centre by k × 90°. */
+  const rot = (p: Pt, k: number): Pt => {
+    let { x, y } = p
+    for (let i = 0; i < k; i++) {
+      const dx = x - cx
+      const dy = y - cy
+      x = cx + dy
+      y = cy - dx
+    }
+    return { x, y }
+  }
+
   for (let n = 0; n < netCount; n++) {
-    // Enter from a random edge, snapped to the routing grid.
-    const edge = Math.floor(rand() * 4)
-    const along = margin + rand() * (size - margin * 2)
+    // Enter from an edge of one quadrant, snapped to the routing grid.
+    // The 90° stamps below fill the other three.
     const snap = (v: number) => Math.round(v / cell) * cell
+    const along = margin + rand() * (size / 2 - margin)
     const start: Pt =
-      edge === 0
-        ? { x: snap(along), y: margin }
-        : edge === 1
-          ? { x: size - margin, y: snap(along) }
-          : edge === 2
-            ? { x: snap(along), y: size - margin }
-            : { x: margin, y: snap(along) }
+      rand() < 0.5
+        ? { x: snap(along), y: margin } // top edge, left half
+        : { x: margin, y: snap(along) } // left edge, top half
 
     // Aim at a point just off the die so nets fan in rather than converging
     // on one pixel — a real board never has 26 traces meeting at a point.
-    const angle = rand() * Math.PI * 2
+    const angle = -Math.PI * 0.5 + rand() * Math.PI * 0.5
     const spread = coreRadius * (0.85 + rand() * 0.5)
     const target: Pt = {
       x: centre.x + Math.cos(angle) * spread,
@@ -147,11 +163,15 @@ export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture
     // Per-net phase offset, so pulses on different nets never march in step.
     const phase = rand()
     const width = rand() < 0.22 ? 5.5 : 3.2
+    const viaIndex = rand() < 0.5 && pts.length > 3
+      ? 1 + Math.floor(rand() * (pts.length - 2))
+      : -1
 
+    for (let k = 0; k < 4; k++) {
     let travelled = 0
     for (let i = 1; i < pts.length; i++) {
-      const a = pts[i - 1]
-      const b = pts[i]
+      const a = rot(pts[i - 1], k)
+      const b = rot(pts[i], k)
       const segLen = Math.hypot(b.x - a.x, b.y - a.y)
 
       // Subdivide so the progress channel varies smoothly along the run.
@@ -182,13 +202,11 @@ export function createTraceTexture(opts: TraceOptions = {}): THREE.CanvasTexture
       ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
       ctx.fill()
     }
-    drawNode(pts[0], width * 1.9)
-    drawNode(pts[pts.length - 1], width * 1.5)
+    drawNode(rot(pts[0], k), width * 1.9)
+    drawNode(rot(pts[pts.length - 1], k), width * 1.5)
 
     // Occasional inline via — the detail that says "this board has layers".
-    if (rand() < 0.5 && pts.length > 3) {
-      const idx = 1 + Math.floor(rand() * (pts.length - 2))
-      drawNode(pts[idx], width * 1.3)
+    if (viaIndex >= 0) drawNode(rot(pts[viaIndex], k), width * 1.3)
     }
   }
 
