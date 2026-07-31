@@ -2,94 +2,71 @@ import * as THREE from 'three'
 import { SERVICES } from '../config/brand'
 
 /**
- * Spatial layout of the system. Kept in one place so the core, the
- * capsules, the threads and the workflow path can never disagree about
- * where anything is.
- */
-
-export const CORE_RADIUS = 0.5
-export const SHELL_SCALE_Y = 1.22
-
-/**
- * The subsystem ring sits below the core's equator and is tilted, so the
- * camera reads it as a plane in space rather than a flat circle.
+ * Spatial layout of the core.
  *
- * The radius is a framing decision, not an arbitrary one. A 9:16 frame is
- * narrow: at the distance where the core still reads as a hero object, a
- * wider ring simply falls out of shot on both sides. This is the largest
- * radius that keeps all five capsules in frame with margin to spare.
+ * The object is a stack of glass circuit wafers with a die at its heart —
+ * one layer per service system. That mapping is the point: a service coming
+ * online is a layer of the object lighting up, not a separate thing
+ * appearing beside it. Five layers, one machine.
  */
-export const RING_RADIUS = 0.95
-export const RING_Y = -0.16
-export const RING_TILT = 0.26
+
+/** Wafer edge length. Sized so the stack fills ~65% of a 9:16 frame. */
+export const WAFER_SIZE = 1.5
+export const WAFER_CORNER = 0.12
+
+/** Vertical gap between layers. Wide enough to read as separate plates. */
+export const LAYER_GAP = 0.19
+
+/** The die at the centre of the stack. */
+export const DIE_SIZE = 0.2
+
+/** Which layer each service occupies, top to bottom. */
+export const LAYER_Y = SERVICES.map(
+  (_, i) => (i - (SERVICES.length - 1) / 2) * -LAYER_GAP,
+)
+
+/** Total height of the assembled stack. */
+export const STACK_HEIGHT = (SERVICES.length - 1) * LAYER_GAP
 
 /**
- * Capsule scale — a legibility decision. At the distance that frames the
- * whole ring, a capsule at its modelled size is under 10% of frame height
- * and its glyph is unreadable. The glyph has to carry meaning on a phone.
- */
-export const CAPSULE_SCALE = 1.9
-/** Half-height of the capsule body, before scaling. */
-export const CAPSULE_HALF_HEIGHT = 0.2
-/** Where the capsule footings sit, and therefore where the guide ring goes. */
-export const CAPSULE_FOOT_Y = RING_Y - CAPSULE_HALF_HEIGHT * CAPSULE_SCALE
-
-/**
- * Orbit rate, radians/sec. Shared by the capsules, the threads and the
- * workflow packet — they all live in the same rotating frame, so this has
- * to be one number rather than three that happen to agree.
- * Slow enough to read as orbit rather than spin.
- */
-export const ORBIT_SPEED = 0.038
-export const orbitAngle = (t: number) => t * ORBIT_SPEED
-
-/** Local (untilted) position of subsystem i on the ring. */
-export function subsystemLocalPosition(i: number, count = SERVICES.length) {
-  // Offset so the first subsystem to activate is already swinging toward
-  // the camera's opening angle rather than hidden behind the core.
-  const a = (i / count) * Math.PI * 2 - Math.PI * 0.35
-  return new THREE.Vector3(Math.cos(a) * RING_RADIUS, RING_Y, Math.sin(a) * RING_RADIUS)
-}
-
-export const SUBSYSTEM_POSITIONS = SERVICES.map((_, i) => subsystemLocalPosition(i))
-
-/**
- * The workflow path — the route the enquiry packet actually travels.
- * It enters from off-frame, meets first contact, qualifies, reaches the
- * core, triggers follow-up, confirms, then schedules reputation.
+ * The workflow path — the route a real enquiry travels.
  *
- * Indices refer to SERVICES order:
- *   0 voice · 1 speed · 2 chat · 3 reputation · 4 automation
+ * It arrives at the edge of the top layer, routes inward across the copper,
+ * drops through a via to the layer below, and repeats until it reaches the
+ * die. Descending through the stack is what makes the process legible: you
+ * can see the enquiry getting deeper into the system.
  */
-export const WORKFLOW_STOPS = [2, 0, -1, 1, 4, 3] as const
-
-/** Builds a smooth curve through the workflow stops (-1 means the core). */
 export function buildWorkflowCurve() {
   const pts: THREE.Vector3[] = []
+  const reach = WAFER_SIZE * 0.42
 
-  // Entry from beyond the frame edge, slightly above the ring plane.
-  const first = SUBSYSTEM_POSITIONS[WORKFLOW_STOPS[0]].clone()
-  pts.push(first.clone().multiplyScalar(2.9).setY(0.9))
+  // Arrives from beyond the top layer.
+  pts.push(new THREE.Vector3(-reach * 2.4, LAYER_Y[0] + 0.5, reach * 1.1))
 
-  for (const stop of WORKFLOW_STOPS) {
-    if (stop === -1) {
-      pts.push(new THREE.Vector3(0, 0.02, 0))
-    } else {
-      const p = SUBSYSTEM_POSITIONS[stop].clone()
-      // Lift slightly so the packet arcs over the capsules instead of
-      // clipping straight through them.
-      pts.push(p.clone().multiplyScalar(0.99).setY(p.y + 0.06))
-    }
-  }
+  LAYER_Y.forEach((y, i) => {
+    // Alternate which side each layer is entered from, so the descent reads
+    // as routing rather than a straight drop.
+    const side = i % 2 === 0 ? 1 : -1
+    const lift = 0.012
 
-  // Settle back toward the core rather than flying out of frame.
-  pts.push(new THREE.Vector3(0, 0.05, 0).lerp(SUBSYSTEM_POSITIONS[3], 0.35))
+    pts.push(new THREE.Vector3(-reach * side, y + lift, reach * 0.55 * side))
+    pts.push(new THREE.Vector3(-reach * 0.25 * side, y + lift, reach * 0.2 * side))
+    // The via: straight down into the next layer.
+    pts.push(new THREE.Vector3(reach * 0.18 * side, y + lift, -reach * 0.12 * side))
+  })
 
-  const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.35)
-  return curve
+  // Lands in the die.
+  pts.push(new THREE.Vector3(0, LAYER_Y[LAYER_Y.length - 1] - 0.05, 0))
+  pts.push(new THREE.Vector3(0, 0, 0))
+
+  return new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.12)
 }
 
-/** Normalised progress along the workflow curve at which each stop lands. */
-export const WORKFLOW_STOP_T = WORKFLOW_STOPS.map(
-  (_, i) => (i + 1) / (WORKFLOW_STOPS.length + 1),
-)
+/**
+ * Normalised progress at which the packet is over each layer, so the
+ * director can flare the right service at the moment the signal reaches it.
+ */
+export const WORKFLOW_LAYER_T = LAYER_Y.map((_, i) => {
+  const perLayer = 1 / (LAYER_Y.length + 1)
+  return perLayer * (i + 0.75)
+})

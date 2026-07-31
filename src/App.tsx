@@ -40,7 +40,7 @@ export default function App() {
     director.current = null
     workflow.current?.kill()
     workflow.current = null
-    gsap.killTweensOf([S, S.cam, S.logo, S.sub, S.thread, S.flare])
+    gsap.killTweensOf([S, S.cam, S.logo, S.sub, S.flare])
   }, [])
 
   const startCinematic = useCallback(
@@ -93,8 +93,10 @@ export default function App() {
         duration: 0.7,
         ease: 'power2.out',
       })
-      gsap.to(S.thread, {
-        [i]: focused === null ? 0.85 : focused === i ? 1 : 0.3,
+      // Focusing a layer dims the others rather than opening a panel over
+      // the object — the stack stays the subject.
+      gsap.to(S.sub, {
+        [i]: focused === null || focused === i ? 1 : 0.28,
         duration: 0.7,
         ease: 'power2.out',
       })

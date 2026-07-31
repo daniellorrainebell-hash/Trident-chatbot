@@ -4,14 +4,7 @@ import * as THREE from 'three'
 import { AmbientRig, Studio } from './Studio'
 import { CameraRig } from './CameraRig'
 import { PostFX } from './PostFX'
-import { InnerCore } from './core/InnerCore'
-import { GlassShell } from './core/GlassShell'
-import { Lattice } from './core/Lattice'
-import { Rings } from './core/Rings'
-import { OrbitalRing } from './systems/OrbitalRing'
-import { DataThreads } from './flow/DataThreads'
-import { Packet } from './flow/Packet'
-import { Confirm } from './flow/Confirm'
+import { CoreStack } from './core/CoreStack'
 import { Motes } from './fx/Motes'
 import { useExperience } from '../state/useExperience'
 import { TIER_FORCED, type TierId } from '../config/quality'
@@ -27,15 +20,8 @@ import { TIER_FORCED, type TierId } from '../config/quality'
 
 function Composition() {
   return (
-    <group position={[0, 0.12, 0]}>
-      <InnerCore />
-      <GlassShell />
-      <Lattice />
-      <Rings />
-      <OrbitalRing />
-      <DataThreads />
-      <Packet />
-      <Confirm />
+    <group position={[0, 0.06, 0]}>
+      <CoreStack />
     </group>
   )
 }

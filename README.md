@@ -2,9 +2,12 @@
 
 A 9:16, phone-first, real-time 3D brand cinematic for **Nexus IQ Systems**.
 
-A glass Living Intelligence Core powers up in a dark studio, five service
-systems come online around it, a real enquiry runs through the connected
-system, and it lands on a brand payoff frame built to be screen-recorded.
+The Living Intelligence Core is a stack of five glass circuit wafers around
+a machined die. Each layer is one service system, so a service coming online
+*is* a layer of the object lighting up rather than a separate thing orbiting
+it — five layers, one machine. A real enquiry then routes across the copper
+and drops through the stack to the die, and it lands on a brand payoff frame
+built to be screen-recorded.
 
 ---
 
@@ -57,7 +60,7 @@ npm run preview  # serve the production build
 It ends on the payoff frame and **holds indefinitely**. There's no auto-loop
 to fight; stop your recording whenever you like.
 
-**Interactive** — everything already online. Drag to orbit, tap a capsule for
+**Interactive** — everything already online. Drag to orbit, tap a layer for
 a one-line summary, run the workflow on demand, replay the film.
 
 **Recording mode** — the `Record` control hides every piece of chrome. Press
@@ -94,11 +97,17 @@ component. To hold the core reveal longer, raise `coreCaption.dur` and push
 `LOGO_SRC` at it. Alpha is required — the mark sits on near-black. The
 alternate neon lockup is already there as `nexus-iq-logo-neon.png`.
 
-**Adding or removing a service**: edit the `SERVICES` array. The orbital ring,
-the threads and the captions all derive from it. A new entry needs a `glyph`
-that exists in `scene/systems/Glyphs.tsx`; the workflow path in
-`scene/layout.ts` refers to services by index, so check `WORKFLOW_STOPS` if
-you reorder them.
+**Adding or removing a service**: edit the `SERVICES` array. The number of
+wafers, the layer spacing, the captions and the workflow path all derive from
+it, so a sixth service adds a sixth layer automatically. Each service's
+`accent` sets the colour of its layer's circuitry — keep them inside the
+blue range or the palette breaks.
+
+**Changing the circuitry**: `scene/core/traceTexture.ts` generates each layer's
+copper procedurally. `nets` controls density and `grid` controls how fine the
+routing is (both set per layer in `Wafer.tsx`). The routing is deliberately
+Manhattan/45° — that constraint is why it reads as engineered rather than
+decorative, so keep it if you change anything else.
 
 ---
 
@@ -121,9 +130,12 @@ user-facing is hard-coded in a component.
 
 **Quality tiers from the start.** Device capability is detected at boot and
 measured at runtime; a device that can't hold its tier is demoted quietly and
-early. Real refraction is the most expensive thing in the scene, so tier C
-drops it for a reflective physical material that reads convincingly at this
-size.
+early. Tiers vary MSAA, resolution scale, particle budget and post effects.
+
+**Restraint is enforced, not aspirational.** There is one object and nothing
+else — no orbiting elements, no connecting lines, no suspended geometry. Five
+layers of visible circuitry is already a lot of detail, and detail only reads
+as expensive when there is empty space around it.
 
 ```
 src/
@@ -132,9 +144,8 @@ src/
 ├─ sequence/    stageState.ts · director.ts
 ├─ scene/
 │  ├─ Stage · Studio · CameraRig · PostFX · layout
-│  ├─ core/     GlassShell · InnerCore · Lattice · Rings
-│  ├─ systems/  OrbitalRing · Glyphs
-│  ├─ flow/     DataThreads · Packet · Confirm
+│  ├─ core/     CoreStack · Wafer · Die · traceTexture
+│  ├─ flow/     Packet
 │  └─ fx/       Motes
 └─ ui/          Preloader · StartScreen · CinematicLogo · Caption ·
                 EndFrame · Controls · ServiceSheet · useStageGestures
@@ -184,3 +195,7 @@ specific Chromium binary.
   shortened) but the cinematic still plays; it isn't reduced to a static frame.
 - **Tier detection** is best-effort. GPU strings are unreliable, which is why
   the runtime FPS probe exists as the real safety net.
+- **Lighting is tuned for flat plates.** The key light is broad and dim on
+  purpose: a plate mirrors its light source, so a compact key returns a blown
+  white rectangle on the glass. If you ever swap the core for a curved form,
+  that trade reverses.

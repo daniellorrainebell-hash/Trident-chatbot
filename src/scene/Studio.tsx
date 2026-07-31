@@ -17,6 +17,12 @@ import { useExperience } from '../state/useExperience'
  * The key is neutral white rather than blue. Lighting everything blue
  * flattens the palette; keeping the key neutral lets the cyan accents
  * actually read as accents.
+ *
+ * It is also broad and dim rather than small and bright. The core is built
+ * from large flat plates, and a plate mirrors its light source: a compact
+ * key returns a blown-out white rectangle sitting on the glass, while a
+ * broad one returns a soft gradient across it. Curved glass wants the
+ * opposite, which is why this changed when the object did.
  */
 export function Studio() {
   const tier = useExperience((s) => s.tier)
@@ -34,9 +40,9 @@ export function Studio() {
         {/* Key — broad, soft, above and slightly forward. */}
         <Lightformer
           form="rect"
-          intensity={2.2}
+          intensity={0.85}
           color="#dbeaff"
-          scale={[1.5, 0.8, 1]}
+          scale={[7, 3.5, 1]}
           position={[0, 5.5, 2.5]}
           rotation={[-Math.PI / 2.1, 0, 0]}
         />

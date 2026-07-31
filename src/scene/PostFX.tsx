@@ -4,7 +4,6 @@ import {
   ChromaticAberration,
   EffectComposer,
   Noise,
-  SMAA,
   Vignette,
 } from '@react-three/postprocessing'
 import {
@@ -48,16 +47,17 @@ export function PostFX() {
   })
 
   return (
-    /* No multisampling: SMAA handles edges on tier A and the composer's
-       MSAA buffer is expensive on mobile for very little gain here. */
-    <EffectComposer multisampling={0}>
+    /* Hardware MSAA rather than an SMAA pass. SMAA was intermittently
+       leaking its edge-detection buffer through as the final image; MSAA is
+       one buffer setting and cannot fail that way. */
+    <EffectComposer multisampling={tier.msaa}>
       <Bloom
         ref={bloom as never}
-        intensity={0.75}
-        luminanceThreshold={0.72}
-        luminanceSmoothing={0.28}
+        intensity={0.5}
+        luminanceThreshold={0.85}
+        luminanceSmoothing={0.22}
         mipmapBlur
-        kernelSize={KernelSize.LARGE}
+        kernelSize={KernelSize.MEDIUM}
       />
 
       {tier.chromaticAberration ? (
@@ -78,8 +78,6 @@ export function PostFX() {
       )}
 
       <Vignette ref={vignette as never} eskil={false} offset={0.28} darkness={0.72} />
-
-      {tier.smaa ? <SMAA /> : <></>}
     </EffectComposer>
   )
 }

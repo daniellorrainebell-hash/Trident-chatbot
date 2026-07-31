@@ -44,18 +44,12 @@ export interface StageState {
   logo: LogoState
   /** Sequence A */
   motes: number
-  /** Sequence B */
+  /** Sequence B — the die ignites, then the stack assembles. */
   ignition: number
-  shellEdges: number
-  shellSolid: number
-  lattice: number
-  rings: number
-  ringSpeed: number
   pulse: number
   /** Sequence C */
   systems: number
   sub: number[]
-  thread: number[]
   /** Per-subsystem momentary flare, used during the workflow. */
   flare: number[]
   /** Sequence D */
@@ -77,21 +71,15 @@ export const createStageState = (): StageState => ({
   logo: { opacity: 0, scale: 1.06, blur: 14, sweep: 0 },
   motes: 0,
   ignition: 0,
-  shellEdges: 0,
-  shellSolid: 0,
-  lattice: 0,
-  rings: 0,
-  ringSpeed: 0,
   pulse: 0,
   systems: 0,
   sub: [0, 0, 0, 0, 0],
-  thread: [0, 0, 0, 0, 0],
   flare: [0, 0, 0, 0, 0],
   packet: -1,
   packetGain: 0,
   confirm: 0,
   recede: 0,
-  bloom: 0.75,
+  bloom: 0.5,
   vignette: 0.55,
   envIntensity: 0,
   cam: {
@@ -114,7 +102,6 @@ export function resetStageState() {
   const fresh = createStageState()
   Object.assign(S, fresh, {
     sub: [...fresh.sub],
-    thread: [...fresh.thread],
     flare: [...fresh.flare],
     logo: S.logo,
     cam: S.cam,

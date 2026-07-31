@@ -23,7 +23,8 @@ export interface Tier {
   dpr: [number, number]
   motes: number
   coreShells: number
-  smaa: boolean
+  /** Hardware MSAA sample count on the composer buffer. 0 disables it. */
+  msaa: number
   chromaticAberration: boolean
   grain: boolean
   envResolution: number
@@ -39,7 +40,7 @@ export const TIERS: Record<TierId, Tier> = {
     dpr: [1, 2],
     motes: 900,
     coreShells: 3,
-    smaa: true,
+    msaa: 4,
     chromaticAberration: true,
     grain: true,
     envResolution: 256,
@@ -53,7 +54,7 @@ export const TIERS: Record<TierId, Tier> = {
     dpr: [1, 1.75],
     motes: 420,
     coreShells: 2,
-    smaa: true,
+    msaa: 2,
     chromaticAberration: true,
     grain: true,
     envResolution: 128,
@@ -67,7 +68,7 @@ export const TIERS: Record<TierId, Tier> = {
     dpr: [1, 1.5],
     motes: 200,
     coreShells: 2,
-    smaa: false,
+    msaa: 0,
     chromaticAberration: false,
     grain: false,
     envResolution: 128,
