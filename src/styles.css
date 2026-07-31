@@ -1,0 +1,767 @@
+/* ══════════════════════════════════════════════════════════════════
+   NEXUS IQ — LIVING INTELLIGENCE CORE
+   Typography is the system stack on purpose: SF Pro on iPhone is
+   genuinely the right typeface for this, needs no download, and never
+   flashes unstyled text mid-recording.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ink: #eaf2fb;
+  --ink-dim: rgba(234, 242, 251, 0.56);
+  --ink-faint: rgba(234, 242, 251, 0.32);
+  --accent: #7fd8ff;
+  --accent-deep: #2f8fd0;
+  --void: #02040a;
+  --hairline: rgba(127, 216, 255, 0.22);
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI',
+    Inter, Roboto, Helvetica, Arial, sans-serif;
+
+  /* Motion language — one easing curve for the whole UI. */
+  --ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background: #000;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── The 9:16 stage ──────────────────────────────────────────────
+   On a phone this simply fills the screen. On desktop it becomes a
+   centred vertical frame with the surround falling away, so the format
+   reads as deliberate rather than letterboxed.                      */
+
+.viewport {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #000;
+}
+
+.stage {
+  position: relative;
+  height: 100dvh;
+  width: min(100vw, calc(100dvh * 9 / 16));
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: var(--void);
+  isolation: isolate;
+}
+
+@media (min-aspect-ratio: 9/16) {
+  .stage {
+    box-shadow:
+      0 0 0 1px rgba(127, 216, 255, 0.06),
+      0 40px 120px -20px rgba(0, 0, 0, 0.9);
+  }
+}
+
+.stage-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* ── Overlay layers ─────────────────────────────────────────────── */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.layer--interactive {
+  pointer-events: auto;
+}
+
+/* Everything chrome-like hides together in recording mode. */
+.chrome {
+  transition: opacity 520ms var(--ease), transform 520ms var(--ease);
+}
+
+.chrome[data-hidden='true'] {
+  opacity: 0 !important;
+  transform: translateY(6px);
+  pointer-events: none !important;
+}
+
+/* ── Type scale ──────────────────────────────────────────────────
+   Sized in cqw so every text element scales with the 9:16 stage
+   itself rather than the browser window. The frame is the unit.     */
+
+.stage {
+  container-type: size;
+}
+
+.eyebrow {
+  font-size: clamp(9px, 2.9cqw, 15px);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+.title {
+  font-size: clamp(17px, 5.4cqw, 30px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 300;
+  line-height: 1.35;
+}
+
+.statement {
+  font-size: clamp(15px, 4.6cqw, 26px);
+  letter-spacing: 0.02em;
+  font-weight: 300;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* ── Sequence A brand lockup ─────────────────────────────────────── */
+
+.cinelogo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.cinelogo__wrap {
+  position: relative;
+  width: 66cqw;
+  max-width: 360px;
+  opacity: 0;
+  will-change: opacity, transform, filter;
+}
+
+.cinelogo__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(70, 160, 230, 0.3));
+}
+
+/* Masked by the logo's own alpha, so the pass travels across the
+   letterforms rather than a rectangle over them. */
+.cinelogo__sheen {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 44%,
+    rgba(255, 255, 255, 0.95) 50%,
+    transparent 56%
+  );
+  /* Oversized so the band can travel right across without repeating. */
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+  mix-blend-mode: screen;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  opacity: 0;
+  will-change: background-position, opacity;
+}
+
+/* ── Preloader ───────────────────────────────────────────────────── */
+
+.preloader {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 22px;
+  justify-items: center;
+  background: var(--void);
+  z-index: 40;
+  transition: opacity 900ms var(--ease);
+}
+
+.preloader[data-done='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preloader__bar {
+  width: 34cqw;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.09);
+  overflow: hidden;
+}
+
+.preloader__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  transition: width 320ms var(--ease);
+}
+
+/* ── Start screen ────────────────────────────────────────────────── */
+
+.start {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  padding: 9cqw;
+  z-index: 30;
+  transition: opacity 700ms var(--ease);
+}
+
+.start[data-leaving='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.start__mark {
+  align-self: end;
+  display: grid;
+  justify-items: center;
+  gap: 4.5cqw;
+  text-align: center;
+}
+
+.start__logo {
+  width: 62cqw;
+  max-width: 340px;
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 26px rgba(70, 160, 230, 0.28));
+}
+
+.start__actions {
+  align-self: end;
+  display: grid;
+  justify-items: center;
+  gap: 5cqw;
+}
+
+/* The one button. */
+.cta {
+  appearance: none;
+  border: 1px solid var(--hairline);
+  background: linear-gradient(
+    180deg,
+    rgba(127, 216, 255, 0.09),
+    rgba(127, 216, 255, 0.02)
+  );
+  color: var(--ink);
+  font-family: inherit;
+  font-size: clamp(10px, 3.1cqw, 15px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-weight: 400;
+  padding: 4.2cqw 7cqw;
+  border-radius: 999px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition:
+    border-color 420ms var(--ease),
+    background 420ms var(--ease),
+    transform 420ms var(--ease);
+}
+
+.cta:hover {
+  border-color: rgba(127, 216, 255, 0.45);
+  background: linear-gradient(
+    180deg,
+    rgba(127, 216, 255, 0.16),
+    rgba(127, 216, 255, 0.04)
+  );
+}
+
+.cta:active {
+  transform: scale(0.985);
+}
+
+/* A slow specular pass across the button — the same material language
+   as the logo sweep, at a fraction of the intensity. */
+.cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.16) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  animation: sheen 5.5s var(--ease) infinite;
+}
+
+@keyframes sheen {
+  0%,
+  62% {
+    transform: translateX(-100%);
+  }
+  92%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.link-button {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  font-family: inherit;
+  font-size: clamp(9px, 2.7cqw, 13px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 2cqw 3cqw;
+  transition: color 320ms var(--ease);
+}
+
+.link-button:hover {
+  color: var(--ink);
+}
+
+/* ── Cut selector ────────────────────────────────────────────────── */
+
+.cuts {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cuts button {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-family: inherit;
+  font-size: clamp(8px, 2.4cqw, 12px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 2.2cqw 4cqw;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 320ms var(--ease);
+}
+
+.cuts button[data-active='true'] {
+  background: rgba(127, 216, 255, 0.12);
+  color: var(--ink);
+}
+
+/* ── Caption layer ───────────────────────────────────────────────── */
+
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Sits clear of the control cluster, which can be two tiers tall. */
+  bottom: 21cqh;
+  display: grid;
+  justify-items: center;
+  gap: 2.4cqw;
+  text-align: center;
+  padding: 0 9cqw;
+  z-index: 10;
+}
+
+.caption__rule {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: rule-in 900ms var(--ease-out) forwards;
+}
+
+@keyframes rule-in {
+  to {
+    width: 12cqw;
+  }
+}
+
+.caption__text {
+  animation: caption-in 900ms var(--ease-out) both;
+}
+
+.caption--out .caption__text {
+  animation: caption-out 500ms var(--ease) both;
+}
+
+@keyframes caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+    letter-spacing: 0.34em;
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes caption-out {
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
+    filter: blur(4px);
+  }
+}
+
+.caption__index {
+  font-size: clamp(8px, 2.3cqw, 11px);
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── End frame ───────────────────────────────────────────────────── */
+
+.endframe {
+  position: absolute;
+  inset: 0;
+  /* Flex, not grid rows: with grid the 1fr tracks landed on the logo and
+     the contact block and stretched them apart. The payoff frame has to be
+     one tight, centred lockup. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10cqw 9cqw;
+  text-align: center;
+  z-index: 20;
+}
+
+/* A soft scrim so the type always holds against whatever the object is
+   doing behind it. */
+.endframe::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    62% 44% at 50% 42%,
+    rgba(2, 4, 10, 0.88) 0%,
+    rgba(2, 4, 10, 0.72) 45%,
+    transparent 100%
+  );
+  z-index: -1;
+}
+
+.endframe__logo {
+  width: 64cqw;
+  max-width: 350px;
+  height: auto;
+  opacity: 0;
+  filter: drop-shadow(0 0 34px rgba(70, 160, 230, 0.32));
+  animation: end-logo 1500ms var(--ease-out) forwards;
+}
+
+@keyframes end-logo {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    filter: blur(8px) drop-shadow(0 0 34px rgba(70, 160, 230, 0));
+  }
+  to {
+    opacity: 0.96;
+    transform: none;
+    filter: blur(0) drop-shadow(0 0 34px rgba(70, 160, 230, 0.32));
+  }
+}
+
+.endframe__statement {
+  margin-top: 7cqw;
+  max-width: 78cqw;
+  opacity: 0;
+  animation: fade-up 1200ms var(--ease-out) 1000ms forwards;
+}
+
+.endframe__divider {
+  width: 14cqw;
+  height: 1px;
+  flex: none;
+  background: linear-gradient(90deg, transparent, var(--hairline), transparent);
+  margin: 9cqw 0 8cqw;
+  opacity: 0;
+  animation: fade-up 900ms var(--ease-out) 1800ms forwards;
+}
+
+.endframe__contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.8cqw;
+  opacity: 0;
+  animation: fade-up 1200ms var(--ease-out) 2100ms forwards;
+}
+
+.endframe__name {
+  font-size: clamp(13px, 4cqw, 22px);
+  letter-spacing: 0.14em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.endframe__role {
+  font-size: clamp(9px, 2.7cqw, 13px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 3cqw;
+}
+
+.endframe__line {
+  font-size: clamp(11px, 3.3cqw, 17px);
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* ── Controls ────────────────────────────────────────────────────── */
+
+.controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3.6cqh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6cqh;
+  align-items: center;
+  padding: 0 6cqw;
+  z-index: 25;
+  opacity: 0;
+  /* Never intercept a tap while faded out. */
+  pointer-events: none;
+  transition: opacity 800ms var(--ease);
+}
+
+.controls__row {
+  display: flex;
+  gap: 2.5cqw;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls__row:empty {
+  display: none;
+}
+
+.controls__links {
+  display: flex;
+  gap: 4cqw;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pill {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(8, 14, 24, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--ink-dim);
+  font-family: inherit;
+  font-size: clamp(8px, 2.5cqw, 12px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 3.2cqw 5cqw;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 340ms var(--ease);
+}
+
+.pill:hover {
+  color: var(--ink);
+  border-color: var(--hairline);
+}
+
+.pill--primary {
+  color: var(--ink);
+  border-color: var(--hairline);
+  background: rgba(127, 216, 255, 0.1);
+}
+
+/* ── Service detail sheet (interactive mode) ─────────────────────── */
+
+.sheet {
+  position: absolute;
+  left: 6cqw;
+  right: 6cqw;
+  bottom: 19cqh;
+  padding: 6cqw;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(
+    180deg,
+    rgba(10, 18, 30, 0.72),
+    rgba(6, 10, 18, 0.62)
+  );
+  backdrop-filter: blur(28px) saturate(1.2);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  z-index: 22;
+  display: grid;
+  gap: 3cqw;
+  animation: sheet-in 620ms var(--ease-out) both;
+  pointer-events: auto;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sheet__label {
+  font-size: clamp(13px, 3.9cqw, 20px);
+  letter-spacing: 0.1em;
+  font-weight: 400;
+}
+
+.sheet__summary {
+  font-size: clamp(11px, 3.2cqw, 16px);
+  line-height: 1.6;
+  font-weight: 300;
+  color: var(--ink-dim);
+}
+
+.sheet__close {
+  position: absolute;
+  top: 3.5cqw;
+  right: 4cqw;
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2cqw;
+}
+
+/* ── Recording-mode hint ─────────────────────────────────────────── */
+
+.hint {
+  position: absolute;
+  bottom: 2.4cqh;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: clamp(7px, 2.1cqw, 10px);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(234, 242, 251, 0.18);
+  z-index: 26;
+  pointer-events: none;
+  /* Shows itself, then gets out of the way — recording mode has to end up
+     with a genuinely empty frame. */
+  animation: hint-cycle 5s var(--ease) forwards;
+}
+
+@keyframes hint-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  14%,
+  62% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* ── Fallback ────────────────────────────────────────────────────── */
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 20px;
+  padding: 10cqw;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta::after {
+    animation: none;
+  }
+  /* Keep the reveals, remove the travel. Content still resolves in order;
+     nothing slides, blurs or drifts. */
+  .caption__text,
+  .caption__rule,
+  .endframe__logo,
+  .endframe__statement,
+  .endframe__divider,
+  .endframe__contact,
+  .sheet,
+  .hint {
+    animation-duration: 260ms !important;
+    animation-timing-function: ease !important;
+  }
+  .chrome,
+  .controls,
+  .start,
+  .preloader {
+    transition-duration: 160ms !important;
+  }
+}

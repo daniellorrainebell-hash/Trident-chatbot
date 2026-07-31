@@ -1,1 +1,181 @@
-# Trident-chatbot
+# NEXUS IQ — LIVING INTELLIGENCE CORE
+
+A 9:16, phone-first, real-time 3D brand cinematic for **Nexus IQ Systems**.
+
+A glass Living Intelligence Core powers up in a dark studio, five service
+systems come online around it, a real enquiry runs through the connected
+system, and it lands on a brand payoff frame built to be screen-recorded.
+
+---
+
+## Before you publish — one thing to fill in
+
+Contact details are deliberately blank. Open `src/config/brand.ts` and fill
+in `COPY.end`:
+
+```ts
+end: {
+  person: 'Daniel Bell',
+  role: 'Founder, Nexus IQ Systems',
+  mobile:  '',   // ← e.g. '07700 900123'
+  office:  '',   // ← e.g. '0161 000 0000'
+  website: '',   // ← e.g. 'nexusiqsystems.com'
+}
+```
+
+Empty fields are **skipped**, not rendered as placeholders, so the end frame
+stays composed either way. Filled-in numbers become tap-to-call links.
+
+---
+
+## Run it
+
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # typecheck + production build to dist/
+npm run preview  # serve the production build
+```
+
+`npm run dev` binds to your network, so you can open it on your phone at
+`http://<your-machine-ip>:5173` — which is how you should be reviewing it.
+
+---
+
+## The two modes
+
+**Cinematic** — the primary deliverable. One button starts it.
+
+- **60s film** — the full sequence.
+- **22s story** — the same components on a compressed timeline, for Stories.
+
+It ends on the payoff frame and **holds indefinitely**. There's no auto-loop
+to fight; stop your recording whenever you like.
+
+**Interactive** — everything already online. Drag to orbit, tap a capsule for
+a one-line summary, run the workflow on demand, replay the film.
+
+**Recording mode** — the `Record` control hides every piece of chrome. Press
+and hold anywhere to bring it back (a tap won't, on purpose).
+
+### Recording on a phone
+
+1. Open on the phone, portrait, in full screen.
+2. Start the screen recording.
+3. Press **Initialise Nexus Intelligence**.
+4. Stop recording once the end frame has held as long as you want.
+
+---
+
+## Editing it
+
+Everything you're likely to change lives in `src/config/` — no 3D code involved.
+
+| To change | Edit |
+|---|---|
+| Any on-screen wording | `config/brand.ts` → `COPY` |
+| Service names / summaries / accents | `config/brand.ts` → `SERVICES` |
+| Contact details | `config/brand.ts` → `COPY.end` |
+| Which logo file is used | `config/brand.ts` → `LOGO_SRC` |
+| Pacing of any beat | `config/timeline.ts` |
+| Device quality tiers | `config/quality.ts` |
+
+**Pacing** is defined as `{ at, dur }` in seconds. `FULL` and `SHORT` are two
+values of the same shape, so retiming the film never means touching a
+component. To hold the core reveal longer, raise `coreCaption.dur` and push
+`systemsReveal.at` back by the same amount.
+
+**Swapping the logo**: drop a transparent PNG into `public/brand/` and point
+`LOGO_SRC` at it. Alpha is required — the mark sits on near-black. The
+alternate neon lockup is already there as `nexus-iq-logo-neon.png`.
+
+**Adding or removing a service**: edit the `SERVICES` array. The orbital ring,
+the threads and the captions all derive from it. A new entry needs a `glyph`
+that exists in `scene/systems/Glyphs.tsx`; the workflow path in
+`scene/layout.ts` refers to services by index, so check `WORKFLOW_STOPS` if
+you reorder them.
+
+---
+
+## How it's built
+
+React 18 · TypeScript · Three.js · React Three Fiber · Drei · GSAP · Zustand,
+bundled with Vite. No external art assets beyond the logo — the studio
+lighting, materials, particles and geometry are all procedural.
+
+Three ideas carry the whole thing:
+
+**One clock.** The entire cinematic is a single GSAP timeline over one mutable
+object (`sequence/stageState.ts`). Components read it inside `useFrame`, so
+animating thirty values at 60fps never touches React. It also means the film
+can be scrubbed, paused or rebuilt at a different tempo for free — the 22s cut
+is a config, not a second implementation.
+
+**Content is data.** All copy, services and timings are config. Nothing
+user-facing is hard-coded in a component.
+
+**Quality tiers from the start.** Device capability is detected at boot and
+measured at runtime; a device that can't hold its tier is demoted quietly and
+early. Real refraction is the most expensive thing in the scene, so tier C
+drops it for a reflective physical material that reads convincingly at this
+size.
+
+```
+src/
+├─ config/      brand.ts · timeline.ts · quality.ts
+├─ state/       useExperience.ts
+├─ sequence/    stageState.ts · director.ts
+├─ scene/
+│  ├─ Stage · Studio · CameraRig · PostFX · layout
+│  ├─ core/     GlassShell · InnerCore · Lattice · Rings
+│  ├─ systems/  OrbitalRing · Glyphs
+│  ├─ flow/     DataThreads · Packet · Confirm
+│  └─ fx/       Motes
+└─ ui/          Preloader · StartScreen · CinematicLogo · Caption ·
+                EndFrame · Controls · ServiceSheet · useStageGestures
+```
+
+### URL flags
+
+- `?tier=A|B|C` — pin the quality tier and disable auto-demotion.
+- `?qa=1` — exposes `window.__nexusQA` (`start`, `seek`, `state`) for
+  deterministic frame capture. Not present without the flag.
+
+---
+
+## Deploying
+
+Static build, no server. `npm run build`, then upload `dist/` to Netlify,
+Vercel, Cloudflare Pages, S3 or any static host. `base` is relative, so it
+works from a subdirectory without rewrite rules.
+
+For website embedding later, an `<iframe>` with a 9:16 aspect ratio is the
+cleanest route — the stage already letterboxes itself on any viewport.
+
+---
+
+## QA
+
+`qa/` holds Playwright scripts that drive the real build and capture frames —
+how the sequence was reviewed beat by beat rather than by eye.
+
+```bash
+npm run preview
+node qa/capture-cinematic.mjs http://127.0.0.1:4173/ A   # timeline beats
+node qa/capture-modes.mjs     http://127.0.0.1:4173/ B   # short cut, interactive, recording
+node qa/capture-desktop.mjs   http://127.0.0.1:4173/     # desktop + tall viewport framing
+```
+
+Set `SHOT_DIR` to choose an output directory, and `CHROME_PATH` if you want a
+specific Chromium binary.
+
+---
+
+## Known limits
+
+- **Sound** is not implemented. The piece is silent by design — screen
+  recordings usually get music in post. No audio hooks are wired up yet.
+- **Reduced motion** is honoured (camera handheld off, UI transitions
+  shortened) but the cinematic still plays; it isn't reduced to a static frame.
+- **Tier detection** is best-effort. GPU strings are unreliable, which is why
+  the runtime FPS probe exists as the real safety net.
