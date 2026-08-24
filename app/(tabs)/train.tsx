@@ -90,6 +90,26 @@ export default function TrainScreen() {
         </>
       ) : null}
 
+      <SectionHeader title="Tools" />
+      <Card padded={false} style={styles.list}>
+        <ListRow
+          title="Timers"
+          subtitle="Rest, rounds, HIIT, EMOM and AMRAP"
+          onPress={() => router.push('/timers')}
+        />
+        <ListRow
+          title="Fight Camp"
+          subtitle="Rounds, roadwork and camp progress"
+          onPress={() => router.push('/fight-camp')}
+        />
+        <ListRow
+          title="Contracts"
+          subtitle="Promises with a deadline"
+          onPress={() => router.push('/contracts')}
+          last
+        />
+      </Card>
+
       <SectionHeader title="Templates" />
       {seedTemplates.length > 0 ? (
         <Card padded={false} style={styles.list}>

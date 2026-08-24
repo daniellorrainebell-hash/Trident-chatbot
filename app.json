@@ -1,21 +1,49 @@
 {
   "expo": {
-    "name": "kennel",
-    "slug": "kennel",
-    "version": "1.0.0",
+    "name": "RABID: The Kennel",
+    "slug": "rabid-the-kennel",
+    "scheme": "rabid",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0C0C0E",
+    "newArchEnabled": true,
+    "assetBundlePatterns": ["assets/fonts/*", "assets/brand/*"],
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#08080A"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.rabidgymwear.kennel",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "NSCameraUsageDescription": "Take progress photos and add them to your record. Photos are private to you unless you choose to share them.",
+        "NSPhotoLibraryUsageDescription": "Attach progress photos from your library. Photos are private to you unless you choose to share them.",
+        "NSPhotoLibraryAddUsageDescription": "Save shareable PR and Contract cards to your library.",
+        "NSHealthShareUsageDescription": "Import workouts, bodyweight and activity from Apple Health so your record stays complete. Requested only when you turn Health on.",
+        "NSHealthUpdateUsageDescription": "Write completed sessions back to Apple Health. Requested only when you turn Health on."
+      }
     },
     "android": {
+      "package": "com.rabidgymwear.kennel",
+      "versionCode": 1,
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "monochromeImage": "./assets/android-icon-monochrome.png",
+        "backgroundColor": "#0C0C0E"
       },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -27,7 +55,31 @@
       "expo-sqlite",
       "expo-sharing",
       "expo-font",
-      "expo-splash-screen"
-    ]
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#08080A"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Attach progress photos from your library. Photos are private to you unless you choose to share them.",
+          "cameraPermission": "Take progress photos and add them to your record."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#A81D1A"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

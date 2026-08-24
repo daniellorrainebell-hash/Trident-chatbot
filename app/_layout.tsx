@@ -6,17 +6,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import {
-  BarlowCondensed_600SemiBold,
-  BarlowCondensed_700Bold,
-  BarlowCondensed_800ExtraBold,
-} from '@expo-google-fonts/barlow-condensed';
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
 import { View } from 'react-native';
 import { colors } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
@@ -41,14 +30,19 @@ export default function RootLayout() {
   const setPersistence = useWorkoutStore((s) => s.setPersistence);
   const hydrate = useWorkoutStore((s) => s.hydrate);
 
+  // Fonts are vendored into assets/fonts rather than pulled from the
+  // @expo-google-fonts packages. Those packages ship every weight of the family,
+  // and Metro bundles all of them — 7.9 MB of typefaces for the seven faces this
+  // app uses. Referencing the files directly ships 1.7 MB instead. Both families
+  // are SIL Open Font Licence; the licences sit alongside the files.
   const [fontsLoaded] = useFonts({
-    BarlowCondensed_600SemiBold,
-    BarlowCondensed_700Bold,
-    BarlowCondensed_800ExtraBold,
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
+    BarlowCondensed_600SemiBold: require('../assets/fonts/BarlowCondensed_600SemiBold.ttf'),
+    BarlowCondensed_700Bold: require('../assets/fonts/BarlowCondensed_700Bold.ttf'),
+    BarlowCondensed_800ExtraBold: require('../assets/fonts/BarlowCondensed_800ExtraBold.ttf'),
+    Inter_400Regular: require('../assets/fonts/Inter_400Regular.ttf'),
+    Inter_500Medium: require('../assets/fonts/Inter_500Medium.ttf'),
+    Inter_600SemiBold: require('../assets/fonts/Inter_600SemiBold.ttf'),
+    Inter_700Bold: require('../assets/fonts/Inter_700Bold.ttf'),
   });
 
   useEffect(() => {
@@ -90,6 +84,7 @@ export default function RootLayout() {
               }}
             >
               <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(onboarding)" options={{ animation: 'fade' }} />
               <Stack.Screen
                 name="workout/active"
                 options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
@@ -100,6 +95,10 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="workout/exercise-picker"
+                options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+              />
+              <Stack.Screen
+                name="timers"
                 options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
               />
             </Stack>
