@@ -128,6 +128,20 @@ describe('buildMealPlan', () => {
     }
   });
 
+  it('never offers the same meal twice within one slot', async () => {
+    const { plan } = await build();
+
+    for (const day of plan!.days) {
+      for (const meal of day.meals) {
+        // Distinct by what is in them, not by the name the template gave them.
+        const signatures = meal.options.map((o) =>
+          o.ingredients.map((i) => i.foodId).sort().join('|'),
+        );
+        expect(new Set(signatures).size).toBe(signatures.length);
+      }
+    }
+  });
+
   it('computes every option against its budget, within tolerance', async () => {
     const { plan } = await build();
     for (const day of plan!.days) {

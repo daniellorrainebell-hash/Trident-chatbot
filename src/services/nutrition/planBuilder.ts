@@ -164,6 +164,17 @@ export async function buildMealOptions(args: BuildMealArgs): Promise<MealOption[
   const accepted: MealOption[] = [];
   const slots: Array<'A' | 'B' | 'C'> = ['A', 'B', 'C'];
 
+  /**
+   * Two templates can resolve to the same foods once exclusions and preferences
+   * narrow their slots — "overnight oats" and "cottage cheese bowl" both land on
+   * yoghurt, oats and seeds when the user has ruled out cottage cheese. Offering
+   * the identical meal twice under different names is worse than offering two
+   * options, so accepted meals are deduplicated by what is actually in them.
+   */
+  const seenSignatures = new Set<string>();
+  const signatureOf = (items: MealIngredient[]): string =>
+    items.map((i) => i.foodId).sort().join('|');
+
   for (const proposal of proposals) {
     if (accepted.length >= args.optionCount) break;
 
@@ -195,6 +206,11 @@ export async function buildMealOptions(args: BuildMealArgs): Promise<MealOption[
     // 3. Nutrients from food data, portions fitted to budget.
     const fitted = fitMealToBudget(ingredients, budget, findFood, MEAL_TOLERANCE);
     if (!fitted || !fitted.validation.valid) continue;
+
+    // 4. Distinct from what has already been accepted for this meal.
+    const signature = signatureOf(fitted.ingredients);
+    if (seenSignatures.has(signature)) continue;
+    seenSignatures.add(signature);
 
     accepted.push({
       id: makeId(),
