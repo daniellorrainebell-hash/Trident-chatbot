@@ -40,11 +40,13 @@
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.4.3",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^26.2.0",
     "@types/react": "~19.2.2",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.12",
