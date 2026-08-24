@@ -1,3 +1,5 @@
+export { BrandMark } from './BrandMark';
+export type { BrandMarkProps } from './BrandMark';
 export { Text } from './Text';
 export type { TextProps } from './Text';
 export { Button } from './Button';
