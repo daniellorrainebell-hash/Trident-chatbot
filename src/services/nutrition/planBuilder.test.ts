@@ -22,6 +22,7 @@ function prefs(overrides: Partial<FoodPreferences> = {}): FoodPreferences {
   return {
     userId: 'user-1',
     states: {},
+    allergenGroups: [],
     allergies: [],
     intolerances: [],
     dietaryRules: [],
@@ -151,6 +152,43 @@ describe('buildMealPlan', () => {
       for (const meal of day.meals) {
         for (const option of meal.options) {
           expect(findExclusionViolations(option.ingredients, preferences, findFood)).toEqual([]);
+        }
+      }
+    }
+  });
+
+  it('builds a full week for someone with a nut allergy', async () => {
+    // The realistic failure mode for allergen groups is over-exclusion leaving
+    // too little to plan from. A nut allergy must still yield a complete week.
+    const preferences = prefs({ allergenGroups: ['nuts'] });
+    const { plan, failures } = await build(preferences);
+
+    expect(plan).not.toBeNull();
+    expect(plan!.days).toHaveLength(7);
+    expect(failures).toEqual([]);
+
+    for (const day of plan!.days) {
+      for (const meal of day.meals) {
+        for (const option of meal.options) {
+          expect(findExclusionViolations(option.ingredients, preferences, findFood)).toEqual([]);
+        }
+      }
+    }
+  });
+
+  it('keeps every allergen group out of the plan entirely', async () => {
+    for (const group of ['nuts', 'dairy', 'gluten', 'soy'] as const) {
+      const preferences = prefs({ allergenGroups: [group] });
+      const { plan } = await build(preferences);
+      if (!plan) continue;
+
+      for (const day of plan.days) {
+        for (const meal of day.meals) {
+          for (const option of meal.options) {
+            expect(
+              findExclusionViolations(option.ingredients, preferences, findFood),
+            ).toEqual([]);
+          }
         }
       }
     }

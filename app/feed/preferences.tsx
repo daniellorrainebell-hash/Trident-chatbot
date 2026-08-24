@@ -6,12 +6,17 @@ import { colors, radius, space as sp, minTouchTarget } from '@/design';
 import { useNutritionStore } from '@/store/nutritionStore';
 import { FOODS, FOOD_CATEGORY_ORDER, foodsByCategory, searchFoods } from '@/data/foods';
 import { allowedFoodIds } from '@/services/nutrition/planBuilder';
-import type { DietaryRule, FoodCategory, PreferenceState } from '@/types';
+import { ALLERGEN_GROUP_LABELS } from '@/engines/nutrition/validation';
+import type { AllergenGroup, DietaryRule, FoodCategory, PreferenceState } from '@/types';
 
 const STATES: Array<{ value: PreferenceState; label: string; short: string }> = [
   { value: 'love_it', label: 'Love it', short: '♥' },
   { value: 'dont_mind_it', label: "Don't mind it", short: '·' },
   { value: 'keep_it_out', label: 'Keep it out', short: '✕' },
+];
+
+const ALLERGEN_GROUPS: AllergenGroup[] = [
+  'nuts', 'dairy', 'eggs', 'gluten', 'soy', 'shellfish', 'fish',
 ];
 
 const DIETARY_RULES: Array<{ value: DietaryRule; label: string }> = [
@@ -39,6 +44,7 @@ export default function PreferencesScreen() {
   const preferences = useNutritionStore((s) => s.preferences);
   const setPreference = useNutritionStore((s) => s.setPreference);
   const setAllergies = useNutritionStore((s) => s.setAllergies);
+  const setAllergenGroups = useNutritionStore((s) => s.setAllergenGroups);
   const setDietaryRules = useNutritionStore((s) => s.setDietaryRules);
 
   const [category, setCategory] = useState<FoodCategory>('protein');
@@ -56,6 +62,13 @@ export default function PreferencesScreen() {
     const current = preferences.dietaryRules;
     setDietaryRules(
       current.includes(rule) ? current.filter((r) => r !== rule) : [...current, rule],
+    );
+  };
+
+  const toggleGroup = (group: AllergenGroup) => {
+    const current = preferences.allergenGroups;
+    setAllergenGroups(
+      current.includes(group) ? current.filter((g) => g !== group) : [...current, group],
     );
   };
 
@@ -112,8 +125,25 @@ export default function PreferencesScreen() {
 
       <SectionHeader
         title="Allergies"
-        subtitle="Hard blocks. These override every preference and every suggestion."
+        subtitle="Hard blocks. These override every preference and every suggestion, including anything the planner proposes."
       />
+      <View style={styles.rules}>
+        {ALLERGEN_GROUPS.map((group) => (
+          <Pill
+            key={group}
+            label={ALLERGEN_GROUP_LABELS[group]}
+            tone={preferences.allergenGroups.includes(group) ? 'danger' : 'neutral'}
+            selected={false}
+            onPress={() => toggleGroup(group)}
+          />
+        ))}
+      </View>
+      <Text variant="caption" tone="tertiary" style={styles.allergenNote}>
+        Selecting a group excludes every food not positively marked free of it —
+        including foods added to The Kennel later. Safer than listing them one by one.
+      </Text>
+
+      <SectionHeader title="Individual foods" subtitle="For anything a group does not cover." />
       {preferences.allergies.length > 0 ? (
         <View style={styles.rules}>
           {preferences.allergies.map((foodId) => {
@@ -219,6 +249,7 @@ export default function PreferencesScreen() {
 const styles = StyleSheet.create({
   header: { marginTop: sp.sm, marginBottom: sp.lg, gap: sp.xs, alignItems: 'flex-start' },
   rules: { flexDirection: 'row', flexWrap: 'wrap', gap: sp.sm },
+  allergenNote: { marginTop: sp.md },
   categories: { gap: sp.sm, paddingVertical: sp.md, paddingRight: sp.lg },
   foodList: { gap: sp.sm, marginTop: sp.md },
   foodCard: { gap: sp.md },

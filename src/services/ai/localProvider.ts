@@ -402,7 +402,16 @@ export class LocalMealProvider implements AIProvider {
     const options: ProposedMeal[] = [];
     const usedNames = new Set<string>();
 
-    for (let i = 0; i < templates.length && options.length < request.optionCount; i += 1) {
+    // Propose more than the caller needs. The validator downstream rejects
+    // anything outside macro tolerance, and a meal whose only fat source is
+    // excluded by an allergy will compose but not validate — without spare
+    // candidates that leaves the slot empty.
+    const wanted = Math.min(
+      templates.length,
+      Math.max(request.optionCount, request.candidateCount ?? request.optionCount + 3),
+    );
+
+    for (let i = 0; i < templates.length && options.length < wanted; i += 1) {
       const template = templates[(start + i) % templates.length]!;
       if (usedNames.has(template.name)) continue;
 

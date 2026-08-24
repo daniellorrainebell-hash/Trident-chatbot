@@ -85,6 +85,7 @@ literally:
         │
         ▼
   findExclusionViolations()          ← model is re-checked, not trusted
+        │                              (allergen groups fail closed)
         │
         ▼
   calculateMealNutrients()           ← computed from the food table
@@ -98,6 +99,18 @@ literally:
 
 A meal that fails any step is dropped, and the failure is surfaced to the user.
 There is no path that shows an unvalidated plan as final.
+
+**Allergen groups fail closed.** Selecting "nuts" excludes every food that does
+not *positively* carry a `nut_free` tag, rather than excluding a list of known
+nuts. An untagged or newly added food is therefore treated as unsafe by default.
+Per-food allergy selection alone was not safe enough: someone with a nut allergy
+should not have to remember to tick almonds, cashews, walnuts and peanut butter
+individually, and a food added to the table next month would silently reach them.
+
+Because the check is inverted, food tags are composed from a base of "free of
+everything" with only what a food *contains* named explicitly — a missing tag
+over-excludes rather than under-protects, and the composition makes an omission
+visible in a short list rather than hidden in a long one.
 
 **What the AI interface deliberately does not expose:** there is no
 `calculateCalories`, no `setMacros`, no `isThisSafe`. Those methods do not exist
@@ -416,13 +429,13 @@ src/engines/nutrition/safetyPolicy.test.ts      17
 src/engines/nutrition/energy.test.ts            25
 src/engines/nutrition/validation.test.ts        21
 src/engines/nutrition/adjustment.test.ts        18
-src/services/nutrition/planBuilder.test.ts      24
+src/services/nutrition/planBuilder.test.ts      26
 src/services/nutrition/excelExport.test.ts       8
 src/store/workoutStore.test.ts                  15
 src/store/nutritionStore.test.ts                14
-src/data/seed.test.ts                           21
+src/data/seed.test.ts                           26
                                                ───
-                                               233
+                                               247
 ```
 
 Seed data is asserted against the production engines, so a fixture that drifts
@@ -439,6 +452,11 @@ Two defects the tests caught during development, both worth recording:
   than the rate the user's plan was actually built around, so someone losing
   exactly the 0.5 kg/week they signed up for read as "behind target" against a
   0.9 kg/week ceiling they never chose.
+- **Allergen groups initially emptied the plan.** Fail-closed exclusion is
+  correct, but the meal provider offered exactly as many candidates as the caller
+  needed, so a couple of validation rejections left a meal slot with nothing in
+  it. The provider now over-generates, which is what spec §40's propose-and-check
+  loop assumes anyway.
 
 Not covered: component rendering (needs `jest-expo`), navigation flows, and
 anything touching a real backend.

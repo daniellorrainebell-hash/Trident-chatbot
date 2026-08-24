@@ -65,7 +65,15 @@ export type MealGenerationRequest = {
   allowedFoodIds: string[];
   /** A subset of allowed foods the user marked LOVE IT. */
   preferredFoodIds: string[];
+  /** How many accepted options the caller ultimately needs. */
   optionCount: 1 | 2 | 3;
+  /**
+   * How many candidates to propose. Always at least `optionCount`, usually more:
+   * the deterministic validator rejects proposals that miss their macro budget,
+   * and without spare candidates a couple of rejections leave a meal slot empty.
+   * Over-generating is the cheap half of spec §40's propose-and-check loop.
+   */
+  candidateCount?: number;
   /** Used to keep the week varied rather than repeating one meal. */
   avoidFoodIds?: string[];
   seed?: string;

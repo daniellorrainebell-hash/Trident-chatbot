@@ -150,6 +150,8 @@ export async function buildMealOptions(args: BuildMealArgs): Promise<MealOption[
       allowedFoodIds: args.allowed,
       preferredFoodIds: args.preferred,
       optionCount: args.optionCount,
+      // Ask for spares so a rejected proposal does not empty the slot.
+      candidateCount: args.optionCount + 4,
       avoidFoodIds: args.avoid,
       seed: args.seed,
     });

@@ -1,6 +1,7 @@
 import type { FoodItem, FoodPreferences, MealIngredient, MealNutrients } from '@/types';
 import {
   MEAL_TOLERANCE,
+  violatesAllergenGroup,
   calculateMealNutrients,
   fitMealToBudget,
   findExclusionViolations,
@@ -11,11 +12,24 @@ import {
 } from './validation';
 
 const FOODS: Record<string, FoodItem> = {
-  chicken: food('chicken', 'Chicken breast', 'raw', 106, 24, 0, 1.2, 0, ['high_protein']),
-  rice: food('rice', 'Basmati rice', 'dry', 356, 8.5, 78, 1, 1.4, ['vegan', 'vegetarian', 'gluten_free', 'dairy_free']),
-  oil: food('oil', 'Olive oil', 'as_sold', 884, 0, 0, 100, 0, ['vegan', 'vegetarian', 'gluten_free', 'dairy_free']),
-  milk: food('milk', 'Whole milk', 'as_sold', 61, 3.2, 4.8, 3.3, 0, ['vegetarian', 'gluten_free']),
-  peanuts: food('peanuts', 'Peanut butter', 'as_sold', 588, 25, 20, 50, 6, ['vegan', 'vegetarian']),
+  chicken: food('chicken', 'Chicken breast', 'raw', 106, 24, 0, 1.2, 0, [
+    'high_protein', 'gluten_free', 'dairy_free', 'nut_free', 'egg_free', 'soy_free',
+  ]),
+  rice: food('rice', 'Basmati rice', 'dry', 356, 8.5, 78, 1, 1.4, [
+    'vegan', 'vegetarian', 'pescatarian',
+    'gluten_free', 'dairy_free', 'nut_free', 'egg_free', 'soy_free',
+  ]),
+  oil: food('oil', 'Olive oil', 'as_sold', 884, 0, 0, 100, 0, [
+    'vegan', 'vegetarian', 'pescatarian',
+    'gluten_free', 'dairy_free', 'nut_free', 'egg_free', 'soy_free',
+  ]),
+  milk: food('milk', 'Whole milk', 'as_sold', 61, 3.2, 4.8, 3.3, 0, [
+    'vegetarian', 'pescatarian', 'gluten_free', 'nut_free', 'egg_free', 'soy_free',
+  ]),
+  peanuts: food('peanuts', 'Peanut butter', 'as_sold', 588, 25, 20, 50, 6, [
+    'vegan', 'vegetarian', 'pescatarian',
+    'gluten_free', 'dairy_free', 'egg_free', 'soy_free',
+  ]),
 };
 
 function food(
@@ -42,6 +56,7 @@ function prefs(overrides: Partial<FoodPreferences> = {}): FoodPreferences {
   return {
     userId: 'user-1',
     states: {},
+    allergenGroups: [],
     allergies: [],
     intolerances: [],
     dietaryRules: [],
@@ -203,6 +218,41 @@ describe('findExclusionViolations', () => {
     expect(violations[0]?.reason).toBe('unknown_food');
   });
 
+  it('excludes a whole allergen group without listing every food', () => {
+    // The user never mentioned almonds or peanut butter individually.
+    const preferences = prefs({ allergenGroups: ['nuts'] });
+
+    expect(
+      findExclusionViolations([ingredient('peanuts', 30)], preferences, lookup)[0]?.reason,
+    ).toBe('allergy');
+
+    // And a food that is positively tagged nut-free still passes.
+    expect(findExclusionViolations([ingredient('rice', 100)], preferences, lookup)).toEqual([]);
+  });
+
+  it('fails closed on a food that carries no allergen tags at all', () => {
+    // An incompletely tagged food must be excluded, not assumed safe.
+    const untagged = food('mystery', 'Unlabelled bar', 'as_sold', 400, 10, 50, 15, 2, []);
+    const withUntagged = (id: string) => (id === 'mystery' ? untagged : FOODS[id]);
+
+    const violations = findExclusionViolations(
+      [{ foodId: 'mystery', foodName: 'Unlabelled bar', grams: 60, state: 'as_sold' }],
+      prefs({ allergenGroups: ['nuts'] }),
+      withUntagged,
+    );
+
+    expect(violations[0]?.reason).toBe('allergy');
+  });
+
+  it('catches dairy through the group even when the food is not listed', () => {
+    const violations = findExclusionViolations(
+      [ingredient('milk', 200)],
+      prefs({ allergenGroups: ['dairy'] }),
+      lookup,
+    );
+    expect(violations[0]?.reason).toBe('allergy');
+  });
+
   it('lets an allergy override a LOVE IT preference', () => {
     const violations = findExclusionViolations(
       [ingredient('peanuts', 30)],
@@ -240,5 +290,39 @@ describe('splitDailyBudget', () => {
     const budgets = splitDailyBudget(targets, ['breakfast', 'lunch', 'dinner']);
     expect(budgets).toHaveLength(3);
     expect(sumNutrients(budgets).calories).toBe(targets.calories);
+  });
+});
+
+
+describe('violatesAllergenGroup', () => {
+  it('treats an absent "-free" tag as unsafe', () => {
+    const noTags = food('plain', 'Plain thing', 'as_sold', 100, 5, 10, 3, 0, []);
+    expect(violatesAllergenGroup(noTags, 'nuts')).toBe(true);
+    expect(violatesAllergenGroup(noTags, 'gluten')).toBe(true);
+  });
+
+  it('clears a food that positively declares itself free of the allergen', () => {
+    expect(violatesAllergenGroup(FOODS['rice']!, 'gluten')).toBe(false);
+    expect(violatesAllergenGroup(FOODS['rice']!, 'dairy')).toBe(false);
+  });
+
+  it('marks shellfish by presence rather than absence', () => {
+    const prawns = food('prawns', 'Prawns', 'raw', 99, 20.5, 0.9, 1.1, 0, [
+      'pescatarian', 'shellfish', 'gluten_free', 'dairy_free',
+    ]);
+    expect(violatesAllergenGroup(prawns, 'shellfish')).toBe(true);
+    expect(violatesAllergenGroup(FOODS['rice']!, 'shellfish')).toBe(false);
+  });
+
+  it('flags fish for a fish allergy but not vegetarian foods', () => {
+    const salmon = food('salmon', 'Salmon', 'raw', 208, 20.4, 0, 13.4, 0, [
+      'pescatarian', 'gluten_free', 'dairy_free',
+    ]);
+    const oats = food('oats', 'Oats', 'dry', 379, 13.2, 60, 8, 10, [
+      'vegan', 'vegetarian', 'pescatarian', 'dairy_free',
+    ]);
+
+    expect(violatesAllergenGroup(salmon, 'fish')).toBe(true);
+    expect(violatesAllergenGroup(oats, 'fish')).toBe(false);
   });
 });

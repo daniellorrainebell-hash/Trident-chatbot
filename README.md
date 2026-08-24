@@ -29,7 +29,7 @@ npx eas build --profile production --platform all
 
 ```bash
 npm run typecheck     # tsc --noEmit, strict
-npm test              # 233 unit tests
+npm test              # 247 unit tests
 npx expo export --platform ios       # verifies the bundle builds
 ```
 
@@ -76,6 +76,10 @@ An AI-proposed meal supplies food ids and grams. Nutrients are computed from the
 structured food table, the model is re-checked against the user's allergies and
 exclusions rather than trusted, and anything failing validation is dropped and
 reported instead of shown.
+
+Allergen exclusions fail closed: choosing "nuts" removes every food not
+positively marked nut-free, so a food added to the table later is treated as
+unsafe until it is tagged, rather than reaching someone who is allergic to it.
 
 ---
 

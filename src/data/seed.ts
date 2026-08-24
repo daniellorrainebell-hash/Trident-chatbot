@@ -90,6 +90,7 @@ export const seedFoodPreferences: FoodPreferences = {
     'cottage-cheese': 'keep_it_out',
     tempeh: 'keep_it_out',
   },
+  allergenGroups: [],
   allergies: [],
   intolerances: [],
   dietaryRules: [],

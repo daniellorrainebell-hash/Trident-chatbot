@@ -47,6 +47,7 @@ export type NutritionState = {
   acceptDisclaimer(version: string): void;
   setPreference(foodId: string, state: PreferenceState): void;
   setAllergies(foodIds: string[]): void;
+  setAllergenGroups(groups: FoodPreferences['allergenGroups']): void;
   setDietaryRules(rules: FoodPreferences['dietaryRules']): void;
 
   generateTargets(): SafetyDecision;
@@ -90,6 +91,16 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
 
   setAllergies(foodIds) {
     set({ preferences: { ...get().preferences, allergies: foodIds } });
+  },
+
+  setAllergenGroups(groups) {
+    // Targets are unaffected, but any existing plan was built against the old
+    // exclusions and may contain something the user cannot eat.
+    set({
+      preferences: { ...get().preferences, allergenGroups: groups },
+      plan: null,
+      shoppingList: null,
+    });
   },
 
   setDietaryRules(rules) {

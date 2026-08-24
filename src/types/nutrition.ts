@@ -165,10 +165,25 @@ export type DietaryRule =
   | 'vegetarian' | 'vegan' | 'pescatarian' | 'halal' | 'kosher'
   | 'gluten_free' | 'dairy_free';
 
+/**
+ * Allergen groups (spec §35).
+ *
+ * Per-food allergy selection is not safe on its own: someone with a nut allergy
+ * should not have to remember to tick almonds, cashews, walnuts and peanut butter
+ * individually, and a food added to the table later would silently slip past them.
+ * A group excludes every food that does not positively carry the matching
+ * "-free" tag, so the check fails closed — an untagged food is excluded rather
+ * than assumed safe.
+ */
+export type AllergenGroup =
+  | 'nuts' | 'dairy' | 'eggs' | 'gluten' | 'soy' | 'shellfish' | 'fish';
+
 export type FoodPreferences = {
   userId: Uuid;
   states: Record<string, PreferenceState>;
-  /** Hard blocks. These override every preference and every AI suggestion. */
+  /** Whole-category blocks. Safer than listing foods one by one. */
+  allergenGroups: AllergenGroup[];
+  /** Individual food blocks, for anything a group does not cover. */
   allergies: string[];
   intolerances: string[];
   dietaryRules: DietaryRule[];

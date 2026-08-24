@@ -1,6 +1,8 @@
 import type {
+  AllergenGroup,
   FoodItem,
   FoodPreferences,
+  FoodTag,
   MacroDelta,
   MealIngredient,
   MealNutrients,
@@ -229,6 +231,55 @@ export function fitMealToBudget(
  * trusted to have respected the constraints it was given — it is checked.
  * Exclusions override preferences without exception (spec §35).
  */
+/**
+ * Each allergen group maps to the tag a food must positively carry to be
+ * considered safe. The check is deliberately inverted — a food is excluded
+ * unless it is tagged free of the allergen — so a new or incompletely tagged
+ * food fails closed rather than reaching someone who is allergic to it.
+ *
+ * `shellfish` and `fish` invert again: those are marked by presence, because
+ * "contains shellfish" is the tag that exists in the food table.
+ */
+const ALLERGEN_REQUIRED_TAG: Record<AllergenGroup, FoodTag> = {
+  nuts: 'nut_free',
+  dairy: 'dairy_free',
+  eggs: 'egg_free',
+  gluten: 'gluten_free',
+  soy: 'soy_free',
+  shellfish: 'shellfish',
+  fish: 'pescatarian',
+};
+
+/** Groups flagged by the *presence* of the tag rather than its absence. */
+const PRESENCE_MARKED: AllergenGroup[] = ['shellfish'];
+
+export const ALLERGEN_GROUP_LABELS: Record<AllergenGroup, string> = {
+  nuts: 'Nuts',
+  dairy: 'Dairy',
+  eggs: 'Eggs',
+  gluten: 'Gluten',
+  soy: 'Soy',
+  shellfish: 'Shellfish',
+  fish: 'Fish',
+};
+
+/** True when this food is unsafe for the given allergen group. */
+export function violatesAllergenGroup(food: FoodItem, group: AllergenGroup): boolean {
+  const tag = ALLERGEN_REQUIRED_TAG[group];
+
+  if (PRESENCE_MARKED.includes(group)) {
+    return food.tags.includes(tag);
+  }
+
+  if (group === 'fish') {
+    // Fish and seafood are the pescatarian-only foods: safe for everything that
+    // is also vegetarian, unsafe for the rest of the pescatarian set.
+    return food.tags.includes('pescatarian') && !food.tags.includes('vegetarian');
+  }
+
+  return !food.tags.includes(tag);
+}
+
 export type ExclusionViolation = {
   foodId: string;
   foodName: string;
@@ -252,6 +303,21 @@ export function findExclusionViolations(
         foodName: ingredient.foodName,
         reason: 'unknown_food',
         detail: 'Food is not in the structured food database.',
+      });
+      continue;
+    }
+
+    // Group allergens are checked before individual ones: they are broader and
+    // catch foods the user never explicitly listed.
+    const breachedGroup = preferences.allergenGroups?.find((group) =>
+      violatesAllergenGroup(food, group),
+    );
+    if (breachedGroup) {
+      violations.push({
+        foodId: food.id,
+        foodName: food.name,
+        reason: 'allergy',
+        detail: `${food.name} is not marked free of ${ALLERGEN_GROUP_LABELS[breachedGroup].toLowerCase()}.`,
       });
       continue;
     }
