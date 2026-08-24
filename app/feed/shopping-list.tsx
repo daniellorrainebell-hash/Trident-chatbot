@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Sharing from 'expo-sharing';
+import { File, Paths } from 'expo-file-system';
 import { Button, Card, EmptyState, Screen, SectionHeader, Text } from '@/components';
 import { colors, radius, space as sp, minTouchTarget } from '@/design';
 import { useNutritionStore } from '@/store/nutritionStore';
@@ -34,11 +35,33 @@ export default function ShoppingListScreen() {
   const checkedCount = shoppingList?.items.filter((i) => i.checked).length ?? 0;
   const total = shoppingList?.items.length ?? 0;
 
+  /**
+   * Share as plain text via the native share sheet (spec §4), so the list lands
+   * usefully in Notes, Messages or whatever the user actually shops from.
+   */
   const handleShare = async () => {
     if (!shoppingList) return;
-    // Native share sheet (spec §4). The list is plain text so it lands in any app.
-    const available = await Sharing.isAvailableAsync();
-    if (!available) return;
+    if (!(await Sharing.isAvailableAsync())) return;
+
+    const lines: string[] = ['RABID: THE KENNEL — Shopping list', ''];
+    for (const [aisle, items] of grouped) {
+      lines.push(AISLE_LABELS[aisle].toUpperCase());
+      for (const item of items) {
+        const state = item.state === 'as_sold' ? '' : ` (${item.state})`;
+        lines.push(`  ${roundedQuantity(item.totalGrams)}  ${item.foodName}${state}`);
+      }
+      lines.push('');
+    }
+
+    const file = new File(Paths.cache, 'rabid-shopping-list.txt');
+    if (file.exists) file.delete();
+    file.create();
+    file.write(lines.join('\n'));
+
+    await Sharing.shareAsync(file.uri, {
+      mimeType: 'text/plain',
+      dialogTitle: 'Share your shopping list',
+    });
   };
 
   if (!shoppingList || total === 0) {

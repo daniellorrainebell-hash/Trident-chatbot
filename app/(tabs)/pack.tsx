@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   Button, Card, EmptyState, ListRow, Pill, Screen, SectionHeader, StatBlock, Text,
@@ -8,6 +8,8 @@ import { colors, space as sp } from '@/design';
 import {
   seedPack, seedPackMembers, seedPackStats, seedLeaderboard, seedYardPosts, SEED_TODAY,
 } from '@/data/seed';
+import { backend } from '@/services/backend/localBackend';
+import { useUserStore } from '@/store/userStore';
 import { formatVolume, formatPercent, formatRank, formatRelative } from '@/utils/format';
 import type { LeaderboardCategory, LeaderboardScope } from '@/types';
 
@@ -38,6 +40,26 @@ export default function PackScreen() {
 
   const now = new Date(`${SEED_TODAY}T20:00:00Z`);
   const yourPosition = seedLeaderboard.find((e) => e.isCurrentUser);
+  const userId = useUserStore((s) => s.profile?.id);
+
+  const confirmLeave = () => {
+    Alert.alert(
+      `Leave ${seedPack.name}?`,
+      'Your training history stays yours. You will drop off this Pack\'s leaderboard and lose access to its activity.',
+      [
+        { text: 'Stay', style: 'cancel' },
+        {
+          text: 'Leave Pack',
+          style: 'destructive',
+          onPress: async () => {
+            if (!userId) return;
+            await backend.leavePack(seedPack.id, userId);
+            router.replace('/(tabs)');
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <Screen>
@@ -210,12 +232,7 @@ export default function PackScreen() {
         <EmptyState title="The Yard is quiet" message="Nothing logged by your Pack yet." />
       )}
 
-      <Button
-        label="Leave Pack"
-        variant="ghost"
-        onPress={() => {}}
-        style={styles.leave}
-      />
+      <Button label="Leave Pack" variant="ghost" onPress={confirmLeave} style={styles.leave} />
     </Screen>
   );
 }

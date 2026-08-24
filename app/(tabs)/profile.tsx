@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import {
   Button, Card, ListRow, Pill, ProgressBar, Screen, SectionHeader, StatBlock, Text,
 } from '@/components';
@@ -11,6 +13,7 @@ import { useContractStore } from '@/store/contractStore';
 import {
   SCORE_WEIGHTS, calculateRabidScore, levelLabel, nextLevel, weakestComponent,
 } from '@/engines/scoring/rabidScore';
+import { backend } from '@/services/backend/localBackend';
 import { SEED_TODAY } from '@/data/seed';
 import { formatDate } from '@/utils/format';
 import type { NotificationCategory } from '@/types';
@@ -48,6 +51,8 @@ export default function ProfileScreen() {
   const consent = useUserStore((s) => s.consent);
   const notifications = useUserStore((s) => s.notifications);
   const toggleNotification = useUserStore((s) => s.toggleNotification);
+  const setProfile = useUserStore((s) => s.setProfile);
+  const signOut = useUserStore((s) => s.signOut);
 
   const history = useWorkoutStore((s) => s.history);
   const personalRecords = useWorkoutStore((s) => s.personalRecords);
@@ -71,15 +76,72 @@ export default function ProfileScreen() {
   const rung = nextLevel(score.total);
   const weakest = weakestComponent(score.breakdown);
 
+  const [busy, setBusy] = useState(false);
+
+  /**
+   * UK GDPR right of access (spec §60): everything held about the user, in a
+   * machine-readable file, handed to the native share sheet so they can actually
+   * take it somewhere.
+   */
+  const exportData = async () => {
+    if (!profile) return;
+    setBusy(true);
+    try {
+      const data = await backend.exportUserData(profile.id);
+      const file = new File(Paths.cache, `rabid-kennel-data-${profile.handle}.json`);
+      if (file.exists) file.delete();
+      file.create();
+      file.write(JSON.stringify(data, null, 2));
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(file.uri, {
+          mimeType: 'application/json',
+          dialogTitle: 'Export your data',
+        });
+      }
+    } catch {
+      Alert.alert('Export failed', 'Your data could not be exported. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const togglePrivacy = () => {
+    if (!profile) return;
+    setProfile({ ...profile, isPrivate: !profile.isPrivate });
+  };
+
   const confirmDeletion = () => {
     Alert.alert(
       'Delete account?',
       'This permanently deletes your training history, Contracts, body metrics, progress photos and meal plans. It cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete everything', style: 'destructive', onPress: () => {} },
+        {
+          text: 'Delete everything',
+          style: 'destructive',
+          onPress: async () => {
+            if (!profile) return;
+            await backend.deleteAccount(profile.id);
+            signOut();
+            router.replace('/(onboarding)/welcome');
+          },
+        },
       ],
     );
+  };
+
+  const confirmSignOut = () => {
+    Alert.alert('Sign out?', 'Your logged work stays on this device until it syncs.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign out',
+        onPress: () => {
+          signOut();
+          router.replace('/(onboarding)/welcome');
+        },
+      },
+    ]);
   };
 
   return (
@@ -198,18 +260,23 @@ export default function ProfileScreen() {
       <Card padded={false} style={styles.list}>
         <ListRow
           title="Export my data"
-          subtitle="Everything held about you, in a machine-readable file"
-          onPress={() => {}}
+          subtitle="Everything held about you, as a JSON file"
+          onPress={exportData}
         />
         <ListRow
-          title="Privacy controls"
-          subtitle="Choose what your Pack and the public can see"
-          onPress={() => {}}
-        />
-        <ListRow
-          title="Delete uploaded media"
-          subtitle="Progress photos and avatars"
-          onPress={() => {}}
+          title="Private profile"
+          subtitle={
+            profile?.isPrivate
+              ? 'Only your Pack can see your activity'
+              : 'Your activity appears on public leaderboards and The Yard'
+          }
+          onPress={togglePrivacy}
+          trailing={
+            <Pill
+              label={profile?.isPrivate ? 'Private' : 'Public'}
+              tone={profile?.isPrivate ? 'success' : 'neutral'}
+            />
+          }
           last
         />
       </Card>
@@ -218,6 +285,7 @@ export default function ProfileScreen() {
         label="Delete account"
         variant="destructive"
         onPress={confirmDeletion}
+        loading={busy}
         style={styles.delete}
       />
       <Text variant="legal" tone="tertiary" center style={styles.deleteNote}>
@@ -225,12 +293,7 @@ export default function ProfileScreen() {
         metrics and meal plans.
       </Text>
 
-      <Button
-        label="Sign out"
-        variant="ghost"
-        onPress={() => {}}
-        style={styles.signOut}
-      />
+      <Button label="Sign out" variant="ghost" onPress={confirmSignOut} style={styles.signOut} />
     </Screen>
   );
 }
