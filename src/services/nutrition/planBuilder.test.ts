@@ -106,6 +106,15 @@ describe('buildMealPlan', () => {
     expect(plan!.days[6]!.date).toBe('2026-03-08');
   });
 
+  it('offers three options for every meal, which spec §39 requires', async () => {
+    const { plan, failures } = await build();
+    const counts = plan!.days.flatMap((d) => d.meals.map((m) => m.options.length));
+
+    expect(failures).toEqual([]);
+    // Not "up to three" — three. A meal offering one choice is not a choice.
+    expect(counts.every((c) => c === 3)).toBe(true);
+  });
+
   it('offers up to three options per meal', async () => {
     const { plan } = await build();
     for (const day of plan!.days) {

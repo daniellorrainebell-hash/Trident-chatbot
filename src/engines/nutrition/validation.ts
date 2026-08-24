@@ -185,13 +185,38 @@ export type FitResult = {
   iterations: number;
 };
 
+/** Which macro an ingredient mostly supplies, by calorie share. */
+function dominantMacro(food: FoodItem): 'protein' | 'carbs' | 'fat' | 'none' {
+  const p = food.proteinPer100g * 4;
+  const c = food.carbsPer100g * 4;
+  const f = food.fatPer100g * 9;
+  const total = p + c + f;
+  if (total <= 0) return 'none';
+
+  const max = Math.max(p, c, f);
+  // A clear majority, otherwise the ingredient is mixed and not a good lever.
+  if (max / total < 0.5) return 'none';
+  if (max === p) return 'protein';
+  if (max === f) return 'fat';
+  return 'carbs';
+}
+
 /**
  * Iteratively fit a proposed meal to its budget.
  *
- * Converges in a couple of passes for a normal meal; the iteration cap stops a
- * pathological case from looping. Returns whatever it reached along with the
- * validation result, so the caller can reject it — no unvalidated plan is ever
- * shown as final (spec §56).
+ * Scaling every ingredient by the same factor only fixes total calories — it
+ * cannot change the *ratio* of protein to carbs to fat, so a meal that is 20 g
+ * short on protein and 15 g over on fat stays wrong however it is scaled, and
+ * gets rejected. That was costing roughly half of all proposals.
+ *
+ * So each macro is corrected using the ingredient that mostly supplies it:
+ * protein first (it has a floor to protect), then fat, then carbohydrate as the
+ * flexible remainder — the same priority the macro engine uses. A final uniform
+ * pass trims total calories.
+ *
+ * Every portion stays inside the ±40% bound and rounds to 5 g, so the result is
+ * still something a person can weigh. A meal that misses after this is rejected,
+ * not stretched further (spec §40, §56).
  */
 export function fitMealToBudget(
   ingredients: MealIngredient[],
@@ -207,18 +232,138 @@ export function fitMealToBudget(
   let validation = validateAgainstBudget(nutrients, budget, tolerance);
   let iterations = 0;
 
+  // Original grams, so bounds are measured against the proposal rather than
+  // compounding across iterations.
+  const original = new Map(ingredients.map((i) => [i.foodId, i.grams]));
+
+  /**
+   * Clamp a proposed portion against the *original* grams, not the current ones.
+   * Bounding against current grams lets successive passes compound — a ratio
+   * correction to +40% followed by a calorie pass to +40% again lands at +96%,
+   * which is how the fitter quietly escaped its own limits and undid its work.
+   */
+  const bound = (foodId: string, proposed: number): number => {
+    const base = original.get(foodId) ?? proposed;
+    const clamped = Math.min(
+      base * MAX_PORTION_SCALE,
+      Math.max(base * MIN_PORTION_SCALE, proposed),
+    );
+    return Math.max(
+      PORTION_ROUNDING_G,
+      Math.round(clamped / PORTION_ROUNDING_G) * PORTION_ROUNDING_G,
+    );
+  };
+
+  const order: Array<'protein' | 'fat' | 'carbs'> = ['protein', 'fat', 'carbs'];
+
   while (!validation.valid && iterations < maxIterations) {
-    if (nutrients.calories <= 0) break;
-    const factor = budget.calories / nutrients.calories;
-    const next = scaleIngredients(current, factor);
+    let changed = false;
 
-    const nextNutrients = calculateMealNutrients(next, lookup);
-    if (nextNutrients === null) break;
+    for (const macro of order) {
+      const actual =
+        macro === 'protein' ? nutrients.proteinG
+        : macro === 'fat' ? nutrients.fatG
+        : nutrients.carbsG;
+      const target =
+        macro === 'protein' ? budget.proteinG
+        : macro === 'fat' ? budget.fatG
+        : budget.carbsG;
 
-    current = next;
-    nutrients = nextNutrients;
+      if (target <= 0 || actual <= 0) continue;
+      const ratio = target / actual;
+      if (Math.abs(ratio - 1) < 0.02) continue;
+
+      // The lever: the ingredient supplying most of this macro.
+      let leverId: string | null = null;
+      let leverContribution = 0;
+
+      for (const ingredient of current) {
+        const food = lookup(ingredient.foodId);
+        if (!food || dominantMacro(food) !== macro) continue;
+
+        const per100 =
+          macro === 'protein' ? food.proteinPer100g
+          : macro === 'fat' ? food.fatPer100g
+          : food.carbsPer100g;
+        const contribution = (per100 * ingredient.grams) / 100;
+
+        if (contribution > leverContribution) {
+          leverContribution = contribution;
+          leverId = ingredient.foodId;
+        }
+      }
+      if (!leverId || leverContribution <= 0) continue;
+
+      // Move only the shortfall this ingredient is responsible for.
+      const deficit = target - actual;
+      const food = lookup(leverId)!;
+      const per100 =
+        macro === 'protein' ? food.proteinPer100g
+        : macro === 'fat' ? food.fatPer100g
+        : food.carbsPer100g;
+
+      const gramsDelta = (deficit / per100) * 100;
+
+      const next = current.map((ingredient) =>
+        ingredient.foodId === leverId
+          ? { ...ingredient, grams: bound(ingredient.foodId, ingredient.grams + gramsDelta) }
+          : ingredient,
+      );
+
+      const nextNutrients = calculateMealNutrients(next, lookup);
+      if (nextNutrients === null) break;
+
+      current = next;
+      nutrients = nextNutrients;
+      changed = true;
+    }
+
+    // Close the calorie gap using the carbohydrate and mixed ingredients only.
+    //
+    // Scaling everything would drag protein and fat back off the targets just
+    // set — the fat lever is usually oil, which is also the densest thing in the
+    // meal, so a uniform calorie pass and the fat pass end up fighting over the
+    // same ingredient and neither converges. Carbohydrate is the flexible macro,
+    // exactly as it is in the macro engine, so it absorbs the remainder here too.
+    if (nutrients.calories > 0) {
+      const gap = budget.calories - nutrients.calories;
+
+      if (Math.abs(gap) / budget.calories > tolerance.caloriesPercent) {
+        const flexible = current.filter((ingredient) => {
+          const food = lookup(ingredient.foodId);
+          if (!food) return false;
+          const macro = dominantMacro(food);
+          return macro === 'carbs' || macro === 'none';
+        });
+
+        const flexibleCalories = flexible.reduce((sum, ingredient) => {
+          const food = lookup(ingredient.foodId)!;
+          return sum + (food.kcalPer100g * ingredient.grams) / 100;
+        }, 0);
+
+        if (flexibleCalories > 0) {
+          const ratio = (flexibleCalories + gap) / flexibleCalories;
+          const flexibleIds = new Set(flexible.map((i) => i.foodId));
+
+          const next = current.map((ingredient) =>
+            flexibleIds.has(ingredient.foodId)
+              ? { ...ingredient, grams: bound(ingredient.foodId, ingredient.grams * ratio) }
+              : ingredient,
+          );
+
+          const nextNutrients = calculateMealNutrients(next, lookup);
+          if (nextNutrients !== null && nextNutrients.calories !== nutrients.calories) {
+            current = next;
+            nutrients = nextNutrients;
+            changed = true;
+          }
+        }
+      }
+    }
+
     validation = validateAgainstBudget(nutrients, budget, tolerance);
     iterations += 1;
+    if (!changed) break;
   }
 
   return { ingredients: current, nutrients, validation, iterations };

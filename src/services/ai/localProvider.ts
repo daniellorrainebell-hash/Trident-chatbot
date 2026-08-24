@@ -95,6 +95,47 @@ const BREAKFAST_TEMPLATES: MealTemplate[] = [
     prepMinutes: 4,
     cookMinutes: 6,
   },
+  {
+    name: 'Overnight oats with yoghurt and berries',
+    proteins: ['greek-yoghurt', 'soy-yoghurt', 'whey', 'vegan-protein'],
+    carbs: ['oats', 'berries'],
+    fats: ['mixed-seeds'],
+    vegetables: [],
+    preparation: [
+      'Stir the oats, yoghurt and a splash of milk together the night before.',
+      'Cover and leave in the fridge overnight — the oats soften and thicken.',
+      'Top with the berries and seeds in the morning.',
+    ],
+    prepMinutes: 5,
+    cookMinutes: 0,
+  },
+  {
+    name: 'Scrambled eggs, beans and toast',
+    proteins: ['eggs', 'egg-whites'],
+    carbs: ['wholemeal-bread', 'black-beans'],
+    fats: ['olive-oil'],
+    vegetables: ['mushrooms', 'spinach'],
+    preparation: [
+      'Warm the beans through with a little of the oil.',
+      'Soft-scramble the eggs over a low heat — take them off just before they look done.',
+      'Toast the bread and pile everything on. Season well.',
+    ],
+    prepMinutes: 4,
+    cookMinutes: 8,
+  },
+  {
+    name: 'Cottage cheese and fruit bowl',
+    proteins: ['cottage-cheese', 'greek-yoghurt', 'soy-yoghurt'],
+    carbs: ['pineapple', 'banana', 'oats'],
+    fats: ['walnuts', 'mixed-seeds'],
+    vegetables: [],
+    preparation: [
+      'Spoon the cottage cheese into a bowl.',
+      'Top with the chopped fruit, oats and nuts.',
+    ],
+    prepMinutes: 4,
+    cookMinutes: 0,
+  },
 ];
 
 const MAIN_TEMPLATES: MealTemplate[] = [
@@ -273,6 +314,29 @@ const SNACK_TEMPLATES: MealTemplate[] = [
     preparation: ['Dress the tuna with the oil and pile onto the rice cakes with the leaves.'],
     prepMinutes: 3,
     cookMinutes: 0,
+  },
+  {
+    name: 'Cheese and apple',
+    proteins: ['cottage-cheese', 'cheddar'],
+    carbs: ['apple', 'rice-cakes'],
+    fats: ['almonds'],
+    vegetables: [],
+    preparation: ['Slice the apple and eat with the cheese and a handful of almonds.'],
+    prepMinutes: 2,
+    cookMinutes: 0,
+  },
+  {
+    name: 'Beef jerky style snack plate',
+    proteins: ['lean-beef', 'eggs'],
+    carbs: ['rice-cakes', 'apple'],
+    fats: ['mixed-seeds'],
+    vegetables: ['carrots'],
+    preparation: [
+      'Slice the cooked beef thin and hard-boil the eggs in advance.',
+      'Plate with the carrot sticks, rice cakes and seeds.',
+    ],
+    prepMinutes: 5,
+    cookMinutes: 10,
   },
   {
     name: 'Peanut butter on toast',

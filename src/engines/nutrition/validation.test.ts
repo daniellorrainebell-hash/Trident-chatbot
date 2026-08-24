@@ -144,6 +144,76 @@ describe('fitMealToBudget', () => {
     expect(result!.iterations).toBeGreaterThan(0);
   });
 
+  it('corrects a macro ratio, not just total calories', () => {
+    // Short on protein and long on fat: uniform scaling cannot fix this, because
+    // it moves both in the same direction.
+    const budget: MealNutrients = {
+      calories: 640, proteinG: 55, carbsG: 60, fatG: 16, fibreG: 5,
+    };
+    const proposed = [
+      ingredient('chicken', 100),  // too little protein
+      ingredient('rice', 80),
+      ingredient('oil', 20),       // too much fat
+    ];
+
+    const before = calculateMealNutrients(proposed, lookup)!;
+    const after = fitMealToBudget(proposed, budget, lookup)!.nutrients;
+
+    // The claim is that the *ratio* improves, not that any single macro moves in
+    // a given direction — the final calorie pass can raise everything at once.
+    const off = (n: MealNutrients, key: 'proteinG' | 'fatG') =>
+      Math.abs(n[key] - budget[key]) / budget[key];
+
+    expect(off(after, 'proteinG')).toBeLessThan(off(before, 'proteinG'));
+    expect(off(after, 'fatG')).toBeLessThan(off(before, 'fatG'));
+  });
+
+  it('respects the portion bound even when that means rejecting the meal', () => {
+    // 100 g of chicken cannot supply 55 g of protein within +40%, so the right
+    // answer is to reject rather than serve someone 230 g and call it a fit.
+    const budget: MealNutrients = {
+      calories: 640, proteinG: 55, carbsG: 60, fatG: 16, fibreG: 5,
+    };
+    const result = fitMealToBudget(
+      [ingredient('chicken', 100), ingredient('rice', 80), ingredient('oil', 20)],
+      budget,
+      lookup,
+    )!;
+
+    const chicken = result.ingredients.find((i) => i.foodId === 'chicken')!;
+    expect(chicken.grams).toBeLessThanOrEqual(140);
+    expect(result.validation.valid).toBe(false);
+  });
+
+  it('accepts a meal whose macros are reachable within the bounds', () => {
+    const budget: MealNutrients = {
+      calories: 640, proteinG: 45, carbsG: 65, fatG: 17, fibreG: 5,
+    };
+    const result = fitMealToBudget(
+      [ingredient('chicken', 170), ingredient('rice', 75), ingredient('oil', 12)],
+      budget,
+      lookup,
+    )!;
+
+    expect(result.validation.valid).toBe(true);
+  });
+
+  it('keeps every portion weighable after ratio correction', () => {
+    const budget: MealNutrients = {
+      calories: 640, proteinG: 55, carbsG: 60, fatG: 16, fibreG: 5,
+    };
+    const result = fitMealToBudget(
+      [ingredient('chicken', 100), ingredient('rice', 80), ingredient('oil', 20)],
+      budget,
+      lookup,
+    )!;
+
+    for (const item of result.ingredients) {
+      expect(item.grams % 5).toBe(0);
+      expect(item.grams).toBeGreaterThanOrEqual(5);
+    }
+  });
+
   it('reports failure rather than distorting portions to force a fit', () => {
     // A budget no plausible scaling of 20 g of oil can reach.
     const budget: MealNutrients = {
