@@ -55,7 +55,7 @@ describe('buildWorkbookBase64', () => {
     expect(buffer.length).toBeGreaterThan(5000);
   });
 
-  it('contains the seven sheets the spec asks for', async () => {
+  it('contains the eight sheets the spec asks for', async () => {
     const { workbook } = await buildExport();
 
     expect(workbook.SheetNames).toEqual([
@@ -66,6 +66,7 @@ describe('buildWorkbookBase64', () => {
       'Recipes',
       'Shopping List',
       'Meal Prep',
+      'My Foods',
     ]);
   });
 

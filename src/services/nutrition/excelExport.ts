@@ -11,7 +11,7 @@ import { AISLE_LABELS, formatPortion, findFood } from '@/data/foods';
 /**
  * Excel export (spec §48).
  *
- * Produces a genuine .xlsx workbook — seven sheets, headers, sensible column
+ * Produces a genuine .xlsx workbook — eight sheets, headers, sensible column
  * widths — rather than a CSV with a misleading extension or a raw table dump.
  * The spec is explicit that this should be professionally formatted.
  *
@@ -34,6 +34,29 @@ export type ExportInput = {
   mealPrep: MealPrepItem[];
   displayName: string;
   disclaimerText: string;
+  /** Scanned and hand-entered foods, exported separately (spec §36). */
+  myFoods?: ExportedFood[];
+};
+
+/**
+ * A saved food as it appears in the workbook.
+ *
+ * Kept structural rather than importing the scanner's store type, so the
+ * export stays a pure data-in/data-out module with no dependency on app state.
+ */
+export type ExportedFood = {
+  name: string;
+  brand?: string;
+  gtin?: string;
+  basis: string;
+  kcal: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  servingSizeG?: number;
+  source: string;
+  verificationStatus: string;
+  savedAt: string;
 };
 
 type Row = Array<string | number>;
@@ -253,6 +276,67 @@ function wrapText(text: string, width: number): string[] {
   return lines;
 }
 
+/**
+ * My Foods (spec §36).
+ *
+ * Scanned and hand-entered foods are marked clearly as user-confirmed rather
+ * than mixed in with the curated catalogue, because a printed plan that hides
+ * which figures came off a phone camera is misleading.
+ */
+function buildMyFoods(foods: ExportedFood[]): XLSX.WorkSheet {
+  const rows: Row[] = [
+    ['Name', 'Brand', 'Barcode', 'Basis', 'kcal', 'Protein (g)', 'Carbs (g)', 'Fat (g)', 'Serving (g)', 'Added by', 'Checked', 'Saved'],
+  ];
+
+  for (const food of foods) {
+    rows.push([
+      food.name,
+      food.brand ?? '',
+      food.gtin ?? '',
+      BASIS_LABELS[food.basis] ?? food.basis,
+      Math.round(food.kcal),
+      Math.round(food.proteinG),
+      Math.round(food.carbsG),
+      Math.round(food.fatG),
+      food.servingSizeG ?? '',
+      SOURCE_LABELS[food.source] ?? food.source,
+      VERIFICATION_LABELS[food.verificationStatus] ?? food.verificationStatus,
+      food.savedAt.slice(0, 10),
+    ]);
+  }
+
+  if (foods.length === 0) {
+    rows.push(['No scanned or custom foods saved yet.']);
+  } else {
+    rows.push([]);
+    rows.push([
+      'These figures were confirmed by you against the packaging. Allergen information from product databases is not a guarantee — always check the physical pack.',
+    ]);
+  }
+
+  return sheet(rows, [30, 18, 16, 14, 9, 12, 11, 9, 12, 14, 16, 12]);
+}
+
+const BASIS_LABELS: Record<string, string> = {
+  per_100g: 'Per 100g',
+  per_100ml: 'Per 100ml',
+  per_serving: 'Per serving',
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+  barcode: 'Barcode scan',
+  label: 'Label scan',
+  manual: 'Entered by hand',
+};
+
+const VERIFICATION_LABELS: Record<string, string> = {
+  provider_unverified: 'Database, unconfirmed',
+  user_confirmed: 'You confirmed it',
+  moderator_verified: 'Moderator checked',
+  manufacturer_verified: 'Manufacturer checked',
+  rejected: 'Rejected',
+};
+
 /** Build the workbook and return it as base64, ready to write to a file. */
 export function buildWorkbookBase64(input: ExportInput): string {
   const workbook = XLSX.utils.book_new();
@@ -265,6 +349,7 @@ export function buildWorkbookBase64(input: ExportInput): string {
   XLSX.utils.book_append_sheet(workbook, buildRecipes(input.plan), 'Recipes');
   XLSX.utils.book_append_sheet(workbook, buildShoppingList(input.shoppingList), 'Shopping List');
   XLSX.utils.book_append_sheet(workbook, buildMealPrep(input.mealPrep), 'Meal Prep');
+  XLSX.utils.book_append_sheet(workbook, buildMyFoods(input.myFoods ?? []), 'My Foods');
 
   return XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
 }
