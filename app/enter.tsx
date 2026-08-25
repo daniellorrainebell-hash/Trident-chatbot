@@ -73,7 +73,11 @@ export default function EnterScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#000000', paddingHorizontal: sp.xl },
 
-  mark: { alignItems: 'center', paddingTop: sp.lg },
+  // Even padding above and below the mark, rather than only above it. The old
+  // 16pt top and nothing underneath sat the wordmark right on the top edge of
+  // the screen; this drops it clear of the corner radius and gives the block
+  // the same air on both sides.
+  mark: { alignItems: 'center', paddingVertical: sp.xxl },
   wordmark: { width: 104, height: 105 },
 
   // The figure sits over the advisory rather than beside it.
