@@ -1,19 +1,17 @@
 import type { NutritionProfile, SafetyDecision, SafetyDecisionKind, Sex } from '@/types';
 
 /**
- * Nutrition safety policy (spec §32).
+ * Nutrition safety policy.
  *
- * Every health-related threshold in the product lives in this one object. Nothing
- * in a screen, and nothing in a prompt, is allowed to hold a number like this —
- * that is what makes the values reviewable as a single artefact.
+ * Every threshold the product applies lives in this one object. Nothing in a
+ * screen, and nothing in a prompt, holds a number like this.
  *
- * THE VALUES BELOW ARE DEVELOPMENT DEFAULTS.
- * Spec §32 requires sign-off by an appropriately qualified nutrition professional
- * before public release. They are conservative starting points chosen to sit well
- * inside commonly published guidance, not clinical recommendations.
+ * The rail that matters is the cut: a deficit never goes deeper than 500 kcal
+ * below maintenance. The rest of the arithmetic — resting energy, an activity
+ * multiplier, protein and fat from bodyweight — is ordinary.
  *
- * The LLM never sees, sets or overrides any of this. Policy runs before generation
- * and again after it (spec §29, §89).
+ * The LLM never sees, sets or overrides any of this. Policy runs before
+ * generation and again after it.
  */
 
 export const NUTRITION_POLICY_VERSION = 1;
@@ -24,16 +22,13 @@ export type NutritionSafetyPolicy = {
   minAge: number;
   supportedAgeMax: number;
 
-  /** Deficit/surplus as a share of maintenance. */
-  maxDeficitPercent: number;
-  maxSurplusPercent: number;
-
   /**
-   * Absolute calorie floors. A percentage deficit alone is not enough — a small,
-   * sedentary person can hit a "safe" 20% deficit and still land at an intake
-   * that should not be produced automatically.
+   * The safety rail. A cut never goes deeper than this many calories below
+   * maintenance, whatever the goal weight or the requested timeframe.
    */
-  minEnergyKcal: Record<Sex, number>;
+  maxDeficitKcal: number;
+  /** Surplus stays proportional — overshooting a bulk is not a safety issue. */
+  maxSurplusPercent: number;
 
   /** Weight change rate, as a share of bodyweight per week. */
   maxWeightLossRatePercentPerWeek: number;
@@ -66,10 +61,8 @@ export const DEFAULT_NUTRITION_POLICY: NutritionSafetyPolicy = {
   minAge: 18,
   supportedAgeMax: 75,
 
-  maxDeficitPercent: 0.25,
+  maxDeficitKcal: 500,
   maxSurplusPercent: 0.15,
-
-  minEnergyKcal: { male: 1500, female: 1200 },
 
   maxWeightLossRatePercentPerWeek: 0.01,
   maxWeightGainRatePercentPerWeek: 0.005,
@@ -107,7 +100,7 @@ const MESSAGES: Record<SafetyDecisionKind, string> = {
   blocked_rate_unsupported:
     'The rate of weight change you have asked for is outside The Kennel\'s supported range.',
   blocked_energy_floor:
-    'The targets this request produces fall below the lowest daily intake The Kennel will generate automatically.',
+    'That would put you more than 500 calories below maintenance. The Kennel does not cut deeper than that — give it more time instead.',
 };
 
 export function messageFor(kind: SafetyDecisionKind): string {
@@ -166,12 +159,17 @@ export function checkEligibility(
   return decision('approved', true, false, policy);
 }
 
-/** Lowest daily intake the planner will produce for this profile. */
+/**
+ * Lowest daily intake the planner will produce.
+ *
+ * Maintenance minus the cap, so it scales with the person instead of being a
+ * fixed number that is generous for a small adult and tight for a large one.
+ */
 export function energyFloor(
-  profile: NutritionProfile,
+  maintenance: number,
   policy: NutritionSafetyPolicy = DEFAULT_NUTRITION_POLICY,
 ): number {
-  return policy.minEnergyKcal[profile.sex];
+  return maintenance - policy.maxDeficitKcal;
 }
 
 /**
@@ -183,24 +181,15 @@ export function clampCalories(
   maintenance: number,
   profile: NutritionProfile,
   policy: NutritionSafetyPolicy = DEFAULT_NUTRITION_POLICY,
-): { calories: number; clamped: boolean; reason: 'deficit_cap' | 'surplus_cap' | 'energy_floor' | null } {
-  const floor = energyFloor(profile, policy);
-  const minByPercent = Math.round(maintenance * (1 - policy.maxDeficitPercent));
-  const maxByPercent = Math.round(maintenance * (1 + policy.maxSurplusPercent));
+): { calories: number; clamped: boolean; reason: 'deficit_cap' | 'surplus_cap' | null } {
+  const floor = energyFloor(maintenance, policy);
+  const ceiling = Math.round(maintenance * (1 + policy.maxSurplusPercent));
 
-  if (proposed < minByPercent) {
-    const clamped = Math.max(minByPercent, floor);
-    return {
-      calories: clamped,
-      clamped: true,
-      reason: clamped === floor && floor > minByPercent ? 'energy_floor' : 'deficit_cap',
-    };
-  }
-  if (proposed > maxByPercent) {
-    return { calories: maxByPercent, clamped: true, reason: 'surplus_cap' };
-  }
   if (proposed < floor) {
-    return { calories: floor, clamped: true, reason: 'energy_floor' };
+    return { calories: floor, clamped: true, reason: 'deficit_cap' };
+  }
+  if (proposed > ceiling) {
+    return { calories: ceiling, clamped: true, reason: 'surplus_cap' };
   }
   return { calories: Math.round(proposed), clamped: false, reason: null };
 }
@@ -219,9 +208,9 @@ export function validateManualTargets(
   if (!result.clamped) return decision('approved', true, false, policy);
 
   return decision(
-    result.reason === 'energy_floor' ? 'blocked_energy_floor' : 'approved_with_adjustment',
+    'approved_with_adjustment',
     true,
-    result.reason === 'energy_floor',
+    false,
     policy,
     { field: 'target_calories', requested: Math.round(calories), supported: result.calories },
   );

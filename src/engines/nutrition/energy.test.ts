@@ -149,7 +149,7 @@ describe('calculateEnergyTargets', () => {
     expect(result.calorieAdjustment).toBe(0);
   });
 
-  it('clamps an unsupported crash request to the policy maximum rate', () => {
+  it('never cuts more than 500 below maintenance, however aggressive the request', () => {
     const profile = makeNutritionProfile({
       currentWeightKg: 100,
       targetWeightKg: 90,
@@ -157,12 +157,11 @@ describe('calculateEnergyTargets', () => {
     });
     const result = calculateEnergyTargets(profile);
 
-    const deficitShare =
-      (result.maintenanceCalories - result.targetCalories) / result.maintenanceCalories;
-    expect(deficitShare).toBeLessThanOrEqual(DEFAULT_NUTRITION_POLICY.maxDeficitPercent + 1e-9);
+    const deficit = result.maintenanceCalories - result.targetCalories;
+    expect(deficit).toBeLessThanOrEqual(DEFAULT_NUTRITION_POLICY.maxDeficitKcal);
   });
 
-  it('never returns a target below the absolute energy floor', () => {
+  it('never returns a target below the floor', () => {
     const profile = makeNutritionProfile({
       sex: 'female',
       currentWeightKg: 50,
@@ -174,7 +173,7 @@ describe('calculateEnergyTargets', () => {
     });
 
     const result = calculateEnergyTargets(profile);
-    expect(result.targetCalories).toBeGreaterThanOrEqual(energyFloor(profile));
+    expect(result.targetCalories).toBeGreaterThanOrEqual(energyFloor(result.maintenanceCalories));
   });
 
   it('records the equation and policy version behind every target', () => {

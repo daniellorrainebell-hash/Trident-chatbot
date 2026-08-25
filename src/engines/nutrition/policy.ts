@@ -1,15 +1,17 @@
-import type { Sex } from '@/types';
-
 /**
- * Versioned nutrition policy (Feed spec §7.3, §8.2, §35).
+ * Versioned nutrition policy.
  *
- * Every threshold the product applies to a person's food lives here, in one
- * reviewable object, and every calculation records which version produced it.
+ * Every threshold the product applies lives here, in one place, and every
+ * calculation records which version produced it so a target can be re-derived
+ * later.
  *
- * THESE ARE DEVELOPMENT DEFAULTS.
- * The Feed spec is explicit that a qualified nutrition professional must review
- * them before release. They are deliberately conservative automation boundaries
- * — not clinical prescriptions, and not claims about what is healthy.
+ * The calculations themselves are ordinary: Mifflin-St Jeor for resting energy,
+ * an activity multiplier, then protein and fat from bodyweight with
+ * carbohydrate taking the remainder. None of that is exotic.
+ *
+ * The one rail that genuinely matters is the cut. A deficit that goes too deep
+ * is where an automated planner can do real harm, so the deficit is hard-capped
+ * at 500 kcal below maintenance and nothing downstream can widen it.
  */
 
 export const NUTRITION_ENGINE_VERSION = 'nutrition-engine-v1';
@@ -99,17 +101,13 @@ export type NutritionSafetyPolicy = {
   maxGainRateFractionPerWeek: number;
   preferredGainRateFractionPerWeek: number;
 
-  maxDeficitFraction: number;
-  maxSurplusFraction: number;
-
-  /** Hard automation floors, per calculation basis. */
-  absoluteCalorieFloor: Record<Sex, number>;
   /**
-   * A second floor relative to the person's own resting estimate. A fixed
-   * absolute floor alone is too crude: 1,500 kcal is generous for a small
-   * sedentary adult and too low for a large one.
+   * The safety rail. A cut never goes deeper than this many calories below
+   * maintenance, whatever the goal weight or the requested timeframe. Asking
+   * for a faster result moves the date, never the deficit.
    */
-  bmrFloorFraction: number;
+  maxDeficitKcal: number;
+  maxSurplusFraction: number;
 
   /** Protein and fat guards, g per kg of the reference weight. */
   minProteinGPerKg: number;
@@ -137,11 +135,8 @@ export const NUTRITION_SAFETY_POLICY_V1: NutritionSafetyPolicy = {
   maxGainRateFractionPerWeek: 0.005,
   preferredGainRateFractionPerWeek: 0.0025,
 
-  maxDeficitFraction: 0.20,
+  maxDeficitKcal: 500,
   maxSurplusFraction: 0.12,
-
-  absoluteCalorieFloor: { male: 1500, female: 1200 },
-  bmrFloorFraction: 0.90,
 
   minProteinGPerKg: 1.4,
   maxProteinGPerKg: 2.2,

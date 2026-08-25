@@ -173,14 +173,17 @@ describe('reconcileMacros', () => {
 });
 
 describe('calculateTargets', () => {
-  it('reproduces the spec worked example', () => {
+  it('reproduces the worked example, with the cap applied', () => {
     const result = calculateTargets(input());
 
     expect(result.bmrEstimate).toBe(1855);
     expect(result.maintenanceCalories).toBe(2750);
-    // 8 kg over 16 weeks = 0.5 kg/week = 550 kcal/day -> ~2,200
-    expect(result.targetCalories).toBe(2200);
-    expect(result.safetyDecision.status).toBe('approved');
+
+    // 8 kg over 16 weeks needs 550 kcal/day. The cap is 500, so the target is
+    // 2,250 rather than the 2,200 the raw arithmetic gives — the deficit stops
+    // at 500 and the goal date moves instead.
+    expect(result.targetCalories).toBe(2250);
+    expect(result.maintenanceCalories - result.targetCalories).toBe(500);
   });
 
   it('records every policy version behind the number', () => {
@@ -202,14 +205,35 @@ describe('calculateTargets', () => {
     }
   });
 
-  it('never exceeds the maximum deficit fraction', () => {
+  it('never cuts more than 500 kcal below maintenance', () => {
     const result = calculateTargets(input({ currentWeightKg: 100, targetWeightKg: 85, requestedWeeks: 6 }));
-    const deficitFraction =
-      (result.maintenanceCalories - result.targetCalories) / result.maintenanceCalories;
-    expect(deficitFraction).toBeLessThanOrEqual(policy.maxDeficitFraction + 1e-9);
+    const deficit = result.maintenanceCalories - result.targetCalories;
+    expect(deficit).toBeLessThanOrEqual(policy.maxDeficitKcal);
   });
 
-  it('never falls below the automation floor', () => {
+  it('holds the 500 cap however aggressive the request', () => {
+    // Every one of these asks for a rate the cap will refuse to fund.
+    const aggressive = [
+      input({ currentWeightKg: 120, targetWeightKg: 80, requestedWeeks: 4 }),
+      input({ currentWeightKg: 90, targetWeightKg: 70, requestedWeeks: 2 }),
+      input({ currentWeightKg: 60, targetWeightKg: 50, requestedWeeks: 3, equationBasis: 'female' }),
+    ];
+
+    for (const request of aggressive) {
+      const result = calculateTargets(request);
+      const deficit = result.maintenanceCalories - result.targetCalories;
+      expect(deficit).toBeLessThanOrEqual(policy.maxDeficitKcal);
+    }
+  });
+
+  it('moves the date rather than the deficit when a request is too fast', () => {
+    const result = calculateTargets(input({ currentWeightKg: 100, targetWeightKg: 90, requestedWeeks: 3 }));
+
+    expect(result.maintenanceCalories - result.targetCalories).toBeLessThanOrEqual(500);
+    expect(result.safetyDecision.status).toBe('adjust_timeframe');
+  });
+
+  it('never falls below the floor, which is maintenance minus the cap', () => {
     const result = calculateTargets(
       input({
         equationBasis: 'female',
@@ -222,11 +246,17 @@ describe('calculateTargets', () => {
       }),
     );
     expect(result.targetCalories).toBeGreaterThanOrEqual(result.automationFloor);
+    expect(result.automationFloor).toBe(result.maintenanceCalories - policy.maxDeficitKcal);
   });
 
-  it('applies a BMR-relative floor, not only the absolute one', () => {
-    const result = calculateTargets(input({ currentWeightKg: 130, targetWeightKg: 100, requestedWeeks: 20 }));
-    expect(result.automationFloor).toBeGreaterThan(policy.absoluteCalorieFloor.male);
+  it('scales the floor with the person rather than using a fixed number', () => {
+    const small = calculateTargets(
+      input({ equationBasis: 'female', heightCm: 155, currentWeightKg: 52, targetWeightKg: 48, activityLevel: 'mostly_seated' }),
+    );
+    const large = calculateTargets(input({ currentWeightKg: 120, targetWeightKg: 100, requestedWeeks: 30 }));
+
+    // A fixed floor is generous for a small adult and tight for a large one.
+    expect(large.automationFloor).toBeGreaterThan(small.automationFloor);
   });
 
   it('sets muscle gain from experience, not from the timeline', () => {
@@ -279,9 +309,9 @@ describe('acceptManualTargets', () => {
     expect(result.belowAutomationFloor).toBe(false);
   });
 
-  it('flags a prescription below the automation floor without refusing to store it', () => {
+  it('flags a prescription below what the app would generate, without refusing to store it', () => {
     const result = acceptManualTargets({
-      calories: 1300, proteinG: 140, carbsG: 100, fatG: 40, basis: 'male',
+      calories: 1300, proteinG: 140, carbsG: 100, fatG: 40, basis: 'male', maintenanceCalories: 2750,
     });
     expect(result.belowAutomationFloor).toBe(true);
     expect(result.macros.calories).toBe(1300);
@@ -299,10 +329,21 @@ describe('projectForTimeframe', () => {
     expect(projectForTimeframe(person, 16)?.supported).toBe(true);
   });
 
-  it('allows more calories as the timeframe lengthens', () => {
-    const fast = projectForTimeframe(person, 10)!;
-    const slow = projectForTimeframe(person, 20)!;
-    expect(slow.calories).toBeGreaterThan(fast.calories);
+  it('allows more calories once the timeframe is long enough to clear the cap', () => {
+    // 20 weeks still needs 550 kcal/day and lands on the cap; 24 weeks needs
+    // 458 and comes in under it.
+    const capped = projectForTimeframe(person, 20)!;
+    const under = projectForTimeframe(person, 24)!;
+    expect(under.calories).toBeGreaterThan(capped.calories);
+  });
+
+  it('flattens every timeframe that would need more than the cap', () => {
+    // Asking for it faster does not produce a deeper cut, only an earlier date
+    // the app will refuse.
+    const six = projectForTimeframe(person, 6)!;
+    const ten = projectForTimeframe(person, 10)!;
+    expect(six.calories).toBe(ten.calories);
+    expect(six.supported).toBe(false);
   });
 
   it('rejects a nonsense timeframe', () => {

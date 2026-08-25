@@ -257,10 +257,10 @@ export function calculateTargets(
 
   const effectiveWeeks = timeframeUnsupported ? supportedWeeks : input.requestedWeeks;
 
-  const automationFloor = Math.max(
-    policy.absoluteCalorieFloor[basis],
-    Math.round(bmr * policy.bmrFloorFraction),
-  );
+  // The floor is simply maintenance minus the maximum deficit. One rule, and
+  // it scales with the person rather than being a fixed number that is
+  // generous for a small adult and tight for a large one.
+  const automationFloor = maintenance - policy.maxDeficitKcal;
 
   let targetCalories: number;
 
@@ -278,16 +278,19 @@ export function calculateTargets(
   } else {
     const fromTimeline =
       effectiveWeeks > 0 ? (changeKg * KCAL_PER_KG_BODYWEIGHT) / (effectiveWeeks * 7) : 0;
-    const maxDeficit = maintenance * policy.maxDeficitFraction;
-    const deficit = Math.min(fromTimeline, maxDeficit);
-    // Round up, not to nearest. Rounding to nearest can shave a few calories off
-    // a target already sitting on the deficit cap and push it through — a 20%
-    // ceiling that reports 20.07% is not a ceiling.
+
+    // The cap is the whole safety story on a cut. Whatever the goal weight or
+    // the requested date, the deficit stops here.
+    const deficit = Math.min(fromTimeline, policy.maxDeficitKcal);
+
+    // Round up, not to nearest. Rounding to nearest can shave calories off a
+    // target already sitting on the cap and push the deficit past it.
     targetCalories = Math.ceil((maintenance - deficit) / 10) * 10;
   }
 
+  // Belt and braces: nothing downstream can widen the deficit past the cap.
   const hitFloor = targetCalories < automationFloor;
-  if (hitFloor) targetCalories = roundToNearest(automationFloor, 10);
+  if (hitFloor) targetCalories = Math.ceil(automationFloor / 10) * 10;
 
   const macros = calculateMacros(targetCalories, input, policy);
 
@@ -354,13 +357,14 @@ function resolveDecision(args: {
  * safe to produce automatically.
  */
 export function acceptManualTargets(
-  input: { calories: number; proteinG: number; carbsG: number; fatG: number; basis: Sex; bmrEstimate?: number },
+  input: { calories: number; proteinG: number; carbsG: number; fatG: number; basis: Sex; maintenanceCalories?: number },
   policy: NutritionSafetyPolicy = NUTRITION_SAFETY_POLICY_V1,
 ): { macros: MacroTargets; belowAutomationFloor: boolean; metadata: NutritionCalculationMetadata } {
-  const floor = Math.max(
-    policy.absoluteCalorieFloor[input.basis],
-    input.bmrEstimate ? Math.round(input.bmrEstimate * policy.bmrFloorFraction) : 0,
-  );
+  // Manual targets are stored as given; the flag simply tells the UI when a
+  // prescribed figure sits below what the app would generate on its own.
+  const floor = input.maintenanceCalories
+    ? input.maintenanceCalories - policy.maxDeficitKcal
+    : 0;
 
   return {
     macros: reconcileMacros({
@@ -406,10 +410,7 @@ export function projectForTimeframe(
   const direction = input.targetWeightKg < input.currentWeightKg ? -1 : 1;
 
   const daily = (direction * (changeKg / weeks) * KCAL_PER_KG_BODYWEIGHT) / 7;
-  const floor = Math.max(
-    policy.absoluteCalorieFloor[basis],
-    Math.round(bmr * policy.bmrFloorFraction),
-  );
+  const floor = maintenance - policy.maxDeficitKcal;
 
   return {
     calories: Math.max(floor, roundToNearest(maintenance + daily, 10)),

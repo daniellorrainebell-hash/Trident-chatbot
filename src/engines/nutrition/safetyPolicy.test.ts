@@ -86,12 +86,11 @@ describe('clampCalories', () => {
     expect(result.calories).toBe(2400);
   });
 
-  it('clamps an aggressive deficit to the policy cap', () => {
+  it('clamps an aggressive deficit to 500 below maintenance', () => {
     const result = clampCalories(1200, maintenance, profile);
     expect(result.clamped).toBe(true);
     expect(result.reason).toBe('deficit_cap');
-    // 25% below 2800
-    expect(result.calories).toBe(2100);
+    expect(result.calories).toBe(2300);
   });
 
   it('clamps an excessive surplus to the policy cap', () => {
@@ -101,17 +100,15 @@ describe('clampCalories', () => {
     expect(result.calories).toBe(3220);
   });
 
-  it('applies the absolute energy floor to a small maintenance', () => {
-    // A 25% deficit from 1800 is 1350, below the 1500 male floor.
-    const result = clampCalories(1000, 1800, profile);
-    expect(result.calories).toBe(energyFloor(profile));
-    expect(result.reason).toBe('energy_floor');
+  it('scales the floor with maintenance rather than using a fixed number', () => {
+    expect(energyFloor(1800)).toBe(1300);
+    expect(energyFloor(3200)).toBe(2700);
   });
 
-  it('uses a sex-specific floor', () => {
-    const female = makeNutritionProfile({ sex: 'female' });
-    expect(energyFloor(female)).toBe(1200);
-    expect(energyFloor(makeNutritionProfile())).toBe(1500);
+  it('applies the same 500 rule at a small maintenance', () => {
+    const result = clampCalories(1000, 1800, profile);
+    expect(result.calories).toBe(energyFloor(1800));
+    expect(result.reason).toBe('deficit_cap');
   });
 });
 
@@ -124,10 +121,9 @@ describe('validateManualTargets', () => {
     expect(decision.adjustment).toBeUndefined();
   });
 
-  it('does not let a manual override bypass the safety band', () => {
+  it('does not let a manual override cut deeper than 500', () => {
     const decision = validateManualTargets(900, 2800, profile);
     expect(decision.adjustment?.requested).toBe(900);
-    expect(decision.adjustment?.supported).toBe(2100);
-    expect(decision.adjustment?.supported).toBeGreaterThan(900);
+    expect(decision.adjustment?.supported).toBe(2300);
   });
 });

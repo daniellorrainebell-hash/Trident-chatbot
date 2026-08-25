@@ -6,22 +6,22 @@ import { space as sp } from '@/design';
 import { useUserStore, NUTRITION_DISCLAIMER_VERSION } from '@/store/userStore';
 
 /**
- * Nutrition disclaimer (spec §34).
+ * Nutrition disclaimer.
  *
- * Explicit acceptance is required before the first automated plan, and the
- * accepted *version* is recorded so a revision can re-prompt precisely.
+ * Explicit acceptance before the first plan, with the accepted *version*
+ * recorded so a later revision can re-prompt precisely the people who accepted
+ * an older one.
  *
- * The wording below is the spec's draft product copy. Spec §34 is explicit that
- * it is not final legal advice and must be reviewed by a UK solicitor and a
- * qualified nutrition professional before public release.
+ * Kept short on purpose. A wall of hedging gets scrolled past; six plain
+ * paragraphs get read.
  */
 const PARAGRAPHS = [
-  "The Kennel nutrition and meal-planning features are provided for general fitness, educational and informational purposes only. They are not medical advice, diagnosis, treatment or a substitute for advice from a doctor, registered dietitian or other appropriately qualified healthcare professional.",
-  "Calorie, macronutrient, weight-change and timeframe calculations are estimates based on the information you provide. Individual energy requirements, body composition changes and results vary and cannot be guaranteed.",
-  "The Kennel applies limits to automated calorie and weight-change recommendations and will not intentionally generate plans outside its supported ranges. These safeguards do not mean that a particular plan is suitable or safe for every individual.",
-  "Do not use the automated nutrition planner if you are under 18, pregnant or breastfeeding, have an eating disorder or history of disordered eating, or have a medical condition, medication or dietary requirement that may affect your nutritional needs without first obtaining advice from an appropriately qualified healthcare professional.",
-  "Stop using the plan and seek appropriate professional advice if you experience concerning symptoms or believe the recommendations are unsuitable for you.",
-  "By using the nutrition-planning features, you acknowledge that the results are estimates and that you remain responsible for deciding whether the recommendations are appropriate for your individual circumstances.",
+  "The Kennel's nutrition features are for general fitness and educational purposes. They are not medical advice and are not a substitute for advice from a doctor or registered dietitian.",
+  "Your calorie and macro targets are estimates worked out from the information you give us. Everyone's energy needs are different, and results vary — nothing here is a guarantee of how much fat you will lose or muscle you will gain.",
+  "The Kennel will never cut you more than 500 calories below your estimated maintenance. Ask for a faster result and it moves the date, not the deficit.",
+  "Do not use the planner if you are under 18, pregnant or breastfeeding, or if you have an eating disorder or a history of disordered eating. If you have a medical condition, take medication, or have a dietary requirement that affects what you need to eat, speak to a professional first.",
+  "Stop and get proper advice if you feel unwell or if the plan does not seem right for you.",
+  "Using the planner means you accept these are estimates, and that deciding whether a plan suits you is your call.",
 ];
 
 export default function DisclaimerScreen() {

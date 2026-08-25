@@ -151,6 +151,8 @@ export function suggestAdjustment(
     policy,
   );
 
+  // Already at the cap. The honest answer is that the app will not cut deeper,
+  // not a silent no-op — `explainNoAdjustment` says so.
   if (suggestedCalories === current.targetCalories) return null;
 
   return {
@@ -191,6 +193,7 @@ function buildReason(trend: TrendAnalysis, profile: NutritionProfile): string {
 export function explainNoAdjustment(
   trend: TrendAnalysis,
   policy: NutritionSafetyPolicy = DEFAULT_NUTRITION_POLICY,
+  context?: { targetCalories: number; maintenanceCalories: number },
 ): string {
   if (!trend.sufficientData) {
     const needed = policy.minWeeksBeforeAdjustment - trend.weeksObserved;
@@ -199,7 +202,23 @@ export function explainNoAdjustment(
   if (!trend.sufficientAdherence) {
     return `Reported adherence is ${trend.averageAdherence}%. The Kennel does not adjust targets until the current plan has been followed consistently.`;
   }
+
+  // Being at the cap is the one case where the app has a reason and no lever.
+  // Saying nothing would read as the feature being broken.
+  if (context && atDeficitCap(context.targetCalories, context.maintenanceCalories, policy)) {
+    return 'You are already 500 calories below maintenance, which is as deep as The Kennel cuts. If the trend has stalled, more time or more activity is the way forward — not fewer calories.';
+  }
+
   return 'Your trend is tracking close enough to target. No change needed.';
+}
+
+/** True when a target already sits on the deficit cap. */
+export function atDeficitCap(
+  targetCalories: number,
+  maintenanceCalories: number,
+  policy: NutritionSafetyPolicy = DEFAULT_NUTRITION_POLICY,
+): boolean {
+  return maintenanceCalories - targetCalories >= policy.maxDeficitKcal;
 }
 
 function round(value: number, dp: number): number {

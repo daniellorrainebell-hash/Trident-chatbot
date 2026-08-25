@@ -7,7 +7,7 @@ import { useNutritionStore } from './nutritionStore';
 
 function reset() {
   useNutritionStore.setState({
-    profile: seedNutritionProfile,
+    profile: { ...seedNutritionProfile, targetWeightKg: 85, requestedTimeframeWeeks: 20 },
     preferences: seedFoodPreferences,
     safetyDecision: null,
     energy: null,

@@ -3,7 +3,13 @@ import { calculateEnergyTargets } from './energy';
 import { DEFAULT_NUTRITION_POLICY } from './safetyPolicy';
 import { analyseTrend, explainNoAdjustment, suggestAdjustment, weeklyTrendKg } from './adjustment';
 
-const profile = makeNutritionProfile();
+/**
+ * A gentle goal, deliberately. The default fixture asks for a rate that lands
+ * exactly on the 500 cap, and a target already at the cap can never be cut
+ * further — which is the point of the cap, but makes it useless for testing
+ * the adjustment logic itself.
+ */
+const profile = makeNutritionProfile({ targetWeightKg: 85, requestedTimeframeWeeks: 20 });
 const current = calculateEnergyTargets(profile);
 const makeId = () => 'suggestion-1';
 
@@ -74,10 +80,31 @@ describe('suggestAdjustment', () => {
   });
 
   it('leaves a plan alone while it is tracking to its own planned rate', () => {
-    // The profile asks for 8 kg over 16 weeks — 0.5 kg/week — which is inside
-    // policy, so that, not the 0.9 kg/week ceiling, is what progress is judged against.
-    const onTarget = checkIns(5, 90, -0.5);
+    // This profile asks for 3.4 kg over 20 weeks — about 0.17 kg/week — and
+    // that planned rate, not the policy ceiling, is what progress is judged
+    // against. Someone doing exactly what they signed up for is not "behind".
+    const onTarget = checkIns(5, 88.4, -0.17);
     expect(suggestAdjustment({ profile, current, checkIns: onTarget, makeId })).toBeNull();
+  });
+
+  it('says why it cannot help when the target is already at the cap', () => {
+    const atCap = makeNutritionProfile({ targetWeightKg: 78, requestedTimeframeWeeks: 10 });
+    const capped = calculateEnergyTargets(atCap);
+
+    // 500 below maintenance already: the honest answer is that there is no
+    // deeper cut on offer, not silence.
+    expect(capped.maintenanceCalories - capped.targetCalories).toBe(500);
+
+    const stalled = checkIns(6, 90, -0.01);
+    expect(suggestAdjustment({ profile: atCap, current: capped, checkIns: stalled, makeId })).toBeNull();
+
+    const message = explainNoAdjustment(
+      analyseTrend(atCap, stalled),
+      undefined,
+      { targetCalories: capped.targetCalories, maintenanceCalories: capped.maintenanceCalories },
+    );
+    expect(message).toMatch(/500 calories below maintenance/);
+    expect(message).toMatch(/not fewer calories/);
   });
 
   it('suggests a reduction when loss has stalled despite good adherence', () => {
@@ -106,9 +133,8 @@ describe('suggestAdjustment', () => {
     });
 
     const delta = suggestion!.suggestedCalories - suggestion!.currentCalories;
-    const deficitFloor = Math.round(
-      current.maintenanceCalories * (1 - DEFAULT_NUTRITION_POLICY.maxDeficitPercent),
-    );
+    const deficitFloor =
+      current.maintenanceCalories - DEFAULT_NUTRITION_POLICY.maxDeficitKcal;
 
     // Steps are rounded to 20 kcal so the change reads as a decision, not a
     // calculation. The clamp takes precedence: landing exactly on the policy
@@ -150,10 +176,8 @@ describe('suggestAdjustment', () => {
     });
 
     if (suggestion) {
-      const deficit =
-        (current.maintenanceCalories - suggestion.suggestedCalories) /
-        current.maintenanceCalories;
-      expect(deficit).toBeLessThanOrEqual(DEFAULT_NUTRITION_POLICY.maxDeficitPercent + 1e-9);
+      const deficit = current.maintenanceCalories - suggestion.suggestedCalories;
+      expect(deficit).toBeLessThanOrEqual(DEFAULT_NUTRITION_POLICY.maxDeficitKcal);
     }
   });
 });

@@ -250,9 +250,9 @@ export default function FeedScreen() {
       </Card>
 
       <Text variant="legal" tone="tertiary" style={styles.footer}>
-        The Kennel's nutrition features are for general fitness and educational purposes
-        only and are not medical advice. Calorie and macronutrient figures are estimates
-        based on the information you provide, and individual results vary.
+        Estimates from the information you gave us, for general fitness purposes — not
+        medical advice. The Kennel never cuts more than 500 calories below your
+        maintenance.
       </Text>
     </Screen>
   );
