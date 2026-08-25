@@ -192,6 +192,19 @@ export default function FeedScreen() {
         </>
       ) : null}
 
+      <SectionHeader title="Food Scanner" />
+      <Card onPress={() => router.push('/feed/scanner')}>
+        <Text variant="h3">Scan a product</Text>
+        <Text variant="bodySmall" tone="tertiary" style={styles.scannerBody}>
+          See what it contains. Check how it fits. Add it to your plan.
+        </Text>
+        <View style={styles.scannerRow}>
+          <Pill label="Barcode" tone="accent" />
+          <Pill label="Nutrition label" tone="accent" />
+          <Pill label="Manual" />
+        </View>
+      </Card>
+
       <SectionHeader title="Manage" />
       <Card padded={false} style={styles.list}>
         <ListRow
@@ -201,8 +214,13 @@ export default function FeedScreen() {
         />
         <ListRow
           title="Food preferences"
-          subtitle="Love it, don't mind it, keep it out"
+          subtitle="Love it, don't mind it, keep it out, can't eat"
           onPress={() => router.push('/feed/preferences')}
+        />
+        <ListRow
+          title="My Foods"
+          subtitle="Everything you have scanned or entered"
+          onPress={() => router.push('/feed/my-foods')}
         />
         <ListRow
           title="Shopping list"
@@ -255,6 +273,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: sp.xl,
   },
+  scannerBody: { marginTop: sp.xs, marginBottom: sp.lg },
+  scannerRow: { flexDirection: 'row', gap: sp.sm, flexWrap: 'wrap' },
   list: { paddingHorizontal: sp.lg },
   footer: { marginTop: sp.xxxl },
 });

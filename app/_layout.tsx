@@ -99,6 +99,15 @@ export default function RootLayout() {
                 name="workout/exercise-picker"
                 options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
               />
+              {/* Camera screens take the whole screen and own their own chrome. */}
+              <Stack.Screen
+                name="feed/scanner/barcode"
+                options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+              />
+              <Stack.Screen
+                name="feed/scanner/label"
+                options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+              />
               <Stack.Screen
                 name="timers"
                 options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
