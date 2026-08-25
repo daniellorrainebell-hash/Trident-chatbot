@@ -21,6 +21,7 @@ const DISCIPLINE_CARDS = [
   { name: 'BJJ', title: 'The Mat', href: '/discipline/bjj' as const },
   { name: 'MMA', title: 'The Cage', href: '/discipline/mma' as const },
   { name: 'HYROX', title: 'The Floor', href: '/discipline/hyrox' as const },
+  { name: 'STRONGMAN', title: 'The Yard', href: '/discipline/strongman' as const },
 ];
 
 export default function TrainScreen() {
@@ -53,14 +54,20 @@ export default function TrainScreen() {
       <SectionHeader title="Discipline" />
       <View style={styles.disciplines}>
         {DISCIPLINE_CARDS.map((card) => (
-          <Card key={card.href} style={styles.disciplineCard} onPress={() => router.push(card.href)}>
-            <Text variant="overline" tone="tertiary">
-              {card.name}
-            </Text>
-            <Text variant="h3" style={styles.disciplineTitle}>
-              {card.title}
-            </Text>
-          </Card>
+          // The width goes on a wrapper, not on the Card. A tappable Card is a
+          // Pressable wrapping its View, so a style passed to the Card lands on
+          // the inner box while the Pressable — the actual flex item — sizes
+          // itself to its content and quietly ignores the grid.
+          <View key={card.href} style={styles.disciplineCell}>
+            <Card onPress={() => router.push(card.href)}>
+              <Text variant="overline" tone="tertiary">
+                {card.name}
+              </Text>
+              <Text variant="h3" style={styles.disciplineTitle}>
+                {card.title}
+              </Text>
+            </Card>
+          </View>
         ))}
       </View>
 
@@ -193,7 +200,7 @@ export default function TrainScreen() {
 
 const styles = StyleSheet.create({
   disciplines: { flexDirection: 'row', gap: sp.sm, flexWrap: 'wrap', marginBottom: sp.lg },
-  disciplineCard: { flex: 1, gap: sp.xxs },
+  disciplineCell: { width: '48.5%' },
   disciplineTitle: { marginTop: sp.xxs },
   header: { marginTop: sp.lg, marginBottom: sp.xl, gap: sp.xs },
   spaced: { marginTop: sp.xs, marginBottom: sp.lg },

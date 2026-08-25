@@ -1,4 +1,4 @@
-import type { BjjLog, BjjRound, HyroxLog, MmaLog, MmaRound, Workout } from '@/types';
+import type { BjjLog, BjjRound, HyroxLog, MmaLog, MmaRound, StrongmanAttempt, StrongmanLog, Workout } from '@/types';
 import { HYROX_STATIONS } from './disciplines';
 import { SEED_TODAY, SEED_USER_ID, seedWorkouts } from './seed';
 
@@ -305,6 +305,87 @@ export const seedRaceSessions: Workout[] = [
   }),
 ];
 
+// ── Events ──────────────────────────────────────────────────────────────────
+
+let attemptId = 0;
+function attempt(
+  eventId: string,
+  eventName: string,
+  style: StrongmanAttempt['style'],
+  fields: Partial<StrongmanAttempt> = {},
+): StrongmanAttempt {
+  attemptId += 1;
+  return {
+    id: `attempt-seed-${attemptId}`,
+    eventId,
+    eventName,
+    style,
+    loadKg: null,
+    reps: null,
+    distanceMetres: null,
+    seconds: null,
+    successful: true,
+    ...fields,
+  };
+}
+
+function events(
+  sessionType: StrongmanLog['sessionType'],
+  attempts: StrongmanAttempt[],
+  extra: Partial<StrongmanLog> = {},
+): StrongmanLog {
+  return { kind: 'strongman', sessionType, attempts, ...extra };
+}
+
+export const seedEventSessions: Workout[] = [
+  // A working openers-to-third-attempt log press day. The 150 misses, which is
+  // the point: it has been missing for a month and the log should show that.
+  session('sm-seed-1', 'Log press', 'strongman', daysBefore(2, 18), 4200, events('max_effort', [
+    attempt('log_press', 'Log press', 'max_load', { loadKg: 110 }),
+    attempt('log_press', 'Log press', 'max_load', { loadKg: 130 }),
+    attempt('log_press', 'Log press', 'max_load', { loadKg: 142 }),
+    attempt('log_press', 'Log press', 'max_load', { loadKg: 150, successful: false, notes: 'Off the chest, died at the lockout.' }),
+    attempt('axle_deadlift', 'Axle deadlift', 'reps_in_time', { loadKg: 180, reps: 8, seconds: 60 }),
+  ])),
+
+  session('sm-seed-2', 'Moving medley', 'strongman', daysBefore(5, 18), 4800, events('event_day', [
+    attempt('yoke_walk', 'Yoke walk', 'time_for_distance', { loadKg: 300, distanceMetres: 20, seconds: 10.8 }),
+    attempt('yoke_walk', 'Yoke walk', 'time_for_distance', { loadKg: 320, distanceMetres: 20, seconds: 12.1 }),
+    attempt('farmers_walk', 'Farmers walk', 'time_for_distance', { loadKg: 100, distanceMetres: 20, seconds: 8.4 }),
+    attempt('farmers_walk', 'Farmers walk', 'time_for_distance', { loadKg: 110, distanceMetres: 20, seconds: 9.6 }),
+    attempt('sandbag_carry', 'Sandbag carry', 'time_for_distance', { loadKg: 90, distanceMetres: 20, seconds: 11.2 }),
+    attempt('moving_medley', 'Moving medley', 'medley', { distanceMetres: 60, seconds: 48.6 }),
+  ])),
+
+  session('sm-seed-3', 'Stones', 'strongman', daysBefore(9, 18), 4200, events('event_day', [
+    attempt('atlas_stones', 'Atlas stones', 'time_for_reps', { loadKg: 120, reps: 5, seconds: 41.2 }),
+    attempt('atlas_stones', 'Atlas stones', 'max_load', { loadKg: 140 }),
+    attempt('atlas_stones', 'Atlas stones', 'max_load', { loadKg: 150, successful: false, notes: 'Lapped it, could not extend.' }),
+    attempt('stone_to_shoulder', 'Stone to shoulder', 'reps_in_time', { loadKg: 100, reps: 6, seconds: 60 }),
+  ])),
+
+  session('sm-seed-4', 'Grip and holds', 'strongman', daysBefore(12, 18), 3000, events('accessory', [
+    attempt('hercules_hold', 'Hercules hold', 'hold_time', { loadKg: 80, seconds: 38 }),
+    attempt('hercules_hold', 'Hercules hold', 'hold_time', { loadKg: 80, seconds: 44 }),
+    attempt('crucifix_hold', 'Crucifix hold', 'hold_time', { loadKg: 15, seconds: 52 }),
+  ])),
+
+  session('sm-seed-5', 'Deadlift', 'strongman', daysBefore(16, 18), 4200, events('max_effort', [
+    attempt('deadlift_max', 'Deadlift', 'max_load', { loadKg: 220 }),
+    attempt('deadlift_max', 'Deadlift', 'max_load', { loadKg: 250 }),
+    attempt('deadlift_max', 'Deadlift', 'max_load', { loadKg: 265 }),
+    attempt('silver_dollar', 'Silver dollar deadlift', 'reps_in_time', { loadKg: 250, reps: 11, seconds: 60 }),
+  ])),
+
+  session('sm-seed-6', 'Northants Strongest', 'strongman', daysBefore(24, 11), 10800, events('competition', [
+    attempt('log_press', 'Log press', 'reps_in_time', { loadKg: 100, reps: 7, seconds: 60 }),
+    attempt('truck_pull', 'Truck pull', 'time_for_distance', { distanceMetres: 20, seconds: 24.8 }),
+    attempt('farmers_walk', 'Farmers walk', 'distance_in_time', { loadKg: 110, distanceMetres: 42, seconds: 60 }),
+    attempt('tyre_flip', 'Tyre flip', 'time_for_reps', { loadKg: 220, reps: 6, seconds: 38.4 }),
+    attempt('atlas_stones', 'Atlas stones', 'time_for_reps', { loadKg: 130, reps: 5, seconds: 44.9 }),
+  ], { competitionName: 'Northants Strongest', weightClass: 'u105' })),
+];
+
 /**
  * Everything trained, in date order.
  *
@@ -315,6 +396,7 @@ export const seedDisciplineSessions: Workout[] = [
   ...seedMatSessions,
   ...seedFightSessions,
   ...seedRaceSessions,
+  ...seedEventSessions,
 ];
 
 export const seedAllSessions: Workout[] = [...seedWorkouts, ...seedDisciplineSessions].sort((a, b) =>

@@ -8,12 +8,12 @@ import type { IsoDate, IsoDateTime, Uuid } from './units';
  * set, and a sled push is not a rep — flattening them into one shape is how
  * multi-discipline trackers end up with numbers that mean nothing to anyone.
  */
-export type Discipline = 'gym' | 'bjj' | 'mma' | 'hyrox';
+export type Discipline = 'gym' | 'bjj' | 'mma' | 'hyrox' | 'strongman';
 
-export const DISCIPLINES: Discipline[] = ['gym', 'bjj', 'mma', 'hyrox'];
+export const DISCIPLINES: Discipline[] = ['gym', 'bjj', 'mma', 'hyrox', 'strongman'];
 
 /** How a discipline's work is counted. Drives the summary line and the record types. */
-export type DisciplineUnit = 'sets' | 'mat_time' | 'rounds' | 'race_time';
+export type DisciplineUnit = 'sets' | 'mat_time' | 'rounds' | 'race_time' | 'events';
 
 // ── Brazilian jiu-jitsu ─────────────────────────────────────────────────────
 
@@ -261,13 +261,93 @@ export type HyroxLog = {
   eventDate?: IsoDate;
 };
 
+// ── Strongman ───────────────────────────────────────────────────────────────
+
+/**
+ * How an event is scored.
+ *
+ * Strongman's awkwardness for a tracker is that the same implement is a
+ * different event depending on the scoring. A yoke can be a fastest-20m, a
+ * max-distance-in-60s or a heaviest-carry, and those three numbers are not
+ * comparable to each other — so the style travels with every attempt and every
+ * record, and a personal best is always a best *at a style*.
+ */
+export type StrongmanEventStyle =
+  | 'max_load'
+  | 'reps_in_time'
+  | 'time_for_reps'
+  | 'distance_in_time'
+  | 'time_for_distance'
+  | 'hold_time'
+  | 'medley';
+
+export type StrongmanEventCategory =
+  | 'overhead'
+  | 'deadlift'
+  | 'squat'
+  | 'carry'
+  | 'load'
+  | 'drag'
+  | 'grip'
+  | 'medley';
+
+export type StrongmanEventDefinition = {
+  id: string;
+  name: string;
+  aliases: string[];
+  category: StrongmanEventCategory;
+  /** The ways this event is actually run. A best is only ever a best at one of them. */
+  styles: StrongmanEventStyle[];
+  implement: string;
+  typicalDistanceMetres: number | null;
+  typicalTimeCapSeconds: number | null;
+  /** What the load figure refers to, since it is rarely just "the weight". */
+  loadNote: string;
+  coachingNote: string;
+};
+
+export type StrongmanSessionType =
+  | 'event_day'
+  | 'max_effort'
+  | 'medley'
+  | 'competition'
+  | 'accessory';
+
+export type StrongmanAttempt = {
+  id: Uuid;
+  eventId: string;
+  eventName: string;
+  style: StrongmanEventStyle;
+  loadKg: number | null;
+  reps: number | null;
+  distanceMetres: number | null;
+  seconds: number | null;
+  /**
+   * Whether it counted.
+   *
+   * A missed attempt is data here in a way a missed gym set is not: opener,
+   * second, third is the shape of the sport, and a log that only kept the
+   * makes would hide the fact that you have failed 150 kg three weeks running.
+   */
+  successful: boolean;
+  notes?: string;
+};
+
+export type StrongmanLog = {
+  kind: 'strongman';
+  sessionType: StrongmanSessionType;
+  attempts: StrongmanAttempt[];
+  competitionName?: string;
+  weightClass?: string;
+};
+
 // ── The union carried on a session ──────────────────────────────────────────
 
 /**
  * A gym session carries no log: its record is the exercise and set list that
  * already existed. The other three each need their own shape.
  */
-export type DisciplineLog = BjjLog | MmaLog | HyroxLog;
+export type DisciplineLog = BjjLog | MmaLog | HyroxLog | StrongmanLog;
 
 export type DisciplineRecordType =
   // Mat
@@ -281,7 +361,13 @@ export type DisciplineRecordType =
   // Race
   | 'fastest_station'
   | 'fastest_run_split'
-  | 'fastest_simulation';
+  | 'fastest_simulation'
+  // Events
+  | 'heaviest_load'
+  | 'most_reps_in_time'
+  | 'furthest_in_time'
+  | 'fastest_over_distance'
+  | 'longest_hold';
 
 export type DisciplineRecord = {
   id: Uuid;
