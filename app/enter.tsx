@@ -122,8 +122,13 @@ const styles = StyleSheet.create({
   advisory: { position: 'absolute', width: '199%', aspectRatio: 1200 / 919 },
   fill: { width: '100%', height: '100%' },
 
+  // alignItems centres each line of type as a block, but a block is only as
+  // wide as its longest line - so the moment THE KENNEL wraps, THE sits at the
+  // left edge of a box the width of KENNEL and the whole stack reads
+  // left-heavy. textAlign centres the lines within the block as well, which is
+  // what actually keeps a stacked title on the centre line.
   type: { alignItems: 'center', paddingBottom: sp.xl },
-  brandLine: { letterSpacing: 3.4 },
+  brandLine: { letterSpacing: 3.4, textAlign: 'center' },
   title: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 46,
@@ -131,9 +136,10 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: colors.text.primary,
     textTransform: 'uppercase',
+    textAlign: 'center',
     marginTop: sp.sm,
   },
-  creed: { letterSpacing: 3.4, marginTop: sp.md },
+  creed: { letterSpacing: 3.4, textAlign: 'center', marginTop: sp.md },
 
   cta: {
     flexDirection: 'row',
