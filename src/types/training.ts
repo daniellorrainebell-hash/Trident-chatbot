@@ -1,3 +1,4 @@
+import type { Discipline, DisciplineLog } from './disciplines';
 import type { IsoDate, IsoDateTime, Uuid } from './units';
 
 export type MuscleGroup =
@@ -84,6 +85,17 @@ export type Workout = {
   id: Uuid;
   userId: Uuid;
   title: string;
+  /**
+   * Which discipline this session was. Required rather than optional: a session
+   * whose kind is unknown cannot be summarised, scored or compared, and
+   * defaulting the unknown to 'gym' would quietly file mat time as lifting.
+   */
+  discipline: Discipline;
+  /**
+   * The discipline-specific record. Gym sessions carry none — their record is
+   * the exercise and set list below, which is what `exercises` has always been.
+   */
+  log?: DisciplineLog;
   status: WorkoutStatus;
   startedAt: IsoDateTime;
   completedAt: IsoDateTime | null;
@@ -99,6 +111,7 @@ export type WorkoutTemplate = {
   id: Uuid;
   userId: Uuid;
   name: string;
+  discipline: Discipline;
   exercises: Array<{
     exerciseId: Uuid;
     exerciseName: string;

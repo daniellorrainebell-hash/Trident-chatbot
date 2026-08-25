@@ -57,6 +57,7 @@ export function makeWorkout(overrides: Partial<Workout> = {}): Workout {
     id: nextId('wo'),
     userId: 'user-1',
     title: 'Push',
+    discipline: 'gym',
     status: 'completed',
     startedAt: '2026-03-02T09:00:00.000Z',
     completedAt: '2026-03-02T10:00:00.000Z',

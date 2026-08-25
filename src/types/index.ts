@@ -3,3 +3,4 @@ export * from './user';
 export * from './training';
 export * from './accountability';
 export * from './nutrition';
+export * from './disciplines';

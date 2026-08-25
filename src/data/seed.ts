@@ -37,8 +37,8 @@ export const seedProfile: Profile = {
   avatarUrl: null,
   dateOfBirth: '1994-07-18',
   countryCode: 'GB',
-  gym: 'Ironworks Gym',
-  town: 'Sheffield',
+  gym: 'B.S.T Northampton',
+  town: 'Northampton',
   memberSince: '2025-08-14',
   units: { weight: 'kg', length: 'cm', distance: 'km' },
   isPrivate: false,
@@ -186,6 +186,7 @@ function buildHistory(weeks: number, endDate: string): Workout[] {
         id: `wo-seed-${w}-${i}`,
         userId: SEED_USER_ID,
         title: shape.title,
+        discipline: 'gym',
         status: 'completed',
         startedAt,
         completedAt: `${date}T${18 + (i % 2)}:${(30 + i * 5) % 60 < 10 ? '05' : '45'}:00.000Z`,
@@ -240,6 +241,7 @@ export const seedTemplates: WorkoutTemplate[] = SESSION_SHAPES.map((shape, i) =>
   id: `template-seed-${i}`,
   userId: SEED_USER_ID,
   name: shape.title,
+  discipline: 'gym',
   // The *latest* use, not the earliest. find() returns the first match and the
   // history is sorted oldest-first, so this read the other way round and the
   // home screen announced your next session as four months stale when you had
@@ -345,13 +347,13 @@ export const seedContracts: Contract[] = [
 
 export const seedPack: Pack = {
   id: 'pack-seed-1',
-  name: 'Ironworks',
-  handle: 'ironworks',
-  description: 'Sheffield. Early doors, heavy bars, no excuses.',
+  name: 'B.S.T Northampton',
+  handle: 'bst-northampton',
+  description: 'Northampton. Early doors, heavy bars, no excuses.',
   memberCount: 9,
   createdAt: '2025-09-02T10:00:00.000Z',
   isPrivate: false,
-  location: 'Sheffield',
+  location: 'Northampton',
 };
 
 export const seedPackMembers: PackMember[] = [
@@ -380,7 +382,7 @@ export const seedLeaderboard: LeaderboardEntry[] = [...seedPackMembers]
   .map((member, i) => ({
     userId: member.userId,
     displayName: member.displayName,
-    packName: 'Ironworks',
+    packName: seedPack.name,
     rank: i + 1,
     value: member.rabidScore,
     change: [0, 2, -1, 1, 0, 3, -2, 1, 0][i] ?? 0,

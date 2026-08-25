@@ -15,7 +15,7 @@ import { calculateProgress, describeProgress } from '@/engines/training/contract
 import { workoutVolumeKg, countWorkingSets } from '@/engines/training/volume';
 import { calculateRabidScore, levelLabel, nextLevel } from '@/engines/scoring/rabidScore';
 import { describePR } from '@/engines/training/personalRecords';
-import { SEED_TODAY, seedLeaderboard, seedTemplates } from '@/data/seed';
+import { SEED_TODAY, seedLeaderboard, seedPack, seedTemplates } from '@/data/seed';
 import { formatVolume, formatRank, formatRelative, formatDuration } from '@/utils/format';
 
 /**
@@ -289,7 +289,7 @@ export default function KennelScreen() {
             }
           />
           <Text variant="caption" tone="tertiary" style={styles.tight}>
-            of {seedLeaderboard.length} in Ironworks
+            of {seedLeaderboard.length} in {seedPack.name}
           </Text>
         </Card>
       </View>

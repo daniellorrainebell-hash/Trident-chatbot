@@ -17,6 +17,12 @@ import { track } from '@/services/analytics';
  * time, run a saved template, or start blank. Most sessions are a repeat, so
  * that path is the shortest.
  */
+const DISCIPLINE_CARDS = [
+  { name: 'BJJ', title: 'The Mat', href: '/discipline/bjj' as const },
+  { name: 'MMA', title: 'The Cage', href: '/discipline/mma' as const },
+  { name: 'HYROX', title: 'The Floor', href: '/discipline/hyrox' as const },
+];
+
 export default function TrainScreen() {
   const active = useWorkoutStore((s) => s.active);
   const history = useWorkoutStore((s) => s.history);
@@ -39,6 +45,23 @@ export default function TrainScreen() {
         <Text variant="body" tone="tertiary">
           Talk is cheap. Log the work.
         </Text>
+      </View>
+
+      {/* The four disciplines. Each keeps its own units, because a round is not
+          a set and a sled push is not a rep — the moment they share a scale,
+          none of the numbers mean anything. Gym is the screen you are on. */}
+      <SectionHeader title="Discipline" />
+      <View style={styles.disciplines}>
+        {DISCIPLINE_CARDS.map((card) => (
+          <Card key={card.href} style={styles.disciplineCard} onPress={() => router.push(card.href)}>
+            <Text variant="overline" tone="tertiary">
+              {card.name}
+            </Text>
+            <Text variant="h3" style={styles.disciplineTitle}>
+              {card.title}
+            </Text>
+          </Card>
+        ))}
       </View>
 
       {active ? (
@@ -169,6 +192,9 @@ export default function TrainScreen() {
 }
 
 const styles = StyleSheet.create({
+  disciplines: { flexDirection: 'row', gap: sp.sm, flexWrap: 'wrap', marginBottom: sp.lg },
+  disciplineCard: { flex: 1, gap: sp.xxs },
+  disciplineTitle: { marginTop: sp.xxs },
   header: { marginTop: sp.lg, marginBottom: sp.xl, gap: sp.xs },
   spaced: { marginTop: sp.xs, marginBottom: sp.lg },
   list: { paddingHorizontal: sp.lg },
