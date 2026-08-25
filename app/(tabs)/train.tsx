@@ -17,13 +17,6 @@ import { track } from '@/services/analytics';
  * time, run a saved template, or start blank. Most sessions are a repeat, so
  * that path is the shortest.
  */
-const DISCIPLINE_CARDS = [
-  { name: 'BJJ', title: 'The Mat', href: '/discipline/bjj' as const },
-  { name: 'MMA', title: 'The Cage', href: '/discipline/mma' as const },
-  { name: 'BOXING', title: 'The Ring', href: '/discipline/boxing' as const },
-  { name: 'STRONGMAN', title: 'The Yard', href: '/discipline/strongman' as const },
-];
-
 export default function TrainScreen() {
   const active = useWorkoutStore((s) => s.active);
   const history = useWorkoutStore((s) => s.history);
@@ -48,27 +41,31 @@ export default function TrainScreen() {
         </Text>
       </View>
 
-      {/* The four disciplines. Each keeps its own units, because a round is not
-          a set and a sled push is not a rep — the moment they share a scale,
-          none of the numbers mean anything. Gym is the screen you are on. */}
-      <SectionHeader title="Discipline" />
-      <View style={styles.disciplines}>
-        {DISCIPLINE_CARDS.map((card) => (
-          // The width goes on a wrapper, not on the Card. A tappable Card is a
-          // Pressable wrapping its View, so a style passed to the Card lands on
-          // the inner box while the Pressable — the actual flex item — sizes
-          // itself to its content and quietly ignores the grid.
-          <View key={card.href} style={styles.disciplineCell}>
-            <Card onPress={() => router.push(card.href)}>
-              <Text variant="overline" tone="tertiary">
-                {card.name}
-              </Text>
-              <Text variant="h3" style={styles.disciplineTitle}>
-                {card.title}
-              </Text>
-            </Card>
-          </View>
-        ))}
+      {/* Training is the gym. Everything else lives one tap away rather than
+          crowding the screen you are on when you want to start lifting. */}
+      <View style={styles.switchRow}>
+        <Card style={styles.switchCard} onPress={() => router.push('/discipline')}>
+          <Text variant="overline" tone="tertiary">
+            Discipline
+          </Text>
+          <Text variant="h3" style={styles.switchTitle}>
+            Gym
+          </Text>
+          <Text variant="caption" tone="tertiary">
+            Tap to switch
+          </Text>
+        </Card>
+        <Card style={styles.switchCard} onPress={() => router.push('/programme')}>
+          <Text variant="overline" tone="tertiary">
+            Programme
+          </Text>
+          <Text variant="h3" style={styles.switchTitle}>
+            Build a week
+          </Text>
+          <Text variant="caption" tone="tertiary">
+            Auto or your own
+          </Text>
+        </Card>
       </View>
 
       {active ? (
@@ -199,9 +196,9 @@ export default function TrainScreen() {
 }
 
 const styles = StyleSheet.create({
-  disciplines: { flexDirection: 'row', gap: sp.sm, flexWrap: 'wrap', marginBottom: sp.lg },
-  disciplineCell: { width: '48.5%' },
-  disciplineTitle: { marginTop: sp.xxs },
+  switchRow: { flexDirection: 'row', gap: sp.sm, marginBottom: sp.lg },
+  switchCard: { flex: 1, gap: sp.xxs },
+  switchTitle: { marginTop: sp.xxs },
   header: { marginTop: sp.lg, marginBottom: sp.xl, gap: sp.xs },
   spaced: { marginTop: sp.xs, marginBottom: sp.lg },
   list: { paddingHorizontal: sp.lg },
