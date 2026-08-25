@@ -296,12 +296,17 @@ export default function ActiveWorkoutScreen() {
           })
         )}
 
-        <Button
-          label="Add exercise"
-          variant="secondary"
-          onPress={() => router.push('/workout/exercise-picker')}
-          style={styles.addExercise}
-        />
+        {/* The empty state carries its own call to action, so the standing
+            button below the list would be the same offer twice on the one
+            screen where there is nothing else to look at. */}
+        {active.exercises.length > 0 ? (
+          <Button
+            label="Add exercise"
+            variant="secondary"
+            onPress={() => router.push('/workout/exercise-picker')}
+            style={styles.addExercise}
+          />
+        ) : null}
 
         <View style={styles.restRow}>
           <Text variant="overline" tone="tertiary">

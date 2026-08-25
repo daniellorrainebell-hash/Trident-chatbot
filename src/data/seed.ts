@@ -240,7 +240,18 @@ export const seedTemplates: WorkoutTemplate[] = SESSION_SHAPES.map((shape, i) =>
   id: `template-seed-${i}`,
   userId: SEED_USER_ID,
   name: shape.title,
-  lastUsedAt: seedWorkouts.find((w) => w.title === shape.title)?.completedAt ?? null,
+  // The *latest* use, not the earliest. find() returns the first match and the
+  // history is sorted oldest-first, so this read the other way round and the
+  // home screen announced your next session as four months stale when you had
+  // done it on Monday. Scanning for the maximum says what it means regardless
+  // of how the history happens to be ordered.
+  lastUsedAt: seedWorkouts.reduce<string | null>(
+    (latest, workout) =>
+      workout.title === shape.title && (workout.completedAt ?? '') > (latest ?? '')
+        ? workout.completedAt ?? latest
+        : latest,
+    null,
+  ),
   exercises: shape.lifts.map((lift) => ({
     exerciseId: lift.id,
     exerciseName: lift.name,

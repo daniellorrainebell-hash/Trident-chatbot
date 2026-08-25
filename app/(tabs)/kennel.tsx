@@ -125,7 +125,11 @@ export default function KennelScreen() {
           <Text variant="bodySmall" tone="tertiary" style={styles.tight}>
             {countWorkingSets(active)} sets logged · {formatVolume(workoutVolumeKg(active))}
           </Text>
-          <Button label="Resume session" onPress={() => router.push('/workout/active')} />
+          <Button
+            label="Resume session"
+            onPress={() => router.push('/workout/active')}
+            style={styles.cta}
+          />
         </Card>
       ) : (
         <Card>
@@ -158,7 +162,7 @@ export default function KennelScreen() {
             </View>
           ) : null}
 
-          <Button label="Log the work" onPress={() => router.push('/train')} />
+          <Button label="Log the work" onPress={() => router.push('/train')} style={styles.cta} />
         </Card>
       )}
 
@@ -365,6 +369,7 @@ export default function KennelScreen() {
             label="Set up The Feed"
             variant="secondary"
             onPress={() => router.push('/feed')}
+            style={styles.cta}
           />
         </Card>
       )}
@@ -385,6 +390,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: sp.md },
   tight: { marginTop: sp.xs },
+  /** Air above a call to action that follows body copy or a list inside a Card. */
+  cta: { marginTop: sp.lg },
   rankDog: { marginTop: sp.xs, marginBottom: sp.xs },
 
   movements: {
