@@ -1,35 +1,18 @@
-import { Image, StyleSheet, type StyleProp, type ImageStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { RankDog } from './RankDog';
 
 export type RabidDogProps = {
   size?: number;
-  style?: StyleProp<ImageStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 
 /**
- * The Rabid dog — the brand's FERAL artwork.
+ * The brand dog, as used for decoration rather than as a rank badge.
  *
- * A standing dog with FERAL cut out of its body, white on transparent, so it
- * drops onto any of the app's dark surfaces with nothing behind it.
- *
- * Sized by width with the aspect ratio locked to the source, because the
- * lettering inside the body distorts the moment the proportions slip.
- *
- * Used sparingly and only where it earns the moment: a broken record, a level
- * gained. It is the brand's teeth, not a decoration.
+ * It is FERAL's artwork — the middle of the ladder, and the piece the brand
+ * itself is built on. Kept as its own component so brand furniture does not
+ * read as a claim about the user's rank; for that, use RankDog directly.
  */
 export function RabidDog({ size = 120, style }: RabidDogProps) {
-  return (
-    <Image
-      source={require('../../assets/brand/rabid-dog.png')}
-      style={[{ width: size, height: size * (1503 / 1100) }, styles.base, style]}
-      resizeMode="contain"
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel="Rabid"
-    />
-  );
+  return <RankDog level="feral" size={size} style={style} />;
 }
-
-const styles = StyleSheet.create({
-  base: { alignSelf: 'center' },
-});

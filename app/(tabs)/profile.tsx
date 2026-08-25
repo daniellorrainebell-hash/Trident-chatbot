@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import {
-  Button, Card, ListRow, Pill, ProgressBar, Screen, SectionHeader, StatBlock, Text,
+  Button, Card, ListRow, Pill, ProgressBar, RankDog, Screen, SectionHeader, StatBlock, Text,
 } from '@/components';
 import { colors, space as sp } from '@/design';
 import { useUserStore, hasAcceptedNutritionDisclaimer } from '@/store/userStore';
@@ -160,8 +160,9 @@ export default function ProfileScreen() {
               Rabid Score
             </Text>
             <Text variant="metricXL">{score.total}</Text>
+            <Pill label={levelLabel(score.level)} tone="accent" style={styles.levelPill} />
           </View>
-          <Pill label={levelLabel(score.level)} tone="accent" />
+          <RankDog level={score.level} size={132} />
         </View>
 
         {rung ? (
@@ -300,7 +301,8 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   header: { marginTop: sp.lg, marginBottom: sp.xl, gap: sp.xs },
-  scoreHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  scoreHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  levelPill: { marginTop: sp.sm },
   nextLevel: { marginTop: sp.sm },
   breakdown: { gap: sp.lg, marginTop: sp.xxl },
   penalty: { marginTop: sp.lg },

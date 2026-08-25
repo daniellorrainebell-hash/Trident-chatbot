@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Text } from './Text';
 import { colors, radius, space, minTouchTarget } from '@/design';
 
@@ -9,6 +9,7 @@ export type PillProps = {
   tone?: PillTone;
   selected?: boolean;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 const toneStyles: Record<PillTone, { bg: string; text: string; border: string }> = {
@@ -21,7 +22,7 @@ const toneStyles: Record<PillTone, { bg: string; text: string; border: string }>
 };
 
 /** A small status or filter chip. Tappable pills meet the 44pt target. */
-export function Pill({ label, tone = 'neutral', selected = false, onPress }: PillProps) {
+export function Pill({ label, tone = 'neutral', selected = false, onPress, style }: PillProps) {
   const palette = toneStyles[tone];
 
   const body = (
@@ -31,6 +32,7 @@ export function Pill({ label, tone = 'neutral', selected = false, onPress }: Pil
         { backgroundColor: palette.bg, borderColor: palette.border },
         selected && styles.selected,
         onPress && styles.tappable,
+        style,
       ]}
     >
       <Text

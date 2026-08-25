@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
-  BrandMark, Button, Card, MacroRow, Pill, ProgressBar,
+  BrandMark, Button, Card, MacroRow, Pill, ProgressBar, RankDog,
   Screen, SectionHeader, StatBlock, Text,
 } from '@/components';
 import { colors, space as sp, radius } from '@/design';
@@ -252,6 +252,7 @@ export default function KennelScreen() {
           <Text variant="metricL" style={styles.tight}>
             {score.total}
           </Text>
+          <RankDog level={score.level} size={72} style={styles.rankDog} />
           <Pill label={levelLabel(score.level)} tone="accent" />
           <Text variant="caption" tone="tertiary" style={styles.tight}>
             {rung ? `${rung.pointsAway} to ${levelLabel(rung.level)}` : 'Top of the ladder'}
@@ -384,6 +385,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: sp.md },
   tight: { marginTop: sp.xs },
+  rankDog: { marginTop: sp.xs, marginBottom: sp.xs },
 
   movements: {
     marginTop: sp.lg,
