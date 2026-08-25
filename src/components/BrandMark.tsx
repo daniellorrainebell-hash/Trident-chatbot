@@ -1,5 +1,6 @@
 import { Image, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Text } from './Text';
+import { RabidDog } from './RabidDog';
 import { colors, space as sp } from '@/design';
 
 export type BrandMarkProps = {
@@ -7,6 +8,8 @@ export type BrandMarkProps = {
   size?: 'hero' | 'compact';
   /** The wordmark alone, without "THE KENNEL" beneath it. */
   hideSubmark?: boolean;
+  /** The dog above the wordmark. Launch and home only. */
+  showDog?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -21,7 +24,12 @@ export type BrandMarkProps = {
  * artwork, so it stays crisp at every size and can be dropped where the mark
  * alone is enough (spec §58: the full wordmark never goes into a small icon).
  */
-export function BrandMark({ size = 'hero', hideSubmark = false, style }: BrandMarkProps) {
+export function BrandMark({
+  size = 'hero',
+  hideSubmark = false,
+  showDog = false,
+  style,
+}: BrandMarkProps) {
   const hero = size === 'hero';
 
   return (
@@ -31,6 +39,8 @@ export function BrandMark({ size = 'hero', hideSubmark = false, style }: BrandMa
       accessibilityRole="image"
       accessibilityLabel="Rabid — The Kennel"
     >
+      {showDog ? <RabidDog size={hero ? 118 : 48} style={styles.dog} /> : null}
+
       <Image
         source={require('../../assets/brand/rabid-wordmark.png')}
         style={hero ? styles.heroMark : styles.compactMark}
@@ -57,6 +67,7 @@ export function BrandMark({ size = 'hero', hideSubmark = false, style }: BrandMa
 
 const styles = StyleSheet.create({
   container: { alignItems: 'center' },
+  dog: { marginBottom: sp.lg },
 
   // Sized by height so the mark's own proportions drive the layout.
   heroMark: { width: 208, height: 210 },

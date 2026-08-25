@@ -1,4 +1,6 @@
 export { BrandMark } from './BrandMark';
+export { RabidDog } from './RabidDog';
+export type { RabidDogProps } from './RabidDog';
 export type { BrandMarkProps } from './BrandMark';
 export { Text } from './Text';
 export type { TextProps } from './Text';

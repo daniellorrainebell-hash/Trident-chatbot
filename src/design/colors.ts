@@ -38,10 +38,12 @@ export const palette = {
   bloodDim: '#6B1614',
 
   // Status. Muted on purpose — no neon.
+  //
+  // There is no amber. The brand is black, white and blood — a third status
+  // hue diluted that, and anything that needs attention here is either fine
+  // or it is not. Warnings use the same red as failure, one step dimmer.
   green: '#4C8C63',
   greenBright: '#5FA97A',
-  amber: '#A8842E',
-  amberBright: '#C79E3C',
 } as const;
 
 export const colors = {
@@ -77,7 +79,7 @@ export const colors = {
     accent: palette.steelBright,
     danger: palette.bloodBright,
     success: palette.greenBright,
-    warning: palette.amberBright,
+    warning: palette.bloodBright,
   },
 
   accent: {
@@ -96,8 +98,8 @@ export const colors = {
   status: {
     success: palette.green,
     successBright: palette.greenBright,
-    warning: palette.amber,
-    warningBright: palette.amberBright,
+    warning: palette.blood,
+    warningBright: palette.bloodBright,
     danger: palette.blood,
     dangerBright: palette.bloodBright,
     neutral: palette.smoke,

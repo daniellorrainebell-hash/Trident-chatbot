@@ -91,7 +91,7 @@ export default function KennelScreen() {
     <Screen>
       {/* The mark, dominant. */}
       <View style={styles.brand}>
-        <BrandMark size="hero" />
+        <BrandMark size="hero" showDog />
       </View>
 
       {/* Identity sits under the mark, quiet by comparison. */}
