@@ -91,7 +91,7 @@ export default function KennelScreen() {
     <Screen>
       {/* The mark, dominant. */}
       <View style={styles.brand}>
-        <BrandMark size="hero" showDog />
+        <BrandMark size="hero" />
       </View>
 
       {/* Identity sits under the mark, quiet by comparison. */}
@@ -382,7 +382,11 @@ export default function KennelScreen() {
 }
 
 const styles = StyleSheet.create({
-  brand: { alignItems: 'center', paddingTop: sp.xxl, paddingBottom: sp.lg },
+  // Equal padding top and bottom, and enough of it. The mark is the first thing
+  // on the front door: it sits dead centre in its own block of air rather than
+  // riding high in it. On a device the status bar inset stacks on top of this,
+  // which is why the figure is generous rather than merely even.
+  brand: { alignItems: 'center', paddingVertical: sp.xxxl },
   identity: { alignItems: 'center', marginBottom: sp.xxl, gap: sp.xs },
   identityMeta: { flexDirection: 'row', alignItems: 'center', gap: sp.sm },
   dot: { width: 3, height: 3, borderRadius: 2, backgroundColor: colors.text.disabled },
