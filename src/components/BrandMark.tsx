@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
   container: { alignItems: 'center' },
 
   // Sized by height so the mark's own proportions drive the layout.
-  heroMark: { width: 208, height: 210 },
-  compactMark: { width: 84, height: 85 },
+  heroMark: { width: 208, height: 206 },
+  compactMark: { width: 84, height: 83 },
 
   heroSub: {
     flexDirection: 'row',

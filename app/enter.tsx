@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   gap: { flex: 1 },
 
   mark: { alignItems: 'center' },
-  wordmark: { width: 104, height: 105 },
+  wordmark: { width: 104, height: 103 },
 
   // The figure sits over the advisory rather than beside it.
   //
