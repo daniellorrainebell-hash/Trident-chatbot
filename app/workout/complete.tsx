@@ -32,13 +32,13 @@ export default function WorkoutCompleteScreen() {
     : null;
 
   if (!summary) {
-    router.replace('/(tabs)');
+    router.replace('/kennel');
     return null;
   }
 
   return (
     <Screen
-      footer={<Button label="Done" onPress={() => router.replace('/(tabs)')} />}
+      footer={<Button label="Done" onPress={() => router.replace('/kennel')} />}
     >
       <View style={styles.header}>
         <Text variant="overline" tone="success">

@@ -6,21 +6,22 @@ export type RabidDogProps = {
 };
 
 /**
- * The Rabid dog.
+ * The Rabid dog — the brand's FERAL artwork.
  *
- * Snarling head, white on transparent with red eyes, so it drops onto any of
- * the app's dark surfaces with nothing behind it. Angular stencil work rather
- * than illustration — it holds up at 76px on a profile screen as readily as it
- * does full-bleed on the splash.
+ * A standing dog with FERAL cut out of its body, white on transparent, so it
+ * drops onto any of the app's dark surfaces with nothing behind it.
  *
- * Used sparingly and only where it earns the moment: launch, a broken record,
- * a level gained. It is the brand's teeth, not a decoration.
+ * Sized by width with the aspect ratio locked to the source, because the
+ * lettering inside the body distorts the moment the proportions slip.
+ *
+ * Used sparingly and only where it earns the moment: a broken record, a level
+ * gained. It is the brand's teeth, not a decoration.
  */
 export function RabidDog({ size = 120, style }: RabidDogProps) {
   return (
     <Image
       source={require('../../assets/brand/rabid-dog.png')}
-      style={[{ width: size, height: size * (1072 / 900) }, styles.base, style]}
+      style={[{ width: size, height: size * (1503 / 1100) }, styles.base, style]}
       resizeMode="contain"
       accessible
       accessibilityRole="image"

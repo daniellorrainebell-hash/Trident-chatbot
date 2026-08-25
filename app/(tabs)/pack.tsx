@@ -54,7 +54,7 @@ export default function PackScreen() {
           onPress: async () => {
             if (!userId) return;
             await backend.leavePack(seedPack.id, userId);
-            router.replace('/(tabs)');
+            router.replace('/kennel');
           },
         },
       ],

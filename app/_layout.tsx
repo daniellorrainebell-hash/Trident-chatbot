@@ -83,6 +83,8 @@ export default function RootLayout() {
                 animation: 'slide_from_right',
               }}
             >
+              {/* The landing screen is the entry point, not a tab. */}
+              <Stack.Screen name="enter" options={{ animation: 'fade' }} />
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="(onboarding)" options={{ animation: 'fade' }} />
               <Stack.Screen

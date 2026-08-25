@@ -20,7 +20,7 @@ export default function WelcomeScreen() {
           <Button
             label="I already have an account"
             variant="ghost"
-            onPress={() => router.replace('/(tabs)')}
+            onPress={() => router.replace('/kennel')}
           />
         </View>
       }

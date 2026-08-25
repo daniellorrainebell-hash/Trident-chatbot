@@ -75,7 +75,7 @@ export default function OnboardingTrainingScreen() {
 
     completeOnboarding();
     track({ name: 'onboarding_complete', properties: { primaryActivity: activity, goal } });
-    router.replace('/(tabs)');
+    router.replace('/kennel');
   };
 
   return (

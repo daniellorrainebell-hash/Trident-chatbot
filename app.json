@@ -7,12 +7,12 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#0C0C0E",
+    "backgroundColor": "#000000",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#08080A"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": false,
@@ -27,7 +27,7 @@
     "android": {
       "package": "com.rabidgymwear.kennel",
       "adaptiveIcon": {
-        "backgroundColor": "#08080A",
+        "backgroundColor": "#000000",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -41,7 +41,7 @@
       "expo-sqlite",
       "expo-sharing",
       "expo-font",
-      ["expo-splash-screen", { "backgroundColor": "#08080A", "resizeMode": "contain" }]
+      ["expo-splash-screen", { "backgroundColor": "#000000", "resizeMode": "contain" }]
     ],
     "experiments": { "typedRoutes": false }
   }

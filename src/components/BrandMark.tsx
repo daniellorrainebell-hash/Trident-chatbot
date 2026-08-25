@@ -39,7 +39,7 @@ export function BrandMark({
       accessibilityRole="image"
       accessibilityLabel="Rabid — The Kennel"
     >
-      {showDog ? <RabidDog size={hero ? 118 : 48} style={styles.dog} /> : null}
+      {showDog ? <RabidDog size={hero ? 132 : 56} style={styles.dog} /> : null}
 
       <Image
         source={require('../../assets/brand/rabid-wordmark.png')}
