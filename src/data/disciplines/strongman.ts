@@ -9,11 +9,11 @@ import type {
  * Strongman reference data.
  *
  * One thing to be honest about up front: strongman has no single governing body
- * setting universal loads the way HYROX does. Loads move between federations,
- * between shows, and with whatever implements the venue owns. So nothing here
- * is presented as a standard — the figures are indicative competition loading
- * for an open amateur, offered so a number on a screen has some context, and
- * the app says so rather than implying an authority that does not exist.
+ * setting universal loads. They move between federations, between shows, and
+ * with whatever implements the venue owns. So nothing here is presented as a
+ * standard — the figures are indicative competition loading for an open
+ * amateur, offered so a number on a screen has some context, and the app says
+ * so rather than implying an authority that does not exist.
  *
  * The structural problem strongman poses a tracker is that the implement is not
  * the event. A yoke can be a fastest-20 m, a max-distance-in-60 s or a

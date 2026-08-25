@@ -20,7 +20,7 @@ import { track } from '@/services/analytics';
 const DISCIPLINE_CARDS = [
   { name: 'BJJ', title: 'The Mat', href: '/discipline/bjj' as const },
   { name: 'MMA', title: 'The Cage', href: '/discipline/mma' as const },
-  { name: 'HYROX', title: 'The Floor', href: '/discipline/hyrox' as const },
+  { name: 'BOXING', title: 'The Ring', href: '/discipline/boxing' as const },
   { name: 'STRONGMAN', title: 'The Yard', href: '/discipline/strongman' as const },
 ];
 

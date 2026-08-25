@@ -8,12 +8,12 @@ import type { IsoDate, IsoDateTime, Uuid } from './units';
  * set, and a sled push is not a rep — flattening them into one shape is how
  * multi-discipline trackers end up with numbers that mean nothing to anyone.
  */
-export type Discipline = 'gym' | 'bjj' | 'mma' | 'hyrox' | 'strongman';
+export type Discipline = 'gym' | 'bjj' | 'mma' | 'boxing' | 'strongman';
 
-export const DISCIPLINES: Discipline[] = ['gym', 'bjj', 'mma', 'hyrox', 'strongman'];
+export const DISCIPLINES: Discipline[] = ['gym', 'bjj', 'mma', 'boxing', 'strongman'];
 
 /** How a discipline's work is counted. Drives the summary line and the record types. */
-export type DisciplineUnit = 'sets' | 'mat_time' | 'rounds' | 'race_time' | 'events';
+export type DisciplineUnit = 'sets' | 'mat_time' | 'rounds' | 'events';
 
 // ── Brazilian jiu-jitsu ─────────────────────────────────────────────────────
 
@@ -190,75 +190,109 @@ export type MmaLog = {
   techniquesDrilled: string[];
 };
 
-// ── HYROX ───────────────────────────────────────────────────────────────────
+// ── Boxing ──────────────────────────────────────────────────────────────────
 
-export type HyroxDivision = 'open' | 'pro' | 'doubles' | 'relay';
-export type HyroxCategory = 'mens' | 'womens' | 'mixed';
+export type BoxingSessionType =
+  | 'pads'
+  | 'heavy_bag'
+  | 'speed_bag'
+  | 'double_end_bag'
+  | 'shadow'
+  | 'sparring'
+  | 'body_sparring'
+  | 'technical_sparring'
+  | 'ring_work'
+  | 'skipping'
+  | 'roadwork'
+  | 'strength'
+  | 'bout';
 
-export type HyroxStationId =
-  | 'ski_erg'
-  | 'sled_push'
-  | 'sled_pull'
-  | 'burpee_broad_jump'
-  | 'row'
-  | 'farmers_carry'
-  | 'sandbag_lunges'
-  | 'wall_balls';
+export type BoxingStance = 'orthodox' | 'southpaw' | 'switch';
 
-export type HyroxLoad = {
-  /** Kilograms, or null where the station carries no external load. */
-  openMen: number | null;
-  openWomen: number | null;
-  proMen: number | null;
-  proWomen: number | null;
-};
+export type PunchTarget = 'head' | 'body';
 
-export type HyroxStationDefinition = {
-  id: HyroxStationId;
-  /** 1-8, the fixed order every race runs in. */
-  order: number;
+/**
+ * A punch, in the numbering coaches actually shout.
+ *
+ * The numbers are the whole point of this table. A gym calls out "one-two-three"
+ * and nobody says "jab, cross, lead hook" mid-round — so a catalogue that only
+ * knows the long names is a catalogue nobody can log from between rounds.
+ * Numbers are given for the orthodox stance, which is the convention; a southpaw
+ * throws the same numbers off the other side.
+ */
+export type PunchDefinition = {
+  id: string;
+  /** 1-6 for head shots, with a b suffix for the body version. */
+  number: string;
   name: string;
-  measure: 'metres' | 'reps';
-  amount: number;
-  load: HyroxLoad;
-  /** What the load means, since it is not the same thing at every station. */
-  loadNote: string;
-  coachingNote: string;
+  aliases: string[];
+  hand: 'lead' | 'rear';
+  target: PunchTarget;
 };
 
-export type HyroxSessionFormat =
-  | 'race'
-  | 'full_simulation'
-  | 'half_simulation'
-  | 'station_work'
-  | 'compromised_running'
-  | 'running';
+export type BoxingDefenceCategory = 'head_movement' | 'guard' | 'hands' | 'footwork';
 
-export type HyroxRunSplit = {
+export type BoxingSkillDefinition = {
+  id: string;
+  name: string;
+  aliases: string[];
+  category: BoxingDefenceCategory;
+  note: string;
+};
+
+export type BoxingCombination = {
+  id: string;
+  /** The numbers as called, e.g. "1-2-3b". */
+  numbers: string;
+  name: string;
+  punchIds: string[];
+  note: string;
+};
+
+/**
+ * A weight class, in both units.
+ *
+ * Boxing is the one sport in the app where the class *is* an identity — people
+ * describe themselves as a welterweight — so the limit is carried in pounds and
+ * kilograms rather than converted on the fly and rounded into something nobody
+ * recognises.
+ */
+export type BoxingWeightClass = {
+  id: string;
+  name: string;
+  limitPounds: number;
+  limitKg: number;
+};
+
+export type BoxingRound = {
+  id: Uuid;
   index: number;
-  metres: number;
-  seconds: number;
-};
-
-export type HyroxStationSplit = {
-  stationId: HyroxStationId;
-  seconds: number;
-  /** Reps completed, where the station is scored in reps rather than distance. */
-  reps?: number;
+  minutes: number;
+  intensity: SparIntensity;
+  partnerName?: string;
+  /**
+   * Punch counts, where somebody was counting. Optional throughout: most
+   * sessions are not scored, and a zero would be a lie about a round nobody
+   * watched with a clicker.
+   */
+  punchesThrown: number | null;
+  punchesLanded: number | null;
+  bodyPunchesThrown: number | null;
+  knockdownsFor: number;
+  knockdownsAgainst: number;
   notes?: string;
 };
 
-export type HyroxLog = {
-  kind: 'hyrox';
-  format: HyroxSessionFormat;
-  division: HyroxDivision;
-  category: HyroxCategory;
-  runs: HyroxRunSplit[];
-  stations: HyroxStationSplit[];
-  /** Wall-clock total. Roxzone is derived from this, never entered by hand. */
-  totalSeconds: number;
-  eventName?: string;
-  eventDate?: IsoDate;
+export type BoxingLog = {
+  kind: 'boxing';
+  sessionType: BoxingSessionType;
+  stance: BoxingStance;
+  rounds: BoxingRound[];
+  restSeconds: number;
+  /** Punch ids and combinations worked this session. */
+  worked: string[];
+  opponentName?: string;
+  weightClassId?: string;
 };
 
 // ── Strongman ───────────────────────────────────────────────────────────────
@@ -347,7 +381,7 @@ export type StrongmanLog = {
  * A gym session carries no log: its record is the exercise and set list that
  * already existed. The other three each need their own shape.
  */
-export type DisciplineLog = BjjLog | MmaLog | HyroxLog | StrongmanLog;
+export type DisciplineLog = BjjLog | MmaLog | BoxingLog | StrongmanLog;
 
 export type DisciplineRecordType =
   // Mat
@@ -358,10 +392,6 @@ export type DisciplineRecordType =
   // Rounds
   | 'most_rounds'
   | 'most_round_minutes'
-  // Race
-  | 'fastest_station'
-  | 'fastest_run_split'
-  | 'fastest_simulation'
   // Events
   | 'heaviest_load'
   | 'most_reps_in_time'

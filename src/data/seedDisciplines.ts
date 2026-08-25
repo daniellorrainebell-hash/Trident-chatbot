@@ -1,5 +1,4 @@
-import type { BjjLog, BjjRound, HyroxLog, MmaLog, MmaRound, StrongmanAttempt, StrongmanLog, Workout } from '@/types';
-import { HYROX_STATIONS } from './disciplines';
+import type { BjjLog, BjjRound, BoxingLog, BoxingRound, MmaLog, MmaRound, StrongmanAttempt, StrongmanLog, Workout } from '@/types';
 import { SEED_TODAY, SEED_USER_ID, seedWorkouts } from './seed';
 
 /**
@@ -235,74 +234,99 @@ export const seedFightSessions: Workout[] = [
   ], ['low_kick', 'overhand', 'spinning_back_kick'])),
 ];
 
-// ── Race ────────────────────────────────────────────────────────────────────
+// ── Ring ────────────────────────────────────────────────────────────────────
 
-function race(
-  format: HyroxLog['format'],
-  runs: number[],
-  stations: number[],
-  totalSeconds: number,
-  extra: Partial<HyroxLog> = {},
-): HyroxLog {
+let boxRoundId = 0;
+function boxRound(
+  minutes: number,
+  intensity: BoxingRound['intensity'],
+  overrides: Partial<BoxingRound> = {},
+): BoxingRound {
+  boxRoundId += 1;
   return {
-    kind: 'hyrox',
-    format,
-    division: 'open',
-    category: 'mens',
-    runs: runs.map((seconds, i) => ({ index: i + 1, metres: 1000, seconds })),
-    stations: stations.map((seconds, i) => ({
-      stationId: HYROX_STATIONS[i]!.id,
-      seconds,
-      reps: HYROX_STATIONS[i]!.measure === 'reps' ? HYROX_STATIONS[i]!.amount : undefined,
-    })),
-    totalSeconds,
-    ...extra,
+    id: `box-seed-${boxRoundId}`,
+    index: boxRoundId,
+    minutes,
+    intensity,
+    punchesThrown: null,
+    punchesLanded: null,
+    bodyPunchesThrown: null,
+    knockdownsFor: 0,
+    knockdownsAgainst: 0,
+    ...overrides,
   };
 }
 
-export const seedRaceSessions: Workout[] = [
-  // A real race. The runs fade, the sled push is the expensive one, and the
-  // roxzone is what the clock has left over - which is how it goes.
-  session('hyrox-seed-1', 'HYROX Birmingham', 'hyrox', daysBefore(21, 10), 5327, race(
-    'race',
-    [286, 291, 298, 305, 312, 318, 327, 341],
-    [268, 214, 186, 341, 249, 176, 292, 388],
-    5327,
-    { eventName: 'HYROX Birmingham', eventDate: '2026-02-13' },
-  )),
+function ring(
+  sessionType: BoxingLog['sessionType'],
+  rounds: BoxingRound[],
+  worked: string[],
+  extra: Partial<BoxingLog> = {},
+): BoxingLog {
+  return { kind: 'boxing', sessionType, stance: 'orthodox', rounds, restSeconds: 60, worked, ...extra };
+}
 
-  session('hyrox-seed-2', 'Full simulation', 'hyrox', daysBefore(7, 8), 5498, race(
-    'full_simulation',
-    [292, 296, 303, 310, 318, 325, 336, 349],
-    [272, 228, 194, 352, 254, 181, 301, 396],
-    5498,
-  )),
+export const seedBoxingSessions: Workout[] = [
+  // A counted spar. Output and accuracy only exist because somebody was on the
+  // clicker; most of the sessions below leave them null, which is honest.
+  session('box-seed-1', 'Sparring', 'boxing', daysBefore(3, 20), 3600, ring('sparring', [
+    boxRound(3, 'hard', { partnerName: 'Ryan', punchesThrown: 58, punchesLanded: 21, bodyPunchesThrown: 9 }),
+    boxRound(3, 'hard', { partnerName: 'Ryan', punchesThrown: 64, punchesLanded: 26, bodyPunchesThrown: 14 }),
+    boxRound(3, 'hard', { partnerName: 'Ryan', punchesThrown: 51, punchesLanded: 19, bodyPunchesThrown: 8 }),
+    boxRound(3, 'medium', { partnerName: 'Dec', punchesThrown: 47, punchesLanded: 20, bodyPunchesThrown: 12 }),
+    boxRound(3, 'medium', { partnerName: 'Dec', punchesThrown: 44, punchesLanded: 17, bodyPunchesThrown: 10 }),
+  ], ['one_two_three', 'three_body_three', 'slip', 'pivot'])),
 
-  session('hyrox-seed-3', 'Station work', 'hyrox', daysBefore(10, 18), 2700, {
-    kind: 'hyrox',
-    format: 'station_work',
-    division: 'open',
-    category: 'mens',
-    runs: [],
-    // Sled work and the carry only. Listing the untouched stations at zero
-    // seconds would read as having done them instantly.
-    stations: [
-      { stationId: 'sled_push', seconds: 198 },
-      { stationId: 'sled_pull', seconds: 172 },
-      { stationId: 'farmers_carry', seconds: 168 },
-    ],
-    totalSeconds: 2700,
-  }),
+  session('box-seed-2', 'Pads', 'boxing', daysBefore(5, 18), 2700, ring('pads', [
+    boxRound(3, 'technical'),
+    boxRound(3, 'technical'),
+    boxRound(3, 'light'),
+    boxRound(3, 'light'),
+    boxRound(3, 'medium'),
+    boxRound(3, 'medium'),
+  ], ['one_two', 'one_one_two', 'one_six_three', 'check_hook'])),
 
-  session('hyrox-seed-4', 'Compromised running', 'hyrox', daysBefore(13, 7), 3600, {
-    kind: 'hyrox',
-    format: 'compromised_running',
-    division: 'open',
-    category: 'mens',
-    runs: [284, 288, 294, 299].map((seconds, i) => ({ index: i + 1, metres: 1000, seconds })),
-    stations: [{ stationId: 'sled_push', seconds: 205 }],
-    totalSeconds: 3600,
-  }),
+  session('box-seed-3', 'Heavy bag', 'boxing', daysBefore(6, 7), 2400, ring('heavy_bag', [
+    boxRound(3, 'medium', { punchesThrown: 96, bodyPunchesThrown: 18 }),
+    boxRound(3, 'medium', { punchesThrown: 88, bodyPunchesThrown: 22 }),
+    boxRound(3, 'medium', { punchesThrown: 91, bodyPunchesThrown: 14 }),
+    boxRound(3, 'light', { punchesThrown: 74, bodyPunchesThrown: 26 }),
+    boxRound(3, 'light', { punchesThrown: 70, bodyPunchesThrown: 20 }),
+    boxRound(3, 'medium', { punchesThrown: 84, bodyPunchesThrown: 16 }),
+    boxRound(3, 'medium', { punchesThrown: 79, bodyPunchesThrown: 21 }),
+    boxRound(3, 'hard', { punchesThrown: 102, bodyPunchesThrown: 12 }),
+  ], ['one_two_three_two', 'two_three_two', 'shovel_hook'])),
+
+  session('box-seed-4', 'Body sparring', 'boxing', daysBefore(8, 20), 2400, ring('body_sparring', [
+    boxRound(3, 'medium', { partnerName: 'Dec', punchesThrown: 62, punchesLanded: 29, bodyPunchesThrown: 51 }),
+    boxRound(3, 'medium', { partnerName: 'Dec', punchesThrown: 58, punchesLanded: 25, bodyPunchesThrown: 47 }),
+    boxRound(3, 'medium', { partnerName: 'Ryan', punchesThrown: 55, punchesLanded: 21, bodyPunchesThrown: 44 }),
+    boxRound(3, 'light', { partnerName: 'Ryan', punchesThrown: 49, punchesLanded: 22, bodyPunchesThrown: 40 }),
+  ], ['three_body_three', 'one_two_body', 'frame'])),
+
+  session('box-seed-5', 'Technical sparring', 'boxing', daysBefore(10, 20), 2400, ring('technical_sparring', [
+    boxRound(3, 'technical', { partnerName: 'Ryan' }),
+    boxRound(3, 'technical', { partnerName: 'Ryan' }),
+    boxRound(3, 'technical', { partnerName: 'Dec' }),
+    boxRound(3, 'technical', { partnerName: 'Dec' }),
+  ], ['slip', 'roll', 'shoulder_roll', 'angle_out'])),
+
+  session('box-seed-6', 'Shadow and skipping', 'boxing', daysBefore(12, 7), 1800, ring('shadow', [
+    boxRound(3, 'light'),
+    boxRound(3, 'light'),
+    boxRound(3, 'light'),
+    boxRound(3, 'light'),
+    boxRound(3, 'light'),
+    boxRound(3, 'light'),
+  ], ['step_drag', 'pivot', 'in_and_out', 'lateral'])),
+
+  session('box-seed-7', 'Ring work', 'boxing', daysBefore(15, 19), 2700, ring('ring_work', [
+    boxRound(3, 'medium', { partnerName: 'Dec' }),
+    boxRound(3, 'medium', { partnerName: 'Dec' }),
+    boxRound(3, 'medium', { partnerName: 'Ryan' }),
+    boxRound(3, 'light', { partnerName: 'Ryan' }),
+    boxRound(3, 'light', { partnerName: 'Dec' }),
+  ], ['cut_the_ring', 'off_the_ropes', 'angle_out'])),
 ];
 
 // ── Events ──────────────────────────────────────────────────────────────────
@@ -395,7 +419,7 @@ export const seedEventSessions: Workout[] = [
 export const seedDisciplineSessions: Workout[] = [
   ...seedMatSessions,
   ...seedFightSessions,
-  ...seedRaceSessions,
+  ...seedBoxingSessions,
   ...seedEventSessions,
 ];
 

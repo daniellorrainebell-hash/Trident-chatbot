@@ -20,9 +20,9 @@ const CATEGORIES: StrongmanEventCategory[] = [
  * the event: a yoke run as a fastest-20 m and a yoke run as a max-distance-in-60 s
  * are two different contests that happen to use the same frame.
  *
- * The load note sits with every event for the same reason it does on the HYROX
- * stations — a farmers figure is per hand, a yoke figure is the whole frame, and
- * a truck pull figure is a vehicle you are never actually lifting.
+ * The load note sits with every event because the number rarely means the same
+ * thing twice — a farmers figure is per hand, a yoke figure is the whole frame,
+ * and a truck pull figure is a vehicle you are never actually lifting.
  */
 export default function StrongmanEventsScreen() {
   const [category, setCategory] = useState<StrongmanEventCategory | 'all'>('all');
