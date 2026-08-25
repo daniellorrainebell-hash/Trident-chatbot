@@ -19,6 +19,8 @@ import { colors, space as sp, radius } from '@/design';
 export default function EnterScreen() {
   return (
     <SafeAreaView style={styles.safe}>
+      <View style={styles.gap} />
+
       <View style={styles.mark}>
         <Image
           source={require('../assets/brand/rabid-wordmark.png')}
@@ -30,16 +32,20 @@ export default function EnterScreen() {
         />
       </View>
 
+      <View style={styles.gap} />
+
       <View style={styles.stage}>
-        <Image
-          source={require('../assets/brand/advisory.png')}
-          style={styles.advisory}
-          resizeMode="contain"
-          accessible={false}
-        />
+        <View style={styles.advisory}>
+          <Image
+            source={require('../assets/brand/advisory.png')}
+            style={styles.fill}
+            resizeMode="contain"
+            accessible={false}
+          />
+        </View>
         <Image
           source={require('../assets/brand/figure.png')}
-          style={styles.figure}
+          style={styles.fill}
           resizeMode="contain"
           accessible={false}
         />
@@ -73,17 +79,44 @@ export default function EnterScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#000000', paddingHorizontal: sp.xl },
 
-  // Even padding above and below the mark, rather than only above it. The old
-  // 16pt top and nothing underneath sat the wordmark right on the top edge of
-  // the screen; this drops it clear of the corner radius and gives the block
-  // the same air on both sides.
-  mark: { alignItems: 'center', paddingVertical: sp.xxl },
+  // Two identical flexible gaps, one above the mark and one below it.
+  //
+  // The stage underneath is sized to the artwork rather than filling the screen,
+  // so all the leftover height pools in these two spacers and nowhere else. That
+  // is what keeps the space above the wordmark equal to the space between it and
+  // the top of his head, at any screen height, without either being a number
+  // somebody has to keep re-measuring.
+  gap: { flex: 1 },
+
+  mark: { alignItems: 'center' },
   wordmark: { width: 104, height: 105 },
 
   // The figure sits over the advisory rather than beside it.
-  stage: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  advisory: { position: 'absolute', width: '104%', height: undefined, aspectRatio: 1200 / 919 },
-  figure: { width: '62%', height: '100%' },
+  //
+  // The aspect ratios live on plain Views, not on the Images. An Image carries
+  // the intrinsic pixel height of its source, and an explicit height beats an
+  // aspect ratio every time - so a ratio set directly on the artwork silently
+  // did nothing and the figure laid out 1847px tall. A View has no size of its
+  // own, so the ratio is the only thing deciding its height.
+  //
+  // The point of doing it this way: the stage is exactly as tall as the figure,
+  // with no letterboxing inside it. That keeps the empty space on this screen in
+  // the two spacers above, where it can be shared evenly, instead of hiding a
+  // band above his head that nothing else can see.
+  stage: {
+    width: '62%',
+    aspectRatio: 1000 / 1847,
+    // The stage used to stretch the full width and centre its contents. Now it
+    // is only as wide as the figure, so it has to centre itself - a column's
+    // default stretch leaves an explicitly sized child pinned to the left edge.
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 1,
+  },
+  // 104% of the full content width, expressed against the narrower stage.
+  advisory: { position: 'absolute', width: '168%', aspectRatio: 1200 / 919 },
+  fill: { width: '100%', height: '100%' },
 
   type: { alignItems: 'center', paddingBottom: sp.xl },
   brandLine: { letterSpacing: 3.4 },
