@@ -19,7 +19,7 @@ import { colors, space as sp, radius } from '@/design';
 export default function EnterScreen() {
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.gap} />
+      <View style={styles.gapAbove} />
 
       <View style={styles.mark}>
         <Image
@@ -32,7 +32,7 @@ export default function EnterScreen() {
         />
       </View>
 
-      <View style={styles.gap} />
+      <View style={styles.gapBelow} />
 
       <View style={styles.stage}>
         <View style={styles.advisory}>
@@ -83,13 +83,17 @@ const styles = StyleSheet.create({
   //
   // The stage underneath is sized to the artwork rather than filling the screen,
   // so all the leftover height pools in these two spacers and nowhere else. That
-  // is what keeps the space above the wordmark equal to the space between it and
-  // the top of his head, at any screen height, without either being a number
-  // somebody has to keep re-measuring.
-  gap: { flex: 1 },
+  // keeps the space above the wordmark equal to the space between it and the top
+  // of his head at any screen height, with no number to keep re-measuring.
+  //
+  // The mark is the loud thing on this screen, so the height it takes is bought
+  // from the figure rather than from that air: making it bigger without giving
+  // the stage back some room would just squeeze the gaps and push it up again.
+  gapAbove: { flex: 1 },
+  gapBelow: { flex: 1 },
 
   mark: { alignItems: 'center' },
-  wordmark: { width: 104, height: 103 },
+  wordmark: { width: 176, height: 175 },
 
   // The figure sits over the advisory rather than beside it.
   //
@@ -104,7 +108,7 @@ const styles = StyleSheet.create({
   // the two spacers above, where it can be shared evenly, instead of hiding a
   // band above his head that nothing else can see.
   stage: {
-    width: '62%',
+    width: '52%',
     aspectRatio: 1000 / 1847,
     // The stage used to stretch the full width and centre its contents. Now it
     // is only as wide as the figure, so it has to centre itself - a column's
@@ -115,7 +119,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   // 104% of the full content width, expressed against the narrower stage.
-  advisory: { position: 'absolute', width: '168%', aspectRatio: 1200 / 919 },
+  advisory: { position: 'absolute', width: '199%', aspectRatio: 1200 / 919 },
   fill: { width: '100%', height: '100%' },
 
   type: { alignItems: 'center', paddingBottom: sp.xl },
