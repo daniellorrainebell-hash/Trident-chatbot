@@ -10,6 +10,9 @@ import { View } from 'react-native';
 import { colors } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
 import { sqlitePersistence } from '@/services/storage/sqlitePersistence';
+import { programmePersistence } from '@/services/storage/programmePersistence';
+import { useProgrammeStore } from '@/store/programmeStore';
+import { SEED_TODAY } from '@/data/seed';
 
 // Held until fonts are ready, so the first frame is not unstyled text.
 void SplashScreen.preventAutoHideAsync();
@@ -29,6 +32,8 @@ export default function RootLayout() {
   const [ready, setReady] = useState(false);
   const setPersistence = useWorkoutStore((s) => s.setPersistence);
   const hydrate = useWorkoutStore((s) => s.hydrate);
+  const setProgrammePersistence = useProgrammeStore((s) => s.setPersistence);
+  const hydrateProgramme = useProgrammeStore((s) => s.hydrate);
 
   // Fonts are vendored into assets/fonts rather than pulled from the
   // @expo-google-fonts packages. Those packages ship every weight of the family,
@@ -50,8 +55,12 @@ export default function RootLayout() {
       // Restore an in-progress session before the first screen renders, so a
       // user who was killed mid-workout lands straight back in it (spec §13).
       setPersistence(sqlitePersistence);
+      setProgrammePersistence(programmePersistence);
       try {
-        await hydrate();
+        // The programme is restored alongside the session. It rolls itself into
+        // the current week on the way in, so nothing downstream ever sees last
+        // week's ticks against this week's days.
+        await Promise.all([hydrate(), hydrateProgramme(SEED_TODAY)]);
       } catch {
         // A storage failure must not block launch; the session is recoverable
         // on the next write, and starting fresh beats a boot loop.
@@ -59,7 +68,7 @@ export default function RootLayout() {
       setReady(true);
     }
     void prepare();
-  }, [hydrate, setPersistence]);
+  }, [hydrate, hydrateProgramme, setPersistence, setProgrammePersistence]);
 
   const onLayout = useCallback(() => {
     if (fontsLoaded && ready) {

@@ -365,3 +365,156 @@ export function longestTrainingRun(days: Array<{ exercises?: unknown[]; name: st
   }
   return longest;
 }
+
+// ── Saving a week ───────────────────────────────────────────────────────────
+
+/**
+ * A programme somebody has actually committed to.
+ *
+ * The generated week above is a proposal. This is the one on the fridge — and
+ * the difference that matters is `completed`, because a plan you cannot see
+ * yourself falling behind on is a plan you will fall behind on quietly.
+ *
+ * `weekOf` is stored alongside it so the ticks reset on their own. Without it
+ * the completed days accumulate forever and Wednesday stays green from a week
+ * you have long since forgotten.
+ */
+export type SavedProgramme = {
+  id: string;
+  name: string;
+  discipline: Discipline;
+  source: 'generated' | 'custom';
+  createdAt: string;
+  /** Gym programmes carry the split; the fight and event disciplines carry a week. */
+  programme: Programme | null;
+  week: DisciplineWeek | null;
+  /** Weekday indexes ticked off this week. 0 = Monday. */
+  completed: number[];
+  /** The Monday the ticks belong to, so a new week starts clean. */
+  weekOf: string;
+};
+
+/** Monday of the week containing a date, as an ISO date. */
+export function mondayOf(isoDate: string): string {
+  const date = new Date(`${isoDate.slice(0, 10)}T00:00:00.000Z`);
+  const day = date.getUTCDay();
+  const offset = day === 0 ? 6 : day - 1;
+  date.setUTCDate(date.getUTCDate() - offset);
+  return date.toISOString().slice(0, 10);
+}
+
+/** 0 for Monday through 6 for Sunday. */
+export function weekdayIndex(isoDate: string): number {
+  const day = new Date(`${isoDate.slice(0, 10)}T00:00:00.000Z`).getUTCDay();
+  return day === 0 ? 6 : day - 1;
+}
+
+/**
+ * Move a saved programme into the current week if it has fallen behind.
+ *
+ * Returns the same object when nothing needs doing, so a caller can use identity
+ * to decide whether to write. Rolling forward clears the ticks rather than
+ * carrying them: last week's Wednesday is not this week's Wednesday, and a
+ * programme that says otherwise is lying to somebody about their own training.
+ */
+export function rollToCurrentWeek(saved: SavedProgramme, today: string): SavedProgramme {
+  const monday = mondayOf(today);
+  if (saved.weekOf === monday) return saved;
+  return { ...saved, weekOf: monday, completed: [] };
+}
+
+export type PlannedSession = {
+  dayIndex: number;
+  weekday: string;
+  name: string;
+  /** Null on a rest day, which is planned rather than empty. */
+  exercises: ProgrammeExercise[] | null;
+  focus: string | null;
+  minutes: number | null;
+  isRest: boolean;
+  isComplete: boolean;
+};
+
+/** What the programme has you doing on a given weekday. */
+export function sessionOnDay(saved: SavedProgramme, dayIndex: number): PlannedSession | null {
+  const isComplete = saved.completed.includes(dayIndex);
+
+  if (saved.programme) {
+    const day = saved.programme.days[dayIndex];
+    if (!day) return null;
+    return {
+      dayIndex,
+      weekday: day.weekday,
+      name: day.name,
+      exercises: day.slotId === null ? null : day.exercises,
+      focus: null,
+      minutes: null,
+      isRest: day.slotId === null,
+      isComplete,
+    };
+  }
+
+  if (saved.week) {
+    const day = saved.week.days[dayIndex];
+    if (!day) return null;
+    return {
+      dayIndex,
+      weekday: day.weekday,
+      name: day.name ?? 'Rest',
+      exercises: null,
+      focus: day.focus,
+      minutes: day.minutes || null,
+      isRest: day.name === null,
+      isComplete,
+    };
+  }
+
+  return null;
+}
+
+export function sessionToday(saved: SavedProgramme, today: string): PlannedSession | null {
+  return sessionOnDay(saved, weekdayIndex(today));
+}
+
+export type WeekProgress = {
+  planned: number;
+  done: number;
+  /** Done over planned. Null when the week has no training days at all. */
+  fraction: number | null;
+  /** Training days already past that were never ticked. */
+  missed: number;
+};
+
+/**
+ * How the week is going.
+ *
+ * Missed days are counted separately from "not done yet", because they are
+ * different news. Three sessions left on a Monday is a week ahead of you;
+ * three sessions left on a Saturday is a week that got away.
+ */
+export function weekProgress(saved: SavedProgramme, today: string): WeekProgress {
+  const todayIndex = weekdayIndex(today);
+  let planned = 0;
+  let done = 0;
+  let missed = 0;
+
+  for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+    const session = sessionOnDay(saved, dayIndex);
+    if (!session || session.isRest) continue;
+    planned += 1;
+    if (session.isComplete) done += 1;
+    else if (dayIndex < todayIndex) missed += 1;
+  }
+
+  return { planned, done, fraction: planned === 0 ? null : done / planned, missed };
+}
+
+export function markComplete(saved: SavedProgramme, dayIndex: number): SavedProgramme {
+  if (saved.completed.includes(dayIndex)) return saved;
+  return { ...saved, completed: [...saved.completed, dayIndex].sort((a, b) => a - b) };
+}
+
+export function clearComplete(saved: SavedProgramme, dayIndex: number): SavedProgramme {
+  if (!saved.completed.includes(dayIndex)) return saved;
+  return { ...saved, completed: saved.completed.filter((d) => d !== dayIndex) };
+}

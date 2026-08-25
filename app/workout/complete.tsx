@@ -1,5 +1,8 @@
 import { StyleSheet, View } from 'react-native';
+import { useEffect } from 'react';
 import { router } from 'expo-router';
+import { useProgrammeStore } from '@/store/programmeStore';
+import { sessionToday, weekdayIndex } from '@/engines/training/programme';
 import { Button, Card, Pill, ProgressBar, Screen, SectionHeader, StatBlock, Text } from '@/components';
 import { space as sp } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
@@ -21,6 +24,8 @@ import { useUserStore } from '@/store/userStore';
  */
 export default function WorkoutCompleteScreen() {
   const summary = useWorkoutStore((s) => s.lastSummary);
+  const programme = useProgrammeStore((s) => s.active);
+  const toggleDay = useProgrammeStore((s) => s.toggleDay);
   const history = useWorkoutStore((s) => s.history);
   const contracts = useContractStore((s) => s.contracts);
   const trainingProfile = useUserStore((s) => s.trainingProfile);
@@ -30,6 +35,15 @@ export default function WorkoutCompleteScreen() {
   const contractProgress = activeContract
     ? calculateProgress(activeContract, history, SEED_TODAY)
     : null;
+
+  // Finishing a session ticks today off the programme, once. Doing it here
+  // rather than at the start means the tick means "trained", not "intended to".
+  useEffect(() => {
+    if (!summary || !programme) return;
+    const today = sessionToday(programme, SEED_TODAY);
+    if (!today || today.isRest || today.isComplete) return;
+    toggleDay(weekdayIndex(SEED_TODAY));
+  }, [programme, summary, toggleDay]);
 
   if (!summary) {
     router.replace('/kennel');

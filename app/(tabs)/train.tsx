@@ -9,6 +9,9 @@ import { seedTemplates, SEED_TODAY } from '@/data/seed';
 import { workoutVolumeKg, countWorkingSets } from '@/engines/training/volume';
 import { formatVolume, formatDuration, formatRelative } from '@/utils/format';
 import { track } from '@/services/analytics';
+import { useProgrammeStore } from '@/store/programmeStore';
+import { sessionToday, weekProgress } from '@/engines/training/programme';
+import { ProgressBar, Pill } from '@/components';
 
 /**
  * TRAIN — the entry point to a session (spec §12).
@@ -23,6 +26,11 @@ export default function TrainScreen() {
   const startWorkout = useWorkoutStore((s) => s.startWorkout);
   const startFromTemplate = useWorkoutStore((s) => s.startFromTemplate);
   const repeatWorkout = useWorkoutStore((s) => s.repeatWorkout);
+  const programme = useProgrammeStore((s) => s.active);
+  const toggleDay = useProgrammeStore((s) => s.toggleDay);
+
+  const today = programme ? sessionToday(programme, SEED_TODAY) : null;
+  const progress = programme ? weekProgress(programme, SEED_TODAY) : null;
 
   const recent = [...history]
     .filter((w) => w.status === 'completed')
@@ -60,13 +68,94 @@ export default function TrainScreen() {
             Programme
           </Text>
           <Text variant="h3" style={styles.switchTitle}>
-            Build a week
+            {programme ? 'My week' : 'Build a week'}
           </Text>
           <Text variant="caption" tone="tertiary">
-            Auto or your own
+            {programme ? programme.name : 'Auto or your own'}
           </Text>
         </Card>
       </View>
+
+      {/* The programme on the fridge. Today first, then how the week is going —
+          because a plan you cannot see yourself falling behind on is a plan you
+          fall behind on quietly. */}
+      {programme && today && progress ? (
+        <>
+          <SectionHeader
+            title="On the programme"
+            action={{ label: 'Week', onPress: () => router.push('/programme/mine') }}
+          />
+          <Card marker={progress.missed > 0 ? 'warning' : 'none'}>
+            <View style={styles.programmeHead}>
+              <View style={styles.flex}>
+                <Text variant="overline" tone="tertiary">
+                  Today · {today.weekday}
+                </Text>
+                <Text variant="h2" style={styles.spaced}>
+                  {today.name}
+                </Text>
+              </View>
+              {today.isComplete ? <Pill label="Done" tone="success" /> : null}
+            </View>
+
+            {today.exercises && today.exercises.length > 0 ? (
+              <Text variant="bodySmall" tone="tertiary" style={styles.spaced}>
+                {today.exercises.map((e) => e.exerciseName).slice(0, 4).join(' · ')}
+              </Text>
+            ) : null}
+            {today.focus ? (
+              <Text variant="bodySmall" tone="tertiary" style={styles.spaced}>
+                {today.focus}
+              </Text>
+            ) : null}
+
+            <ProgressBar
+              fraction={progress.fraction ?? 0}
+              value={`${progress.done} / ${progress.planned} this week`}
+              tone={progress.missed > 0 ? 'warning' : 'default'}
+              style={styles.programmeBar}
+            />
+            {progress.missed > 0 ? (
+              <Text variant="caption" tone="tertiary" style={styles.spaced}>
+                {progress.missed} session{progress.missed === 1 ? '' : 's'} missed so far.
+              </Text>
+            ) : null}
+
+            {today.isRest ? (
+              <Text variant="bodySmall" tone="tertiary" style={styles.spaced}>
+                Rest is on the plan, not a gap in it.
+              </Text>
+            ) : (
+              <Button
+                label={today.isComplete ? 'Mark as not done' : 'Start today'}
+                variant={today.isComplete ? 'secondary' : 'primary'}
+                onPress={() => {
+                  if (today.isComplete) {
+                    toggleDay(today.dayIndex);
+                    return;
+                  }
+                  if (today.exercises && today.exercises.length > 0) {
+                    startFromTemplate(
+                      today.name,
+                      today.exercises.map((e) => ({
+                        exerciseId: e.exerciseId,
+                        exerciseName: e.exerciseName,
+                        metric: 'weight_reps' as const,
+                        targetSets: e.sets,
+                        targetReps: e.repsLow,
+                      })),
+                    );
+                    router.push('/workout/active');
+                  } else {
+                    toggleDay(today.dayIndex);
+                  }
+                }}
+                style={styles.programmeCta}
+              />
+            )}
+          </Card>
+        </>
+      ) : null}
 
       {active ? (
         <Card marker="live">
@@ -197,6 +286,10 @@ export default function TrainScreen() {
 
 const styles = StyleSheet.create({
   switchRow: { flexDirection: 'row', gap: sp.sm, marginBottom: sp.lg },
+  programmeHead: { flexDirection: 'row', alignItems: 'flex-start', gap: sp.md },
+  programmeBar: { marginTop: sp.lg },
+  programmeCta: { marginTop: sp.lg },
+  flex: { flex: 1 },
   switchCard: { flex: 1, gap: sp.xxs },
   switchTitle: { marginTop: sp.xxs },
   header: { marginTop: sp.lg, marginBottom: sp.xl, gap: sp.xs },

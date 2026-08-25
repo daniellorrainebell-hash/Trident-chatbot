@@ -10,6 +10,8 @@ import {
   DISCIPLINE_LABELS, EXPERIENCE_LABELS, GOAL_LABELS, type Experience, type Goal,
 } from '@/data/programmes/coaching';
 import { formatDuration } from '@/utils/format';
+import { useProgrammeStore } from '@/store/programmeStore';
+import { SEED_TODAY } from '@/data/seed';
 import type { Discipline } from '@/types';
 
 const DISCIPLINES: Discipline[] = ['gym', 'bjj', 'mma', 'boxing', 'strongman'];
@@ -32,6 +34,9 @@ export default function ProgrammeScreen() {
   const [days, setDays] = useState(5);
   const [experience, setExperience] = useState<Experience>('intermediate');
   const [goal, setGoal] = useState<Goal>('hypertrophy');
+  const saveGenerated = useProgrammeStore((s) => s.saveGenerated);
+  const saveDisciplineWeek = useProgrammeStore((s) => s.saveDisciplineWeek);
+  const active = useProgrammeStore((s) => s.active);
 
   const programme = useMemo(
     () => (discipline === 'gym' ? generateProgramme({ daysPerWeek: days, experience, goal }) : null),
@@ -153,10 +158,18 @@ export default function ProgrammeScreen() {
           </Card>
 
           <Button
+            label={active?.programme ? 'Replace my programme' : 'Make this my programme'}
+            onPress={() => {
+              saveGenerated(programme, programme.splitName, SEED_TODAY);
+              router.push('/train');
+            }}
+            style={styles.cta}
+          />
+          <Button
             label="Build my own instead"
             variant="secondary"
             onPress={() => router.push('/programme/pick')}
-            style={styles.cta}
+            style={styles.secondaryCta}
           />
         </>
       ) : null}
@@ -185,6 +198,15 @@ export default function ProgrammeScreen() {
               trailing={day.hard ? <Pill label="Hard" tone="danger" /> : undefined}
             />
           ))}
+
+          <Button
+            label={active?.week ? 'Replace my programme' : 'Make this my programme'}
+            onPress={() => {
+              saveDisciplineWeek(week, `${DISCIPLINE_LABELS[discipline]} week`, SEED_TODAY);
+              router.push('/train');
+            }}
+            style={styles.cta}
+          />
         </>
       ) : null}
     </Screen>
@@ -197,4 +219,5 @@ const styles = StyleSheet.create({
   statRow: { flexDirection: 'row', gap: sp.xl },
   note: { marginTop: sp.lg },
   cta: { marginTop: sp.lg },
+  secondaryCta: { marginTop: sp.sm },
 });
