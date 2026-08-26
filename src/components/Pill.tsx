@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Text } from './Text';
-import { colors, radius, space, minTouchTarget } from '@/design';
+import { CHROME_EDGE, chromeText, colors, radius, space, minTouchTarget } from '@/design';
+import { Chrome } from './Chrome';
 
 export type PillTone = 'neutral' | 'accent' | 'success' | 'danger' | 'warning' | 'live';
 
@@ -15,9 +16,9 @@ export type PillProps = {
 const toneStyles: Record<PillTone, { bg: string; text: string; border: string }> = {
   neutral: { bg: colors.bg.elevated, text: colors.text.secondary, border: colors.border.default },
   accent: { bg: colors.bg.elevated, text: colors.text.accent, border: colors.accent.steelDim },
-  // Filled, alone among the tones. Done is the loudest thing in its row;
-  // everything else states its case with an outline.
-  success: { bg: colors.status.success, text: colors.text.inverse, border: colors.status.success },
+  // Chrome, alone among the tones — see design/chrome.ts. The other five are
+  // flat because they are states; this one is an achievement.
+  success: { bg: 'transparent', text: colors.text.inverse, border: CHROME_EDGE },
   danger: { bg: 'transparent', text: colors.text.danger, border: colors.status.danger },
   warning: { bg: 'transparent', text: colors.text.warning, border: colors.status.warning },
   live: { bg: colors.signal.dim, text: colors.text.primary, border: colors.signal.default },
@@ -27,7 +28,26 @@ const toneStyles: Record<PillTone, { bg: string; text: string; border: string }>
 export function Pill({ label, tone = 'neutral', selected = false, onPress, style }: PillProps) {
   const palette = toneStyles[tone];
 
-  const body = (
+  const chrome = tone === 'success' && !selected;
+
+  const content = (
+    <Text
+      variant="overline"
+      style={
+        chrome
+          ? chromeText
+          : { color: selected ? colors.text.inverse : palette.text }
+      }
+    >
+      {label}
+    </Text>
+  );
+
+  const body = chrome ? (
+    <Chrome radius={radius.pill} style={[styles.pill, styles.chromePill, onPress && styles.tappable, style]}>
+      {content}
+    </Chrome>
+  ) : (
     <View
       style={[
         styles.pill,
@@ -37,12 +57,7 @@ export function Pill({ label, tone = 'neutral', selected = false, onPress, style
         style,
       ]}
     >
-      <Text
-        variant="overline"
-        style={{ color: selected ? colors.text.inverse : palette.text }}
-      >
-        {label}
-      </Text>
+      {content}
     </View>
   );
 
@@ -62,6 +77,8 @@ export function Pill({ label, tone = 'neutral', selected = false, onPress, style
 }
 
 const styles = StyleSheet.create({
+  // The gradient paints the fill, so the plate carries only its edge.
+  chromePill: { borderWidth: 1, borderColor: CHROME_EDGE, justifyContent: 'center' },
   pill: {
     paddingHorizontal: space.md,
     paddingVertical: space.sm,

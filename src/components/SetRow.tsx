@@ -1,8 +1,9 @@
 import { memo, useCallback } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { Chrome } from './Chrome';
 import { Text } from './Text';
-import { colors, radius, space, border, minTouchTarget, fontFamily } from '@/design';
+import { colors, radius, space, border, minTouchTarget, fontFamily, chromeText } from '@/design';
 import type { SetMetric, WorkoutSet } from '@/types';
 
 export type SetRowProps = {
@@ -124,14 +125,18 @@ function SetRowComponent({
 
       <Pressable
         onPress={handleToggle}
-        style={[styles.tick, set.completed && styles.tickDone]}
+        style={styles.tick}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: set.completed }}
         accessibilityLabel={`Mark set ${set.index} ${set.completed ? 'incomplete' : 'complete'}`}
       >
+        {/* Painted behind the mark rather than around it, so the plate keeps
+            its own clip and the tick sits on top of the shimmer. */}
+        {set.completed ? <Chrome radius={radius.sm} style={StyleSheet.absoluteFill} /> : null}
         <Text
           variant="metricS"
-          tone={set.completed ? 'inverse' : 'tertiary'}
+          style={set.completed ? chromeText : undefined}
+          tone={set.completed ? undefined : 'tertiary'}
         >
           {set.completed ? '✓' : '○'}
         </Text>
@@ -236,5 +241,4 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     backgroundColor: colors.bg.elevated,
   },
-  tickDone: { backgroundColor: colors.status.success },
 });

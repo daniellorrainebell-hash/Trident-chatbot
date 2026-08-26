@@ -1,9 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
-  Button, Card, EmptyState, ListRow, Pill, ProgressBar, Screen, SectionHeader, StatBlock, Text,
-} from '@/components';
-import { colors, space as sp } from '@/design';
+  Button, Card, EmptyState, ListRow, Pill, ProgressBar, Screen, SectionHeader, StatBlock, Text, Chrome } from '@/components';
+import { colors, space as sp, chromeText } from '@/design';
 import { useProgrammeStore } from '@/store/programmeStore';
 import { sessionOnDay, weekProgress, weekdayIndex } from '@/engines/training/programme';
 import { SEED_TODAY } from '@/data/seed';
@@ -92,9 +91,10 @@ export default function MyProgrammeScreen() {
             ) : (
               <View style={styles.trailing}>
                 {day.dayIndex === todayIndex ? <Pill label="Today" /> : null}
-                <View style={[styles.tick, day.isComplete && styles.tickOn]}>
+                <View style={styles.tick}>
+                  {day.isComplete ? <Chrome radius={6} style={StyleSheet.absoluteFill} /> : null}
                   {day.isComplete ? (
-                    <Text variant="caption" style={styles.tickMark}>
+                    <Text variant="caption" style={chromeText}>
                       ✓
                     </Text>
                   ) : null}
@@ -148,8 +148,6 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.border.strong,
     alignItems: 'center', justifyContent: 'center',
   },
-  tickOn: { backgroundColor: colors.text.primary, borderColor: colors.text.primary },
-  tickMark: { color: colors.text.inverse },
   cta: { marginTop: sp.xl },
   ghostCta: { marginTop: sp.sm },
 });

@@ -3,8 +3,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
-import { Button, Card, EmptyState, Screen, SectionHeader, Text } from '@/components';
-import { colors, radius, space as sp, minTouchTarget } from '@/design';
+import { Button, Card, EmptyState, Screen, SectionHeader, Text, Chrome } from '@/components';
+import { colors, radius, space as sp, minTouchTarget, chromeText } from '@/design';
 import { useNutritionStore } from '@/store/nutritionStore';
 import { AISLE_LABELS, formatPortion } from '@/data/foods';
 import type { ShoppingAisle, ShoppingListItem } from '@/types';
@@ -99,8 +99,13 @@ export default function ShoppingListScreen() {
                 accessibilityLabel={`${item.foodName}, ${roundedQuantity(item.totalGrams)}`}
                 style={[styles.item, i < items.length - 1 && styles.itemDivider]}
               >
-                <View style={[styles.checkbox, item.checked && styles.checkboxChecked]}>
-                  <Text variant="caption" tone={item.checked ? 'inverse' : 'tertiary'}>
+                <View style={styles.checkbox}>
+                  {item.checked ? <Chrome radius={radius.sm} style={StyleSheet.absoluteFill} /> : null}
+                  <Text
+                    variant="caption"
+                    style={item.checked ? chromeText : undefined}
+                    tone={item.checked ? undefined : 'tertiary'}
+                  >
                     {item.checked ? '✓' : ''}
                   </Text>
                 </View>
@@ -167,7 +172,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkboxChecked: { backgroundColor: colors.status.success, borderColor: colors.status.success },
   itemBody: { flex: 1, gap: sp.xxs },
   checkedText: { textDecorationLine: 'line-through' },
   footer: { marginTop: sp.xxl },

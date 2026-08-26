@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, ListRow, Pill, Screen, SectionHeader, StatBlock, Text } from '@/components';
-import { colors, space as sp } from '@/design';
+import { Button, Card, ListRow, Pill, Screen, SectionHeader, StatBlock, Text, Chrome } from '@/components';
+import { colors, space as sp, chromeText } from '@/design';
 import { EXERCISES } from '@/data/exercises';
 import { SLOTS, type SlotId } from '@/data/programmes/splits';
 import { REP_RANGES, REST_SECONDS, SETS_PER_EXERCISE } from '@/data/programmes/coaching';
@@ -148,8 +148,9 @@ export default function ProgrammePickScreen() {
                 subtitle={`${exercise.equipment.replace(/_/g, ' ')} · ${exercise.pattern === 'isolation' ? 'isolation' : 'compound'}`}
                 onPress={() => toggle(exercise.id)}
                 trailing={
-                  <View style={[styles.tick, on && styles.tickOn]}>
-                    {on ? <Text variant="caption" style={styles.tickMark}>✓</Text> : null}
+                  <View style={styles.tick}>
+                    {on ? <Chrome radius={6} style={StyleSheet.absoluteFill} /> : null}
+                    {on ? <Text variant="caption" style={chromeText}>✓</Text> : null}
                   </View>
                 }
               />
@@ -171,6 +172,4 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.border.strong,
     alignItems: 'center', justifyContent: 'center',
   },
-  tickOn: { backgroundColor: colors.text.primary, borderColor: colors.text.primary },
-  tickMark: { color: colors.text.inverse },
 });

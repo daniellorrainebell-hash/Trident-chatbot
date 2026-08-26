@@ -2,6 +2,8 @@ export { BrandMark } from './BrandMark';
 export { RankDog } from './RankDog';
 export type { RankDogProps } from './RankDog';
 export type { BrandMarkProps } from './BrandMark';
+export { Chrome } from './Chrome';
+export type { ChromeProps } from './Chrome';
 export { Text } from './Text';
 export type { TextProps } from './Text';
 export { Button } from './Button';
