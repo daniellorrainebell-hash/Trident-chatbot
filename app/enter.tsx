@@ -23,7 +23,7 @@ export default function EnterScreen() {
 
       <View style={styles.mark}>
         <Image
-          source={require('../assets/brand/rabid-wordmark.png')}
+          source={require('../assets/brand/rabid-mark-claw.png')}
           style={styles.wordmark}
           resizeMode="contain"
           accessible
@@ -89,11 +89,15 @@ const styles = StyleSheet.create({
   // The mark is the loud thing on this screen, so the height it takes is bought
   // from the figure rather than from that air: making it bigger without giving
   // the stage back some room would just squeeze the gaps and push it up again.
-  gapAbove: { flex: 1 },
+  // Weighted, not equal. The clawed mark carries a lot of empty canvas above
+  // the lettering, so an even split reads as sitting high even when the box is
+  // centred — the eye measures to the letters, not to the tip of a claw.
+  gapAbove: { flex: 2 },
   gapBelow: { flex: 1 },
 
   mark: { alignItems: 'center' },
-  wordmark: { width: 176, height: 175 },
+  // Sized so the lettering lands near where it was; the claws are the extra.
+  wordmark: { width: 210, height: 275 },
 
   // The figure sits over the advisory rather than beside it.
   //
@@ -108,7 +112,7 @@ const styles = StyleSheet.create({
   // the two spacers above, where it can be shared evenly, instead of hiding a
   // band above his head that nothing else can see.
   stage: {
-    width: '52%',
+    width: '44%',
     aspectRatio: 1000 / 1847,
     // The stage used to stretch the full width and centre its contents. Now it
     // is only as wide as the figure, so it has to centre itself - a column's
@@ -119,7 +123,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   // 104% of the full content width, expressed against the narrower stage.
-  advisory: { position: 'absolute', width: '199%', aspectRatio: 1200 / 919 },
+  advisory: { position: 'absolute', width: '236%', aspectRatio: 1200 / 919 },
   fill: { width: '100%', height: '100%' },
 
   // alignItems centres each line of type as a block, but a block is only as
