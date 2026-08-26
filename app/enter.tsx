@@ -1,7 +1,7 @@
 import { Image, StyleSheet, View, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text } from '@/components';
+import { ClawMark, Text } from '@/components';
 import { colors, space as sp, radius } from '@/design';
 
 /**
@@ -49,6 +49,10 @@ export default function EnterScreen() {
           resizeMode="contain"
           accessible={false}
         />
+
+        {/* Raked over the plate and the figure both, so it reads as damage to
+            the poster rather than as a graphic sitting beside it. */}
+        <ClawMark variant="rake" size={300} rotate={14} style={styles.claw} />
       </View>
 
       <View style={styles.type}>
@@ -121,6 +125,7 @@ const styles = StyleSheet.create({
   // 104% of the full content width, expressed against the narrower stage.
   advisory: { position: 'absolute', width: '199%', aspectRatio: 1200 / 919 },
   fill: { width: '100%', height: '100%' },
+  claw: { top: '-6%', right: '-58%' },
 
   // alignItems centres each line of type as a block, but a block is only as
   // wide as its longest line - so the moment THE KENNEL wraps, THE sits at the
