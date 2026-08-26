@@ -88,5 +88,7 @@ const styles = StyleSheet.create({
   item: { paddingVertical: space.xs },
   label: { alignItems: 'center', gap: space.xs },
   marker: { height: 2, width: 18, backgroundColor: 'transparent', borderRadius: 1 },
-  markerActive: { backgroundColor: colors.text.primary },
+  // The one persistent piece of brand colour in the app. It marks position,
+  // never state, so it cannot be mistaken for a warning.
+  markerActive: { backgroundColor: colors.brand.edge },
 });

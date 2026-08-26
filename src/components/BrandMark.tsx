@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
   },
   compactSub: { flexDirection: 'row', alignItems: 'center', gap: sp.sm, marginTop: sp.xs },
 
-  // Steel hairlines running out from the wordmark, so it reads as a plate.
-  rule: { flex: 1, height: 1, backgroundColor: colors.border.default },
+  // Hairlines running out from the wordmark, so it reads as a plate. Blood
+  // rather than steel: the one place the brand colour touches the mark itself.
+  rule: { flex: 1, height: 1, backgroundColor: colors.brand.edge },
   heroSubText: { letterSpacing: 3 },
 });

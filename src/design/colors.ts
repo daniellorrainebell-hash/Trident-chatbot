@@ -88,6 +88,22 @@ export const colors = {
     steelBright: palette.steelBright,
   },
 
+  /**
+   * Brand red, for structure only — never for text or fills.
+   *
+   * Red still means live, failed or destructive everywhere it lands on a word
+   * or a surface. That meaning is worth keeping, so the brand accent is
+   * confined to hairlines and markers: the tab rule, the tick beside a section
+   * title, the rules flanking the mark. A red line is Rabid. A red word is a
+   * warning. Keeping those apart is what stops either from going quiet.
+   *
+   * Not used on the landing screen, which stays black and white.
+   */
+  brand: {
+    edge: palette.blood,
+    edgeBright: palette.bloodBright,
+  },
+
   /** Reserved for live/destructive/failed. Do not use as a brand wash. */
   signal: {
     default: palette.blood,

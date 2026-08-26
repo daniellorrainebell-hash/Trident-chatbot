@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './Text';
-import { space, hitSlop } from '@/design';
+import { colors, space, hitSlop } from '@/design';
 
 export type SectionHeaderProps = {
   title: string;
@@ -13,9 +13,14 @@ export function SectionHeader({ title, action, subtitle }: SectionHeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <Text variant="overline" tone="tertiary" accessibilityRole="header">
-          {title}
-        </Text>
+        <View style={styles.titleGroup}>
+          {/* A hairline, not a colour on the words. Structure carries the brand
+              here; the text stays the same grey it always was. */}
+          <View style={styles.tick} />
+          <Text variant="overline" tone="tertiary" accessibilityRole="header">
+            {title}
+          </Text>
+        </View>
         {action ? (
           <Pressable
             onPress={action.onPress}
@@ -41,5 +46,7 @@ export function SectionHeader({ title, action, subtitle }: SectionHeaderProps) {
 const styles = StyleSheet.create({
   container: { marginTop: space.xxl, marginBottom: space.md },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  titleGroup: { flexDirection: 'row', alignItems: 'center', gap: space.sm, flexShrink: 1 },
+  tick: { width: 10, height: 2, borderRadius: 1, backgroundColor: colors.brand.edge },
   subtitle: { marginTop: space.xs },
 });
