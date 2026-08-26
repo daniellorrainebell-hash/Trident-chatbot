@@ -20,7 +20,9 @@ const ARTWORK: Record<RabidLevel, { source: number; width: number; height: numbe
   mutt: { source: require('../../assets/brand/ranks/mutt.png'), width: 866, height: 946 },
   hound: { source: require('../../assets/brand/ranks/hound.png'), width: 860, height: 1115 },
   feral: { source: require('../../assets/brand/ranks/feral.png'), width: 1100, height: 1503 },
-  rabid: { source: require('../../assets/brand/ranks/rabid.png'), width: 1041, height: 1193 },
+  // The only rank with colour in it. RABID bleeds; the other four are grey
+  // plus alpha, so this one ships RGBA or the blood is silently thrown away.
+  rabid: { source: require('../../assets/brand/ranks/rabid.png'), width: 1043, height: 1198 },
 };
 
 export type RankDogProps = {
