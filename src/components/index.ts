@@ -1,6 +1,4 @@
 export { BrandMark } from './BrandMark';
-export { ClawMark } from './ClawMark';
-export type { ClawMarkProps, ClawMarkVariant } from './ClawMark';
 export { RankDog } from './RankDog';
 export type { RankDogProps } from './RankDog';
 export type { BrandMarkProps } from './BrandMark';
