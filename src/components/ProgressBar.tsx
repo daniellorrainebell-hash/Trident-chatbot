@@ -22,7 +22,7 @@ const toneColors = {
 
 /**
  * Status is never carried by colour alone (spec §73) — the bar always has a text
- * label or value beside it, so a red bar and a green bar are still distinguishable
+ * label or value beside it, so a red bar and a bone bar are still distinguishable
  * to someone who cannot tell them apart.
  */
 export function ProgressBar({

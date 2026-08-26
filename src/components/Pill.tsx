@@ -15,7 +15,9 @@ export type PillProps = {
 const toneStyles: Record<PillTone, { bg: string; text: string; border: string }> = {
   neutral: { bg: colors.bg.elevated, text: colors.text.secondary, border: colors.border.default },
   accent: { bg: colors.bg.elevated, text: colors.text.accent, border: colors.accent.steelDim },
-  success: { bg: 'transparent', text: colors.text.success, border: colors.status.success },
+  // Filled, alone among the tones. Done is the loudest thing in its row;
+  // everything else states its case with an outline.
+  success: { bg: colors.status.success, text: colors.text.inverse, border: colors.status.success },
   danger: { bg: 'transparent', text: colors.text.danger, border: colors.status.danger },
   warning: { bg: 'transparent', text: colors.text.warning, border: colors.status.warning },
   live: { bg: colors.signal.dim, text: colors.text.primary, border: colors.signal.default },

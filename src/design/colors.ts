@@ -39,11 +39,13 @@ export const palette = {
 
   // Status. Muted on purpose — no neon.
   //
-  // There is no amber. The brand is black, white and blood — a third status
-  // hue diluted that, and anything that needs attention here is either fine
-  // or it is not. Warnings use the same red as failure, one step dimmer.
-  green: '#4C8C63',
-  greenBright: '#5FA97A',
+  // There is no amber and there is no green. The brand is black, bone and
+  // blood, and a status palette that reached outside it was the one part of
+  // the app that looked borrowed.
+  //
+  // Success is not a hue here, it is a state: done is filled, pending is an
+  // outline, failed is an outline in blood. That survives a greyscale
+  // screenshot and a colourblind reader, which a green chip never did.
 } as const;
 
 export const colors = {
@@ -78,7 +80,7 @@ export const colors = {
     inverse: palette.void,
     accent: palette.steelBright,
     danger: palette.bloodBright,
-    success: palette.greenBright,
+    success: palette.bone,
     warning: palette.bloodBright,
   },
 
@@ -112,8 +114,8 @@ export const colors = {
   },
 
   status: {
-    success: palette.green,
-    successBright: palette.greenBright,
+    success: palette.bone,
+    successBright: palette.bone,
     warning: palette.blood,
     warningBright: palette.bloodBright,
     danger: palette.blood,
