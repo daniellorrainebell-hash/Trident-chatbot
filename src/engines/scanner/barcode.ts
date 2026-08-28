@@ -9,8 +9,15 @@
 
 export type BarcodeType = 'ean13' | 'ean8' | 'upca' | 'upce' | 'code128' | 'unknown';
 
-/** The symbologies the camera is configured to read. UK retail is mostly EAN-13. */
-export const SUPPORTED_BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128'] as const;
+/**
+ * The symbologies the camera is configured to read. UK retail is mostly EAN-13.
+ *
+ * Code 128 is deliberately absent. It is a variable-length symbology used for
+ * logistics labels, not consumer packaging, so `isPlausibleProductBarcode`
+ * rejects every one of them. Leaving it switched on only bought a buzz, a
+ * locked camera and a failure screen for a shelf-edge label.
+ */
+export const SUPPORTED_BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e'] as const;
 
 export type NormalisedBarcode = {
   /** Exactly what the scanner returned, preserved for support and audit. */
@@ -95,6 +102,15 @@ export function normaliseBarcode(raw: string, reportedType?: string): Normalised
 
   let gtin = code;
   let type: BarcodeType = 'unknown';
+  /**
+   * The string the check digit is actually defined over.
+   *
+   * For most symbologies that is the code as scanned. UPC-E is the exception:
+   * its last digit is the check digit of the *expanded* UPC-A, not of the
+   * compressed eight. Validating the compressed form rejects 42% of genuine
+   * UPC-E codes before they ever reach a lookup.
+   */
+  let checkAgainst = code;
 
   if (code.length === 13) {
     type = 'ean13';
@@ -106,18 +122,25 @@ export function normaliseBarcode(raw: string, reportedType?: string): Normalised
     if (expanded) {
       type = 'upce';
       gtin = `0${expanded}`;
+      checkAgainst = expanded;
     } else {
       type = 'ean8';
       gtin = code.padStart(13, '0');
     }
   } else if (code.length === 14) {
+    // A GTIN-14 is a case or carton: an indicator digit, the consumer unit's
+    // twelve-digit body, then its own check digit. Dropping the indicator
+    // leaves the *case* check digit on the end, which only happens to be right
+    // when the indicator is 0 — for every other pallet configuration it yields
+    // a GTIN that does not exist. Recompute it from the body instead.
     type = 'ean13';
-    gtin = code.slice(1);
+    const body = code.slice(1, 13);
+    gtin = `${body}${calculateCheckDigit(body)}`;
   } else if (reportedType?.includes('code128')) {
     type = 'code128';
   }
 
-  return { raw, gtin, type, validCheckDigit: hasValidCheckDigit(code) };
+  return { raw, gtin, type, validCheckDigit: hasValidCheckDigit(checkAgainst) };
 }
 
 /**

@@ -69,8 +69,20 @@ export interface FoodProductProvider {
 
 /** The cache-first chain the app actually calls. */
 export interface FoodProductResolver {
-  resolve(rawBarcode: string, options?: { locale?: string }): Promise<ProductLookupResult>;
+  resolve(rawBarcode: string, options?: ResolveOptions): Promise<ProductLookupResult>;
 }
+
+export type ResolveOptions = {
+  locale?: string;
+  /**
+   * The symbology the camera reported, passed straight through.
+   *
+   * Eight digits alone are ambiguous — EAN-8 and UPC-E are the same length and
+   * normalise to completely different GTINs. Only the scanner knows which it
+   * read, so it has to say.
+   */
+  symbology?: string;
+};
 
 /** Local and remote caches implement this. */
 export interface ProductCache {

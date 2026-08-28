@@ -214,6 +214,28 @@ describe('CachedProductResolver', () => {
     expect(calls.count).toBe(0);
   });
 
+  it('looks up a UPC-E scan under its expanded GTIN', async () => {
+    // Eight digits are ambiguous: as an EAN-8 this pads to 0000004252614, as a
+    // UPC-E it expands to 0042100005264. Only the reported symbology separates
+    // them, so the resolver has to be told and has to pass it on.
+    const asked: string[] = [];
+    const provider: FoodProductProvider = {
+      name: 'open_food_facts',
+      async lookupBarcode(gtin) { asked.push(gtin); return null; },
+    };
+
+    await new CachedProductResolver([], [provider]).resolve('04252614', { symbology: 'upc_e' });
+    expect(asked).toEqual(['0042100005264']);
+  });
+
+  it('rejects a valid UPC-E when the symbology is withheld', async () => {
+    // Not a policy — a demonstration that dropping the symbology on the way
+    // down is not a harmless omission.
+    const result = await new CachedProductResolver([], []).resolve('04252614');
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.code).toBe('BARCODE_INVALID');
+  });
+
   it('serves a cache hit without calling the provider', async () => {
     const cache = new MemoryProductCache();
     await cache.put(product);

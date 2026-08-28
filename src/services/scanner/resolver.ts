@@ -5,6 +5,7 @@ import type {
   FoodProductResolver,
   ProductCache,
   ProductLookupResult,
+  ResolveOptions,
 } from './types';
 
 /**
@@ -24,8 +25,8 @@ export class CachedProductResolver implements FoodProductResolver {
     private readonly isOnline: () => boolean = () => true,
   ) {}
 
-  async resolve(rawBarcode: string): Promise<ProductLookupResult> {
-    const normalised = normaliseBarcode(rawBarcode);
+  async resolve(rawBarcode: string, options?: ResolveOptions): Promise<ProductLookupResult> {
+    const normalised = normaliseBarcode(rawBarcode, options?.symbology);
 
     // Reject before spending a network call on something that is not a product.
     if (!isPlausibleProductBarcode(normalised)) {

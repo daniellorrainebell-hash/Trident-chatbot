@@ -8,6 +8,7 @@ import { Button, Card, Text } from '@/components';
 import { colors, radius, space as sp } from '@/design';
 import { useScannerStore } from '@/store/scannerStore';
 import { LOOKUP_MESSAGES } from '@/services/scanner/types';
+import { SUPPORTED_BARCODE_TYPES } from '@/engines/scanner/barcode';
 
 /**
  * Barcode scanning (Feed spec §22).
@@ -40,10 +41,12 @@ export default function BarcodeScanScreen() {
   }, [stage]);
 
   const onScanned = useCallback(
-    ({ data }: { data: string }) => {
+    ({ data, type }: { data: string; type: string }) => {
       if (locked) return;
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      void scanBarcode(data);
+      // The symbology travels with the code. Eight digits could be EAN-8 or
+      // UPC-E, and those normalise to different GTINs — only the camera knows.
+      void scanBarcode(data, type);
     },
     [locked, scanBarcode],
   );
@@ -79,13 +82,26 @@ export default function BarcodeScanScreen() {
 
   if (stage === 'failed' && failure) {
     const copy = LOOKUP_MESSAGES[failure.code];
+    // A code that was never a product barcode has nothing to look up on a
+    // label either — its recovery is another scan, and the copy says so. Every
+    // other failure means the product is real but the lookup could not answer,
+    // where reading the panel is the way through.
+    const retry = failure.code === 'BARCODE_INVALID';
     return (
       <Shell>
         <Card marker="warning">
           <Text variant="h3">{copy.title}</Text>
           <Text variant="body" tone="secondary" style={styles.body}>{copy.detail}</Text>
-          <Button label={copy.action} onPress={() => router.replace('/feed/scanner/label')} />
-          <Button label="Scan again" variant="secondary" onPress={reset} style={styles.gap} />
+          <Button
+            label={copy.action}
+            onPress={retry ? reset : () => router.replace('/feed/scanner/label')}
+          />
+          <Button
+            label={retry ? 'Enter it manually' : 'Scan again'}
+            variant="secondary"
+            onPress={retry ? () => router.replace('/feed/scanner/confirm') : reset}
+            style={styles.gap}
+          />
         </Card>
       </Shell>
     );
@@ -97,9 +113,7 @@ export default function BarcodeScanScreen() {
         <CameraView
           style={StyleSheet.absoluteFill}
           facing="back"
-          barcodeScannerSettings={{
-            barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128'],
-          }}
+          barcodeScannerSettings={{ barcodeTypes: [...SUPPORTED_BARCODE_TYPES] }}
           onBarcodeScanned={locked ? undefined : onScanned}
         />
 

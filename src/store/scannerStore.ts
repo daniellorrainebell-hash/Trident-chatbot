@@ -61,7 +61,7 @@ type ScannerState = {
 
   openScanner(mode: ScannerMode): void;
   close(): void;
-  scanBarcode(raw: string): Promise<void>;
+  scanBarcode(raw: string, symbology?: string): Promise<void>;
   submitLabel(label: ParsedLabel): void;
   confirmNutrition(nutrition: ScannedProductNutrition): void;
   saveToMyFoods(input: Omit<SavedFood, 'id' | 'savedAt' | 'private'>): SavedFood;
@@ -99,11 +99,11 @@ export const useScannerStore = create<ScannerState>((set, get) => ({
    * Guarded by `locked` because the camera fires the same code many times a
    * second; without it every frame starts another lookup.
    */
-  async scanBarcode(raw) {
+  async scanBarcode(raw, symbology) {
     if (get().locked) return;
     set({ locked: true, stage: 'resolving' });
 
-    const result = await get().resolver.resolve(raw);
+    const result = await get().resolver.resolve(raw, { symbology });
 
     if (result.ok) {
       set({
