@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
-  Button, Card, EmptyState, ListRow, Screen, SectionHeader, Text,
+  Button, Card, EmptyState, ListRow, Pill, ProgressBar, Screen, SectionHeader, Text,
 } from '@/components';
 import { space as sp } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
@@ -11,7 +11,6 @@ import { formatVolume, formatDuration, formatRelative } from '@/utils/format';
 import { track } from '@/services/analytics';
 import { useProgrammeStore } from '@/store/programmeStore';
 import { sessionToday, weekProgress } from '@/engines/training/programme';
-import { ProgressBar, Pill } from '@/components';
 
 /**
  * TRAIN — the entry point to a session (spec §12).

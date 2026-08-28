@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Button, Card, EmptyState, Pill, Screen, SectionHeader, StatBlock, Text } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
 import { workoutVolumeKg, countWorkingSets, setVolumeKg } from '@/engines/training/volume';
 import { formatVolume, formatDuration, formatDate } from '@/utils/format';

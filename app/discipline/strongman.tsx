@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
@@ -9,7 +8,7 @@ import { SEED_TODAY } from '@/data/seed';
 import { seedEventSessions } from '@/data/seedDisciplines';
 import { attemptHistory, eventBests, strongmanLogs, summariseSession } from '@/engines/training/strongman';
 import {
-  STRONGMAN_SESSION_TYPE_LABELS, STRONGMAN_STYLE_LABELS, findEvent, higherIsBetter,
+  STRONGMAN_SESSION_TYPE_LABELS, STRONGMAN_STYLE_LABELS, higherIsBetter,
 } from '@/data/disciplines';
 import { formatRelative } from '@/utils/format';
 import type { StrongmanEventStyle } from '@/types';
@@ -26,6 +25,26 @@ import type { StrongmanEventStyle } from '@/types';
  * sport, and the useful thing on this screen is often the lift that has refused
  * to move for a month.
  */
+/**
+ * The heaviest lift that has been missed, and how many times.
+ *
+ * Derived from fixed data, so it is computed once at module load. As a
+ * `useMemo` with no dependencies it forced the React Compiler to skip
+ * optimising this whole screen for a value that could never change.
+ */
+const LOGS = strongmanLogs(seedEventSessions);
+const BESTS = [...eventBests(seedEventSessions).values()];
+
+const STUBBORN = (() => {
+  const failed = seedEventSessions
+    .flatMap((s) => (s.log?.kind === 'strongman' ? s.log.attempts : []))
+    .filter((a) => !a.successful && a.loadKg !== null)
+    .sort((a, b) => (b.loadKg ?? 0) - (a.loadKg ?? 0))[0];
+  if (!failed) return null;
+  const history = attemptHistory(seedEventSessions, failed.eventId, failed.style);
+  return { attempt: failed, tries: history.filter((a) => !a.successful).length };
+})();
+
 function formatValue(style: StrongmanEventStyle, value: number): string {
   switch (style) {
     case 'max_load':
@@ -40,8 +59,8 @@ function formatValue(style: StrongmanEventStyle, value: number): string {
 }
 
 export default function StrongmanScreen() {
-  const logs = useMemo(() => strongmanLogs(seedEventSessions), []);
-  const bests = useMemo(() => [...eventBests(seedEventSessions).values()], []);
+  const logs = LOGS;
+  const bests = BESTS;
   const now = new Date(`${SEED_TODAY}T21:00:00Z`);
 
   const totals = logs.reduce(
@@ -60,15 +79,6 @@ export default function StrongmanScreen() {
   const misses = totals.attempts - totals.successful;
 
   // The lift that keeps refusing. Worth more screen space than another PB.
-  const stubborn = useMemo(() => {
-    const failed = seedEventSessions
-      .flatMap((s) => (s.log?.kind === 'strongman' ? s.log.attempts : []))
-      .filter((a) => !a.successful && a.loadKg !== null)
-      .sort((a, b) => (b.loadKg ?? 0) - (a.loadKg ?? 0))[0];
-    if (!failed) return null;
-    const history = attemptHistory(seedEventSessions, failed.eventId, failed.style);
-    return { attempt: failed, tries: history.filter((a) => !a.successful).length };
-  }, []);
 
   return (
     <Screen>
@@ -96,16 +106,16 @@ export default function StrongmanScreen() {
         </View>
       </Card>
 
-      {stubborn ? (
+      {STUBBORN ? (
         <>
           <SectionHeader title="Still standing" />
           <Card marker="warning">
             <Text variant="h3">
-              {stubborn.attempt.eventName} · {stubborn.attempt.loadKg} kg
+              {STUBBORN.attempt.eventName} · {STUBBORN.attempt.loadKg} kg
             </Text>
             <Text variant="bodySmall" tone="tertiary" style={styles.note}>
-              Missed {stubborn.tries} time{stubborn.tries === 1 ? '' : 's'}.
-              {stubborn.attempt.notes ? ` ${stubborn.attempt.notes}` : ''}
+              Missed {STUBBORN.tries} time{STUBBORN.tries === 1 ? '' : 's'}.
+              {STUBBORN.attempt.notes ? ` ${STUBBORN.attempt.notes}` : ''}
             </Text>
           </Card>
         </>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
@@ -25,9 +25,10 @@ export default function TargetsScreen() {
   const energy = useNutritionStore((s) => s.energy);
   const safetyDecision = useNutritionStore((s) => s.safetyDecision);
 
-  const [selectedWeeks, setSelectedWeeks] = useState<number | null>(
-    profile?.requestedTimeframeWeeks ?? null,
-  );
+  // The timeline below is a read-only comparison: it marks the timeframe the
+  // plan was built around. Held in state it could only ever go stale against
+  // the profile, because nothing on this screen sets it.
+  const selectedWeeks = profile?.requestedTimeframeWeeks ?? null;
 
   const timeframe = useMemo(
     () => (profile ? assessTimeframe(profile) : null),

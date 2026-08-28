@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Button, Card, EmptyState, Pill, SetRow, Text, Timer,
 } from '@/components';
-import { colors, space as sp, radius } from '@/design';
+import { colors, space as sp } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
 import { workoutVolumeKg, countWorkingSets } from '@/engines/training/volume';
 import { findExercise } from '@/data/exercises';

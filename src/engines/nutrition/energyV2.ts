@@ -1,4 +1,4 @@
-import type { MacroTargets, NutritionProfile, Sex } from '@/types';
+import type { MacroTargets, Sex } from '@/types';
 import {
   ACTIVITY_POLICY_V1,
   KCAL_PER_KG_BODYWEIGHT,
@@ -14,7 +14,7 @@ import {
   type NutritionSafetyPolicy,
   type TrainingExperience,
 } from './policy';
-import { screenProfile, type NutritionSafetyDecision } from './safetyDecision';
+import { type NutritionSafetyDecision } from './safetyDecision';
 
 /**
  * Deterministic energy and macro engine (Feed spec §7, §8, §9).

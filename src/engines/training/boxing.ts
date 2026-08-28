@@ -1,6 +1,5 @@
 import type { BoxingLog, BoxingRound, BoxingSessionType, IsoDate, SparIntensity, Workout } from '@/types';
-import { LIVE_SESSION_TYPES } from '@/data/disciplines';
-import { HARD_SPARRING_WINDOW_DAYS } from '@/data/disciplines';
+import { HARD_SPARRING_WINDOW_DAYS, LIVE_SESSION_TYPES } from '@/data/disciplines';
 import { daysBetween } from './contracts';
 
 /**

@@ -1,5 +1,5 @@
 import type { CatalogueFood } from './types';
-import { f, PLANT, DAIRY, EGG } from './helpers';
+import { f, PLANT, DAIRY } from './helpers';
 
 /**
  * Fat foods (Feed spec §15.3).

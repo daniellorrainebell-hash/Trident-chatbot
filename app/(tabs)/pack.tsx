@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import {
   Button, Card, EmptyState, ListRow, Pill, Screen, SectionHeader, StatBlock, Text,
 } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 import {
   seedPack, seedPackMembers, seedPackStats, seedLeaderboard, seedYardPosts, SEED_TODAY,
 } from '@/data/seed';

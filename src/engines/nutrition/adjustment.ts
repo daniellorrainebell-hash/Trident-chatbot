@@ -83,7 +83,7 @@ export function analyseTrend(
   const timeframe = assessTimeframe(profile, policy);
 
   // The rate the plan was actually built around, not the policy ceiling.
-  const targetRate = resolveWeeklyRate(profile, timeframe, policy);
+  const targetRate = resolveWeeklyRate(profile, timeframe);
 
   const averageAdherence =
     checkIns.length === 0

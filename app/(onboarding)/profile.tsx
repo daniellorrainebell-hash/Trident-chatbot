@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
-  Button, ChoiceGroup, Field, Screen, SectionHeader, Text, type Choice,
+  Button, ChoiceGroup, Field, Screen, SectionHeader, Text,
 } from '@/components';
 import { space as sp } from '@/design';
 import { useUserStore } from '@/store/userStore';

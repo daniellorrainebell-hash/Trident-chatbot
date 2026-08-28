@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { Text } from './Text';
-import { colors, space } from '@/design';
+import { space } from '@/design';
 import type { MealNutrients } from '@/types';
 
 export type MacroRowProps = {

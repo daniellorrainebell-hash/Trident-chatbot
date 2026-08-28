@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Text } from '@/components';
-import { colors, space, type } from '@/design';
+import { colors, space } from '@/design';
 
 /**
  * Five tabs, named in the product's own language (spec §10, §3).

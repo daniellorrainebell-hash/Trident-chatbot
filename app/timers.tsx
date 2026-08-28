@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, ChoiceGroup, Field, Pill, Screen, SectionHeader, Text, Timer } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 
 type TimerMode = 'rest' | 'stopwatch' | 'boxing' | 'mma' | 'hiit' | 'emom' | 'amrap';
 

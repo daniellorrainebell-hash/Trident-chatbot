@@ -73,7 +73,10 @@ export default function ExportScreen() {
 
       track({ name: 'plan_exported', properties: { format: 'xlsx' } });
     } catch (cause) {
-      // Surface the failure rather than leaving a spinner spinning.
+      // Surface the failure rather than leaving a spinner spinning. The cause
+      // goes to the log too — writing a file and opening a share sheet fails
+      // for device-specific reasons, and a swallowed error is undiagnosable.
+      console.warn('[export] workbook failed', cause);
       setError('The workbook could not be created. Try regenerating your plan.');
     } finally {
       setExporting(false);

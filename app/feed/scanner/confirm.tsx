@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, Field, Pill, Screen, SectionHeader, Text } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 import { useScannerStore } from '@/store/scannerStore';
 import { ALLERGEN_LABELS } from '@/engines/food/eligibility';
 import { checkPlausibility, classifyByMacros, crossCheckEnergy } from '@/engines/scanner/portions';

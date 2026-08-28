@@ -1,5 +1,5 @@
 import type { CatalogueFood } from './types';
-import { f, PLANT, EGG, DAIRY, HONEY } from './helpers';
+import { f, PLANT, EGG, HONEY } from './helpers';
 
 /**
  * Carbohydrate foods (Feed spec §15.2).

@@ -6,7 +6,7 @@ import { File, Paths } from 'expo-file-system';
 import { Button, Card, EmptyState, Screen, SectionHeader, Text, Chrome } from '@/components';
 import { colors, radius, space as sp, minTouchTarget, chromeText } from '@/design';
 import { useNutritionStore } from '@/store/nutritionStore';
-import { AISLE_LABELS, formatPortion } from '@/data/foods';
+import { AISLE_LABELS } from '@/data/foods';
 import type { ShoppingAisle, ShoppingListItem } from '@/types';
 
 /**

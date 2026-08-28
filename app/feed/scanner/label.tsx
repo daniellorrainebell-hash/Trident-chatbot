@@ -64,7 +64,20 @@ export default function LabelScanScreen() {
     }
   }, [submitLabel]);
 
-  if (!permission?.granted) {
+  // `permission` is null until the hook has read the current status. Falling
+  // through to the denied card here showed "Open settings" for a split second
+  // to someone who had never been asked.
+  if (!permission) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.shell}>
+          <Text variant="body" tone="tertiary" center>Preparing the camera…</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!permission.granted) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.shell}>
@@ -74,7 +87,7 @@ export default function LabelScanScreen() {
               The label scanner uses your camera to read the nutrition panel. The photo is
               temporary and is not kept.
             </Text>
-            {permission?.canAskAgain ? (
+            {permission.canAskAgain ? (
               <Button label="Allow camera" onPress={() => void requestPermission()} />
             ) : (
               <Button label="Open settings" onPress={() => void Linking.openSettings()} />

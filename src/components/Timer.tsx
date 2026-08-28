@@ -37,11 +37,16 @@ export function Timer({
 }: TimerProps) {
   const [running, setRunning] = useState(autoStart);
   const [elapsed, setElapsed] = useState(0);
-  const startedAt = useRef<number | null>(autoStart ? Date.now() : null);
+  const startedAt = useRef<number | null>(null);
   const fired = useRef(false);
 
   useEffect(() => {
     if (!running) return;
+
+    // Stamp the start here rather than in the ref initialiser. Reading the
+    // clock during render is a fresh value on every re-render that React is
+    // free to discard, and it blocks the component from being compiled.
+    if (startedAt.current == null) startedAt.current = Date.now();
 
     const tick = () => {
       if (startedAt.current == null) return;

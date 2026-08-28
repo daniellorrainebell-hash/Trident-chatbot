@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import {
   Button, Card, ListRow, MacroRow, Pill, Screen, SectionHeader, StatBlock, Text,
 } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 import { useNutritionStore } from '@/store/nutritionStore';
 import { useUserStore, hasAcceptedNutritionDisclaimer } from '@/store/userStore';
 import { assessTimeframe } from '@/engines/nutrition/energy';

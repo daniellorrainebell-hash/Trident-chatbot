@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { BrandMark, Button, Card, EmptyState, ListRow, Pill, Screen, SectionHeader, Text } from '@/components';
+import { BrandMark, Button, Card, EmptyState, ListRow, Screen, SectionHeader, Text } from '@/components';
 import { colors, space as sp } from '@/design';
 import { useScannerStore } from '@/store/scannerStore';
 import { formatRelative } from '@/utils/format';

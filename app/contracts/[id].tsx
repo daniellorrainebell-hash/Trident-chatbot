@@ -180,7 +180,7 @@ export default function ContractDetailScreen() {
       />
       {contributing.length > 0 ? (
         <Card padded={false} style={styles.list}>
-          {contributing.slice(0, 20).map((workout, i, arr) => (
+          {contributing.slice(0, 20).map((workout) => (
             <View key={workout.id} style={styles.contributionRow}>
               <View style={styles.contributionBody}>
                 <Text variant="bodyStrong">{workout.title}</Text>

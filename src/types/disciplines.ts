@@ -1,4 +1,4 @@
-import type { IsoDate, IsoDateTime, Uuid } from './units';
+import type { IsoDateTime, Uuid } from './units';
 
 /**
  * What kind of training a session was.

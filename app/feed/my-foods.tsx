@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, EmptyState, Field, Pill, Screen, SectionHeader, Text } from '@/components';
+import { Button, Card, EmptyState, Field, Pill, Screen, Text } from '@/components';
 import { colors, space as sp } from '@/design';
 import { useScannerStore, type SavedFood } from '@/store/scannerStore';
 import { PREFERENCE_LABELS, type PreferenceLevel } from '@/engines/food/eligibility';

@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import {
   Button, Card, EmptyState, MacroRow, Pill, Screen, SectionHeader, Text,
 } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 import { useNutritionStore } from '@/store/nutritionStore';
 import { useUserStore } from '@/store/userStore';
 import { weekStart } from '@/engines/training/streaks';

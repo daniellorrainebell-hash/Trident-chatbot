@@ -4,9 +4,9 @@ import { router } from 'expo-router';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import {
-  Button, Card, ListRow, Pill, ProgressBar, RankDog, Screen, SectionHeader, StatBlock, Text,
+  Button, Card, ListRow, Pill, ProgressBar, RankDog, Screen, SectionHeader, Text,
 } from '@/components';
-import { colors, space as sp } from '@/design';
+import { space as sp } from '@/design';
 import { useUserStore, hasAcceptedNutritionDisclaimer } from '@/store/userStore';
 import { useWorkoutStore } from '@/store/workoutStore';
 import { useContractStore } from '@/store/contractStore';

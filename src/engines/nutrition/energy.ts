@@ -220,7 +220,7 @@ export function calculateEnergyTargets(
 
   // Rate is driven by the timeframe when one is supported, otherwise by the
   // policy maximum for the direction of travel.
-  const weeklyRateKg = resolveWeeklyRate(profile, timeframe, policy);
+  const weeklyRateKg = resolveWeeklyRate(profile, timeframe);
   const dailyAdjustment = Math.round((weeklyRateKg * KCAL_PER_KG_BODYWEIGHT) / 7);
 
   const proposed = maintenance + dailyAdjustment;
@@ -247,11 +247,15 @@ export function calculateEnergyTargets(
  * rate the target was derived from. Comparing a user who asked for a gentle
  * 0.5 kg/week against the policy maximum of 0.9 would read as "behind target"
  * when they are doing exactly what they signed up for.
+ *
+ * No policy argument: the ceiling is already baked into
+ * `timeframe.supportedWeeklyRateKg` by `assessTimeframe`. Taking one here and
+ * not applying it invited a caller to pass a stricter policy and quietly get
+ * the rate for a different one.
  */
 export function resolveWeeklyRate(
   profile: NutritionProfile,
   timeframe: TimeframeAssessment,
-  policy: NutritionSafetyPolicy,
 ): number {
   if (profile.goal === 'maintain_recomp') return 0;
   if (timeframe.totalChangeKg === 0) return 0;

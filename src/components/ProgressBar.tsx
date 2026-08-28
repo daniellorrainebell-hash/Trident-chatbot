@@ -1,6 +1,6 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Text } from './Text';
-import { colors, radius, space } from '@/design';
+import { colors, space } from '@/design';
 
 export type ProgressBarProps = {
   /** 0–1. Clamped, so an over-delivered Contract shows a full bar, not an overflow. */

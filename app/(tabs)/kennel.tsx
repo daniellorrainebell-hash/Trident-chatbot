@@ -5,7 +5,7 @@ import {
   BrandMark, Button, Card, MacroRow, Pill, ProgressBar, RankDog,
   Screen, SectionHeader, StatBlock, Text,
 } from '@/components';
-import { colors, space as sp, radius } from '@/design';
+import { colors, space as sp } from '@/design';
 import { useWorkoutStore } from '@/store/workoutStore';
 import { useContractStore } from '@/store/contractStore';
 import { useNutritionStore } from '@/store/nutritionStore';

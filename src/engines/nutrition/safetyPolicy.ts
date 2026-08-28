@@ -1,4 +1,4 @@
-import type { NutritionProfile, SafetyDecision, SafetyDecisionKind, Sex } from '@/types';
+import type { NutritionProfile, SafetyDecision, SafetyDecisionKind } from '@/types';
 
 /**
  * Nutrition safety policy.
