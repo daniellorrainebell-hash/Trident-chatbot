@@ -13,9 +13,24 @@ import { sqlitePersistence } from '@/services/storage/sqlitePersistence';
 import { programmePersistence } from '@/services/storage/programmePersistence';
 import { useProgrammeStore } from '@/store/programmeStore';
 import { SEED_TODAY } from '@/data/seed';
+import { sqliteDocumentStore } from '@/services/storage/sqliteDocumentStore';
+import { attachPersistence } from '@/store/persistence';
+import { USER_DOCUMENT, useUserStore } from '@/store/userStore';
+import { NUTRITION_DOCUMENT, useNutritionStore } from '@/store/nutritionStore';
+import { SCANNER_DOCUMENT, useScannerStore } from '@/store/scannerStore';
+import { CONTRACT_DOCUMENT, useContractStore } from '@/store/contractStore';
 
 // Held until fonts are ready, so the first frame is not unstyled text.
 void SplashScreen.preventAutoHideAsync();
+
+/**
+ * Startup runs once per process, not once per mount.
+ *
+ * Under StrictMode the effect below fires twice, which attached a second
+ * persistence subscription to every store — two writes for every change, and a
+ * listener with no way to be removed.
+ */
+let started: Promise<void> | null = null;
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,14 +75,26 @@ export default function RootLayout() {
         // The programme is restored alongside the session. It rolls itself into
         // the current week on the way in, so nothing downstream ever sees last
         // week's ticks against this week's days.
-        await Promise.all([hydrate(), hydrateProgramme(SEED_TODAY)]);
+        //
+        // The remaining four stores read their document and then keep writing
+        // it on every change for the life of the process. Without this the
+        // profile, calorie targets, saved foods and contracts existed only in
+        // memory and were gone the moment the app closed.
+        await Promise.all([
+          hydrate(),
+          hydrateProgramme(SEED_TODAY),
+          attachPersistence(useUserStore, sqliteDocumentStore, USER_DOCUMENT),
+          attachPersistence(useNutritionStore, sqliteDocumentStore, NUTRITION_DOCUMENT),
+          attachPersistence(useScannerStore, sqliteDocumentStore, SCANNER_DOCUMENT),
+          attachPersistence(useContractStore, sqliteDocumentStore, CONTRACT_DOCUMENT),
+        ]);
       } catch {
         // A storage failure must not block launch; the session is recoverable
         // on the next write, and starting fresh beats a boot loop.
       }
-      setReady(true);
     }
-    void prepare();
+    started ??= prepare();
+    void started.then(() => setReady(true));
   }, [hydrate, hydrateProgramme, setPersistence, setProgrammePersistence]);
 
   const onLayout = useCallback(() => {

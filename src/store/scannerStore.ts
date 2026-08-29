@@ -5,6 +5,7 @@ import type { ProductLookupFailure, ResolvedProduct } from '@/services/scanner/t
 import { CachedProductResolver, MemoryProductCache } from '@/services/scanner/resolver';
 import { createId } from '@/utils/id';
 import type { PreferenceLevel } from '@/engines/food/eligibility';
+import type { PersistedDocument } from './persistence';
 
 /**
  * Food scanner state (Feed spec §21–§28).
@@ -45,7 +46,7 @@ export type SavedFood = {
   private: boolean;
 };
 
-type ScannerState = {
+export type ScannerState = {
   mode: ScannerMode;
   stage: ScanStage;
   /** Locks the camera after the first valid read (§22). */
@@ -162,3 +163,20 @@ export const useScannerStore = create<ScannerState>((set, get) => ({
     });
   },
 }));
+
+/**
+ * Only My Foods persists. The rest of this store is one scan in flight —
+ * stage, lock, pending nutrition — and restoring a half-finished scan into a
+ * cold app would put someone on a confirmation screen for a product they
+ * scanned last week.
+ *
+ * `resolver` is excluded because it is a live object with an open cache, not
+ * data. Serialising it would store `{}` and restore something inert over the
+ * working one.
+ */
+export const SCANNER_DOCUMENT: PersistedDocument<ScannerState, Pick<ScannerState, 'myFoods'>> = {
+  key: 'my-foods',
+  version: 1,
+  select: (s) => ({ myFoods: s.myFoods }),
+  merge: (data) => data,
+};

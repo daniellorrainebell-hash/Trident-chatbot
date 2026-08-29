@@ -18,6 +18,7 @@ import { localMealProvider } from '@/services/ai/localProvider';
 import type { AIProvider } from '@/services/ai/types';
 import { createId } from '@/utils/id';
 import { seedFoodPreferences, seedNutritionProfile } from '@/data/seed';
+import type { PersistedDocument } from './persistence';
 
 /**
  * The Feed's state (spec §27).
@@ -266,3 +267,32 @@ export const useNutritionStore = create<NutritionState>((set, get) => ({
     set({ pendingAdjustment: { ...pendingAdjustment, status: 'declined' } });
   },
 }));
+
+/**
+ * The Feed's durable state: the profile the targets came from, the approved
+ * targets themselves, the plan built against them, and the check-in history
+ * the adjustment engine reads.
+ *
+ * `provider` is an AI provider object and `generating`/`planFailures` describe
+ * a build that is happening right now — none of the three mean anything after
+ * a restart, and the provider would not survive a round trip through JSON.
+ */
+export const NUTRITION_DOCUMENT: PersistedDocument<NutritionState, Pick<NutritionState,
+  'profile' | 'preferences' | 'safetyDecision' | 'energy' | 'plan' | 'shoppingList'
+  | 'checkIns' | 'pendingAdjustment' | 'disclaimerAcceptedVersion'
+>> = {
+  key: 'nutrition',
+  version: 1,
+  select: (s) => ({
+    profile: s.profile,
+    preferences: s.preferences,
+    safetyDecision: s.safetyDecision,
+    energy: s.energy,
+    plan: s.plan,
+    shoppingList: s.shoppingList,
+    checkIns: s.checkIns,
+    pendingAdjustment: s.pendingAdjustment,
+    disclaimerAcceptedVersion: s.disclaimerAcceptedVersion,
+  }),
+  merge: (data) => data,
+};

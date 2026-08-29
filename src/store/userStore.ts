@@ -7,13 +7,14 @@ import type {
   UnitPreferences,
 } from '@/types';
 import { seedProfile, seedTrainingProfile, SEED_USER_ID } from '@/data/seed';
+import type { PersistedDocument } from './persistence';
 
 /** Legal document versions currently in force (spec §8). */
 export const TERMS_VERSION = '2026-03-01';
 export const PRIVACY_VERSION = '2026-03-01';
 export const NUTRITION_DISCLAIMER_VERSION = '2026-03-01';
 
-type UserState = {
+export type UserState = {
   profile: Profile | null;
   trainingProfile: TrainingProfile | null;
   consent: ConsentRecord | null;
@@ -123,3 +124,24 @@ export const useUserStore = create<UserState>((set, get) => ({
 export function hasAcceptedNutritionDisclaimer(consent: ConsentRecord | null): boolean {
   return consent?.nutritionDisclaimerVersion === NUTRITION_DISCLAIMER_VERSION;
 }
+
+/**
+ * What survives a restart: who you are, how you train, what you agreed to and
+ * how you want to be notified. `signedIn` is included deliberately — being
+ * asked to sign in again every cold start is the thing people uninstall over.
+ */
+export const USER_DOCUMENT: PersistedDocument<UserState, Pick<UserState,
+  'profile' | 'trainingProfile' | 'consent' | 'notifications' | 'onboardingComplete' | 'signedIn'
+>> = {
+  key: 'user',
+  version: 1,
+  select: (s) => ({
+    profile: s.profile,
+    trainingProfile: s.trainingProfile,
+    consent: s.consent,
+    notifications: s.notifications,
+    onboardingComplete: s.onboardingComplete,
+    signedIn: s.signedIn,
+  }),
+  merge: (data) => data,
+};

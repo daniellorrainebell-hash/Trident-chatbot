@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Contract, ContractMetric, ContractVisibility } from '@/types';
 import { createId } from '@/utils/id';
 import { seedContracts, SEED_USER_ID } from '@/data/seed';
+import type { PersistedDocument } from './persistence';
 
 /**
  * Contracts (spec §17).
@@ -11,7 +12,7 @@ import { seedContracts, SEED_USER_ID } from '@/data/seed';
  * running out of time.
  */
 
-type ContractState = {
+export type ContractState = {
   contracts: Contract[];
   createContract(input: {
     title: string;
@@ -95,3 +96,16 @@ export const useContractStore = create<ContractState>((set, get) => ({
     });
   },
 }));
+
+/**
+ * Contracts are a promise with a deadline, so losing them on restart would be
+ * the app breaking the promise for you. The whole list persists — met, failed
+ * and active alike, because a failed Contract staying in the record is the
+ * point of them.
+ */
+export const CONTRACT_DOCUMENT: PersistedDocument<ContractState, Pick<ContractState, 'contracts'>> = {
+  key: 'contracts',
+  version: 1,
+  select: (s) => ({ contracts: s.contracts }),
+  merge: (data) => data,
+};
