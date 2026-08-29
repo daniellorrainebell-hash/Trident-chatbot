@@ -18,6 +18,8 @@ import { attachPersistence } from '@/store/persistence';
 import { USER_DOCUMENT, useUserStore } from '@/store/userStore';
 import { NUTRITION_DOCUMENT, useNutritionStore } from '@/store/nutritionStore';
 import { SCANNER_DOCUMENT, useScannerStore } from '@/store/scannerStore';
+import { createProductResolver } from '@/services/scanner/createResolver';
+import { watchConnectivity } from '@/services/network/connectivity';
 import { CONTRACT_DOCUMENT, useContractStore } from '@/store/contractStore';
 
 // Held until fonts are ready, so the first frame is not unstyled text.
@@ -71,6 +73,10 @@ export default function RootLayout() {
       // user who was killed mid-workout lands straight back in it (spec §13).
       setPersistence(sqlitePersistence);
       setProgrammePersistence(programmePersistence);
+
+      // The barcode scanner's lookup chain. Built here rather than in the
+      // store so the store keeps no opinion about networks or databases.
+      useScannerStore.getState().setResolver(createProductResolver());
       try {
         // The programme is restored alongside the session. It rolls itself into
         // the current week on the way in, so nothing downstream ever sees last
@@ -83,6 +89,9 @@ export default function RootLayout() {
         await Promise.all([
           hydrate(),
           hydrateProgramme(SEED_TODAY),
+          // Cached synchronously afterwards, so the resolver can tell
+          // "cannot look this up now" from "this product does not exist".
+          watchConnectivity(),
           attachPersistence(useUserStore, sqliteDocumentStore, USER_DOCUMENT),
           attachPersistence(useNutritionStore, sqliteDocumentStore, NUTRITION_DOCUMENT),
           attachPersistence(useScannerStore, sqliteDocumentStore, SCANNER_DOCUMENT),

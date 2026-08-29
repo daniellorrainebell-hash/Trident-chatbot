@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { NutrientBasis, ParsedLabel } from '@/engines/scanner/label';
 import type { NutrientVector, ScannedProductNutrition } from '@/engines/scanner/portions';
-import type { ProductLookupFailure, ResolvedProduct } from '@/services/scanner/types';
+import type { FoodProductResolver, ProductLookupFailure, ResolvedProduct } from '@/services/scanner/types';
 import { CachedProductResolver, MemoryProductCache } from '@/services/scanner/resolver';
 import { createId } from '@/utils/id';
 import type { PreferenceLevel } from '@/engines/food/eligibility';
@@ -58,7 +58,7 @@ export type ScannerState = {
   pendingNutrition: ScannedProductNutrition | null;
 
   myFoods: SavedFood[];
-  resolver: CachedProductResolver;
+  resolver: FoodProductResolver;
 
   openScanner(mode: ScannerMode): void;
   close(): void;
@@ -68,6 +68,7 @@ export type ScannerState = {
   saveToMyFoods(input: Omit<SavedFood, 'id' | 'savedAt' | 'private'>): SavedFood;
   setPreference(foodId: string, preference: PreferenceLevel | 'cant_eat'): void;
   removeSavedFood(foodId: string): void;
+  setResolver(resolver: FoodProductResolver): void;
   reset(): void;
 };
 
@@ -82,8 +83,14 @@ export const useScannerStore = create<ScannerState>((set, get) => ({
   pendingNutrition: null,
 
   myFoods: [],
-  // Providers are injected at startup; on device this chain sits in front of
-  // SQLite and a server-side proxy that holds the provider credentials.
+  /**
+   * A cache with nothing behind it, replaced at startup by `setResolver` with
+   * the real chain (memory, SQLite, then Open Food Facts).
+   *
+   * Injected rather than imported for the same reason persistence is: the
+   * store stays testable without a network, and nothing here reaches for a
+   * provider on its own.
+   */
   resolver: new CachedProductResolver([new MemoryProductCache()], []),
 
   openScanner(mode) {
@@ -154,6 +161,10 @@ export const useScannerStore = create<ScannerState>((set, get) => ({
 
   removeSavedFood(foodId) {
     set({ myFoods: get().myFoods.filter((food) => food.id !== foodId) });
+  },
+
+  setResolver(resolver) {
+    set({ resolver });
   },
 
   reset() {
