@@ -365,7 +365,36 @@ feed/
 including validation and exclusion enforcement, Excel export (verified by
 asserting the ZIP container signature and reading the sheets back), offline
 SQLite persistence for every store, barcode lookup against Open Food Facts
-behind a two-layer cache, all navigation and screens, the design system.
+behind a two-layer cache, email-and-password accounts with biometric or PIN
+quick unlock, all navigation and screens, the design system.
+
+### Authentication
+
+Screens talk to an `AuthProvider`, never to a backend, the same way they talk
+to `BackendClient` and `FoodProductProvider`. `LocalAuthProvider` is the
+current implementation: real accounts, real password checking, real sessions,
+stored on the device. It exists so the flow is complete before a Supabase
+project does, and it is not production authentication — there is no server, and
+`expo-crypto` offers a digest with no PBKDF2, so password stretching is capped.
+Real hashing belongs server-side.
+
+Quick unlock is the part worth reading twice. The refresh token is written to
+`expo-secure-store` with `requireAuthentication`, so iOS Keychain and Android
+Keystore refuse to return it until the user authenticates — the check is in the
+operating system, not in a screen that could be routed around. The PIN path is
+weaker and says so: six digits cannot be stretched into something expensive to
+guess, so what protects it is that five wrong attempts destroy the stored token
+rather than starting a timer someone can wait out.
+
+Three states, not a boolean: `signed_out`, `locked`, `signed_in`. "No account
+on this device" and "signed in but the phone has been put down" need different
+screens, and collapsing them is how an app either asks for a password every
+morning or never asks at all.
+
+Adding or removing a fingerprint invalidates the keychain entry and the token
+becomes permanently unreadable. That is the system working correctly, so it is
+handled explicitly: the entry is cleared and the user is sent to the password,
+never to a dead end.
 
 **Nothing has yet run on a device or a simulator.** Every verification to date
 is a unit test, a typecheck, or the app driven through its web export in a
@@ -379,7 +408,7 @@ interface is complete and `LocalBackend` implements it against seed data using
 the same engines the server will run, so swapping in Supabase is a change of
 transport rather than behaviour.
 
-**Not built:** auth (screens exist, no provider wired), push delivery,
+**Not built:** push delivery,
 Sentry/PostHog adapters (the seams exist), Pack Wars, challenges, progress photo
 upload, HealthKit / Health Connect, GPS, RevenueCat, on-device OCR for the
 nutrition-label scanner (the recogniser is an injection point and the screen

@@ -7,6 +7,7 @@ import {
   Button, Card, ListRow, Pill, ProgressBar, RankDog, Screen, SectionHeader, Text,
 } from '@/components';
 import { space as sp } from '@/design';
+import { useAuthStore } from '@/store/authStore';
 import { useUserStore, hasAcceptedNutritionDisclaimer } from '@/store/userStore';
 import { useWorkoutStore } from '@/store/workoutStore';
 import { useContractStore } from '@/store/contractStore';
@@ -53,6 +54,8 @@ export default function ProfileScreen() {
   const toggleNotification = useUserStore((s) => s.toggleNotification);
   const setProfile = useUserStore((s) => s.setProfile);
   const signOut = useUserStore((s) => s.signOut);
+  const endSession = useAuthStore((s) => s.signOut);
+  const deleteAuthAccount = useAuthStore((s) => s.deleteAccount);
 
   const history = useWorkoutStore((s) => s.history);
   const personalRecords = useWorkoutStore((s) => s.personalRecords);
@@ -123,8 +126,12 @@ export default function ProfileScreen() {
           onPress: async () => {
             if (!profile) return;
             await backend.deleteAccount(profile.id);
+            // Delete the credentials too, and take the keychain entry with
+            // them. An account deleted while a thumb print still opened the
+            // app would not be deleted in any sense that matters.
+            await deleteAuthAccount();
             signOut();
-            router.replace('/(onboarding)/welcome');
+            router.replace('/enter');
           },
         },
       ],
@@ -136,9 +143,12 @@ export default function ProfileScreen() {
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Sign out',
-        onPress: () => {
+        onPress: async () => {
+          // Clears the stored session and the quick unlock with it, so the
+          // next launch asks for a password rather than a fingerprint.
+          await endSession();
           signOut();
-          router.replace('/(onboarding)/welcome');
+          router.replace('/enter');
         },
       },
     ]);

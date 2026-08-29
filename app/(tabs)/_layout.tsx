@@ -1,7 +1,8 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Text } from '@/components';
 import { colors, space } from '@/design';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * Five tabs, named in the product's own language (spec §10, §3).
@@ -23,6 +24,18 @@ function TabLabel({ label, focused }: { label: string; focused: boolean }) {
 }
 
 export default function TabsLayout() {
+  const status = useAuthStore((s) => s.status);
+
+  /**
+   * The gate, in one place.
+   *
+   * Guarding individual screens leaves whichever one gets added next
+   * unguarded. This is the layout every tab renders inside, so there is no
+   * route in without passing it — including a deep link straight to /record.
+   */
+  if (status === 'locked') return <Redirect href="/auth/unlock" />;
+  if (status !== 'signed_in') return <Redirect href="/auth/sign-in" />;
+
   return (
     <Tabs
       screenOptions={{

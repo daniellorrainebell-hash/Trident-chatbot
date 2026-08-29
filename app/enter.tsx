@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components';
 import { colors, space as sp, radius } from '@/design';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * ENTER THE KENNEL — the landing screen.
@@ -17,6 +18,21 @@ import { colors, space as sp, radius } from '@/design';
  * the difference between a poster and a layout.
  */
 export default function EnterScreen() {
+  const status = useAuthStore((s) => s.status);
+
+  /**
+   * Where the door leads depends on what this device already knows.
+   *
+   * A returning user with a thumb print set up should never see a password
+   * field; someone who has signed out should never be offered an unlock into
+   * an account they have left.
+   */
+  const enter = () => {
+    if (status === 'signed_in') router.replace('/kennel');
+    else if (status === 'locked') router.replace('/auth/unlock');
+    else router.replace('/auth/sign-in');
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.gapAbove} />
@@ -64,7 +80,7 @@ export default function EnterScreen() {
       </View>
 
       <Pressable
-        onPress={() => router.replace('/kennel')}
+        onPress={enter}
         accessibilityRole="button"
         accessibilityLabel="Enter The Kennel"
         style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}

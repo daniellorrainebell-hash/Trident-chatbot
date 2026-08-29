@@ -19,6 +19,8 @@ import { USER_DOCUMENT, useUserStore } from '@/store/userStore';
 import { NUTRITION_DOCUMENT, useNutritionStore } from '@/store/nutritionStore';
 import { SCANNER_DOCUMENT, useScannerStore } from '@/store/scannerStore';
 import { createProductResolver } from '@/services/scanner/createResolver';
+import { createAuthProvider } from '@/services/auth/createAuthProvider';
+import { useAuthStore } from '@/store/authStore';
 import { watchConnectivity } from '@/services/network/connectivity';
 import { CONTRACT_DOCUMENT, useContractStore } from '@/store/contractStore';
 
@@ -77,6 +79,7 @@ export default function RootLayout() {
       // The barcode scanner's lookup chain. Built here rather than in the
       // store so the store keeps no opinion about networks or databases.
       useScannerStore.getState().setResolver(createProductResolver());
+      useAuthStore.getState().setProvider(createAuthProvider());
       try {
         // The programme is restored alongside the session. It rolls itself into
         // the current week on the way in, so nothing downstream ever sees last
@@ -92,6 +95,9 @@ export default function RootLayout() {
           // Cached synchronously afterwards, so the resolver can tell
           // "cannot look this up now" from "this product does not exist".
           watchConnectivity(),
+          // Decides whether launch lands on the password, the unlock, or
+          // straight into the app. Nothing renders until it has answered.
+          useAuthStore.getState().bootstrap(),
           attachPersistence(useUserStore, sqliteDocumentStore, USER_DOCUMENT),
           attachPersistence(useNutritionStore, sqliteDocumentStore, NUTRITION_DOCUMENT),
           attachPersistence(useScannerStore, sqliteDocumentStore, SCANNER_DOCUMENT),
