@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { File } from 'expo-file-system';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Card, Text } from '@/components';
 import { colors, radius, space as sp } from '@/design';
@@ -19,7 +20,8 @@ import { parseLabel, type OcrLine } from '@/engines/scanner/label';
  * development build rather than Expo Go — is swappable. Until one is wired in,
  * the screen routes to manual entry rather than pretending to read anything.
  *
- * The captured image is temporary and is not retained (§37).
+ * The captured image is temporary and is not retained (§37): the file is
+ * deleted as soon as the recogniser has read it, success or failure.
  */
 export type LabelRecogniser = (imageUri: string) => Promise<OcrLine[]>;
 
@@ -32,6 +34,10 @@ export function setLabelRecogniser(next: LabelRecogniser | null): void {
 export default function LabelScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [busy, setBusy] = useState(false);
+  // Taking a picture before the preview is ready throws on Android and
+  // captures the last frame on iOS, so the button waits for the camera.
+  const [cameraReady, setCameraReady] = useState(false);
+  const camera = useRef<CameraView>(null);
   const submitLabel = useScannerStore((s) => s.submitLabel);
   const stage = useScannerStore((s) => s.stage);
 
@@ -54,12 +60,24 @@ export default function LabelScanScreen() {
     }
 
     setBusy(true);
+    let uri: string | null = null;
     try {
-      const lines = await recogniser('');
+      // Full quality and no skipped processing: OCR reads small print off a
+      // curved surface, and a compressed or unrotated frame is the difference
+      // between reading "1.2g" and reading nothing.
+      const photo = await camera.current?.takePictureAsync({ quality: 1, skipProcessing: false });
+      uri = photo?.uri ?? null;
+      if (!uri) {
+        router.replace('/feed/scanner/confirm');
+        return;
+      }
+
+      const lines = await recogniser(uri);
       submitLabel(parseLabel(lines));
     } catch {
       router.replace('/feed/scanner/confirm');
     } finally {
+      discard(uri);
       setBusy(false);
     }
   }, [submitLabel]);
@@ -107,7 +125,12 @@ export default function LabelScanScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.cameraWrap}>
-        <CameraView style={StyleSheet.absoluteFill} facing="back" />
+        <CameraView
+          ref={camera}
+          style={StyleSheet.absoluteFill}
+          facing="back"
+          onCameraReady={() => setCameraReady(true)}
+        />
         <View style={styles.overlay} pointerEvents="none">
           {/* Portrait frame, because a UK nutrition panel is a tall table. */}
           <View style={styles.frame} />
@@ -118,7 +141,12 @@ export default function LabelScanScreen() {
       </View>
 
       <View style={styles.actions}>
-        <Button label={busy ? 'Reading…' : 'Capture label'} loading={busy} onPress={() => void capture()} />
+        <Button
+          label={busy ? 'Reading…' : 'Capture label'}
+          loading={busy}
+          disabled={!cameraReady}
+          onPress={() => void capture()}
+        />
         <Button
           label="Enter it manually"
           variant="ghost"
@@ -131,6 +159,22 @@ export default function LabelScanScreen() {
       </View>
     </SafeAreaView>
   );
+}
+
+/**
+ * Remove the captured frame.
+ *
+ * The screen promises the photo is not kept, and a promise about someone's
+ * camera roll is one to actually honour. Failure is ignored: a file that
+ * cannot be deleted must not turn a successful read into an error.
+ */
+function discard(uri: string | null): void {
+  if (!uri) return;
+  try {
+    new File(uri).delete();
+  } catch {
+    /* best effort */
+  }
 }
 
 const styles = StyleSheet.create({
