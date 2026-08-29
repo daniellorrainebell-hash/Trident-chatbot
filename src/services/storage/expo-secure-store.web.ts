@@ -14,6 +14,8 @@
  *
  * Metro swaps this in for `platform === 'web'` only. Native keeps the keychain.
  */
+import { deleteWebValue, readWebValue, writeWebValue } from './webStorage';
+
 const PREFIX = 'kennel.securestore.';
 
 export const AFTER_FIRST_UNLOCK = 0;
@@ -64,25 +66,13 @@ export async function setItemAsync(
 }
 
 export async function deleteItemAsync(key: string): Promise<void> {
-  try {
-    globalThis.localStorage?.removeItem(PREFIX + key);
-  } catch {
-    /* private browsing, or site data blocked */
-  }
+  deleteWebValue(PREFIX + key);
 }
 
 export function getItem(key: string): string | null {
-  try {
-    return globalThis.localStorage?.getItem(PREFIX + key) ?? null;
-  } catch {
-    return null;
-  }
+  return readWebValue(PREFIX + key);
 }
 
 export function setItem(key: string, value: string): void {
-  try {
-    globalThis.localStorage?.setItem(PREFIX + key, value);
-  } catch {
-    /* best effort */
-  }
+  writeWebValue(PREFIX + key, value);
 }

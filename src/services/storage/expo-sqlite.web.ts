@@ -15,6 +15,8 @@
  * null can answer. Workout rows stay a no-op; they are covered by their own
  * tests and by the native build.
  */
+import { readWebValue, writeWebValue } from './webStorage';
+
 type Row = Record<string, unknown>;
 
 const tables = new Map<string, Row[]>();
@@ -24,22 +26,19 @@ const DOCUMENTS_KEY = 'kennel.documents';
 type DocumentRow = { version: number; payload: string; saved_at: string };
 
 function loadDocuments(): Record<string, DocumentRow> {
+  const raw = readWebValue(DOCUMENTS_KEY);
+  if (!raw) return {};
   try {
-    const raw = globalThis.localStorage?.getItem(DOCUMENTS_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, DocumentRow>) : {};
+    return JSON.parse(raw) as Record<string, DocumentRow>;
   } catch {
-    // Private browsing, blocked site data, or a corrupt payload. An empty
-    // store is a working app on defaults; a throw here is a blank screen.
+    // A corrupt payload. An empty store is a working app on defaults; a throw
+    // here is a blank screen.
     return {};
   }
 }
 
 function saveDocuments(rows: Record<string, DocumentRow>): void {
-  try {
-    globalThis.localStorage?.setItem(DOCUMENTS_KEY, JSON.stringify(rows));
-  } catch {
-    /* best effort — a failed write must never break the app */
-  }
+  writeWebValue(DOCUMENTS_KEY, JSON.stringify(rows));
 }
 
 function tableFor(sql: string): Row[] {
