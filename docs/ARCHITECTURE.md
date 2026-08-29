@@ -364,7 +364,15 @@ feed/
 **Real and working:** every deterministic engine, the complete meal-plan pipeline
 including validation and exclusion enforcement, Excel export (verified by
 asserting the ZIP container signature and reading the sheets back), offline
-SQLite persistence, all navigation and screens, the design system.
+SQLite persistence for every store, barcode lookup against Open Food Facts
+behind a two-layer cache, all navigation and screens, the design system.
+
+**Nothing has yet run on a device or a simulator.** Every verification to date
+is a unit test, a typecheck, or the app driven through its web export in a
+headless browser. That covers layout, navigation, state and all engine logic.
+It does not cover the camera, haptics, notifications, the share sheet, or
+SQLite itself — those are exercised only by their native modules, and this build
+has never loaded one.
 
 **Interface-only, backed by `LocalBackend`:** Supabase. The `BackendClient`
 interface is complete and `LocalBackend` implements it against seed data using
@@ -373,7 +381,9 @@ transport rather than behaviour.
 
 **Not built:** auth (screens exist, no provider wired), push delivery,
 Sentry/PostHog adapters (the seams exist), Pack Wars, challenges, progress photo
-upload, HealthKit / Health Connect, GPS, RevenueCat.
+upload, HealthKit / Health Connect, GPS, RevenueCat, on-device OCR for the
+nutrition-label scanner (the recogniser is an injection point and the screen
+routes to manual entry rather than pretending to read anything).
 
 ---
 
@@ -389,6 +399,28 @@ upload, HealthKit / Health Connect, GPS, RevenueCat.
 | **Rabid Score gaming.** Users will find the cheapest path to points | Medium | Volume contributes nothing; frequency is capped. Server-side computation means the input is logged work, not a client claim |
 | **Offline sync conflicts.** Same workout edited on two devices | Medium | Client-minted UUIDs make sync idempotent. Last-write-wins per workout is acceptable; a set-level merge is not worth the complexity |
 | **Bundle size.** Already caught once — the font packages shipped 7.9 MB | Low | Fixed by vendoring 7 faces (1.7 MB). Worth re-checking `expo export` output before each release |
+
+---
+
+### One nutrition engine, not two
+
+A second energy engine (`energyV2.ts`, `policy.ts`, `safetyDecision.ts`) was
+carried alongside the live one for a while and has been removed. It was a
+closed island — nothing outside those three files ever imported it — and it
+disagreed with the shipping engine in ways that would have been silent if
+anyone had picked up the wrong import: four activity levels at 1.35–1.78
+against the live five at 1.2–1.85, protein 1.4–2.2 g/kg against 1.6–2.8, and a
+12% surplus cap against 15%.
+
+The live engine won because the app is built on it end to end: the shared
+`ActivityLevel` type, the onboarding screen, the seed profiles and the stores
+all speak its five levels, and its policy object carries the pregnancy,
+breastfeeding, eating-disorder and medical-referral exclusions directly.
+
+Three ideas in the draft are worth revisiting rather than losing: a *preferred*
+rate of change distinct from the maximum, explicit bounds on fat as a fraction
+of intake, and a minimum carbohydrate floor before automation is allowed. None
+are in the shipping policy today.
 
 ---
 
