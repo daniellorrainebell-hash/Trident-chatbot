@@ -1,0 +1,35 @@
+{
+  "name": "nexus-iq-linkedin-content-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nexus IQ LinkedIn Content Engine. A persistent content operating system that turns a rough idea into a strategically structured first draft.",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint:post": "tsx scripts/lint-post.ts",
+    "seed:frameworks": "tsx scripts/seed-frameworks.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.10",
+    "next": "^15.1.6",
+    "openai": "^4.80.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.4"
+  }
+}
