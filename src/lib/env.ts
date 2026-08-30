@@ -26,8 +26,18 @@ const serverSchema = z.object({
 
   OPENAI_VECTOR_STORE_ID: z.string().optional(),
 
-  SUPABASE_SERVICE_ROLE_KEY: nonEmpty("SUPABASE_SERVICE_ROLE_KEY"),
+  // Supabase is optional. Without it the engine stores everything in a local
+  // JSON file, which is enough for a single user and removes the need to stand
+  // up a database before the first post. Semantic retrieval is the one feature
+  // that genuinely requires Postgres, and it degrades to off rather than
+  // pretending to work.
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   DATABASE_URL: z.string().optional(),
+
+  /** Single-user deployment. There is no login, so the user is resolved here. */
+  NEXUS_USER_ID: z.string().uuid().default("00000000-0000-0000-0000-000000000001"),
+  /** Where the local JSON store lives, when Supabase is not configured. */
+  NEXUS_DATA_DIR: z.string().default(".data"),
 
   APP_ENV: z
     .enum(["development", "test", "staging", "production"])
@@ -35,8 +45,8 @@ const serverSchema = z.object({
 });
 
 const publicSchema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: nonEmpty("NEXT_PUBLIC_SUPABASE_URL").url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: nonEmpty("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -106,6 +116,25 @@ export function getPublicEnv(): PublicEnv {
 
   cachedPublicEnv = parsed.data;
   return cachedPublicEnv;
+}
+
+/**
+ * Is Supabase configured?
+ *
+ * All three values are required together. A half-configured Supabase is worse
+ * than none, because it fails at the first query rather than at startup.
+ */
+export function isSupabaseConfigured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+}
+
+/** The single user this deployment serves. */
+export function getCurrentUserId(): string {
+  return getServerEnv().NEXUS_USER_ID;
 }
 
 /** Test helper. Clears memoised env so a test can vary process.env. */

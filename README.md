@@ -6,7 +6,7 @@ This is not a generic AI writer. The value is not the base model. It is **contex
 
 ## Status
 
-The content engine is built. The interface is not, deliberately: the build order in the master spec is architecture, schema, frameworks, agents, persistence, and only then the UI.
+Built and usable end to end.
 
 | Layer | State |
 |---|---|
@@ -19,28 +19,45 @@ The content engine is built. The interface is not, deliberately: the build order
 | Pipeline orchestrator and state machine | Built |
 | Retrieval (embeddings, memory, knowledge) | Built |
 | API route handlers | Built |
-| Web interface | Not started |
+| Web interface | Built |
+| Local JSON storage (no database needed) | Built |
 
-102 tests pass. `tsc --noEmit` is clean.
+117 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
 
 ## Setup
 
+You need one thing: an OpenAI key.
+
 ```bash
 npm install
-cp .env.example .env.local   # then fill it in
+cp .env.example .env.local     # add OPENAI_API_KEY
+npm run dev                    # http://localhost:3000
 ```
 
-Apply the schema to your Supabase project:
+Everything is stored in `.data/nexus.json`. Back it up by copying it, read it by opening it.
+
+### Optional: Supabase
+
+Add the three Supabase values to `.env.local` and the engine switches from the local file to Postgres. That is what turns on semantic retrieval over your previous posts and knowledge base, which the local store cannot do.
 
 ```bash
 psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
-```
-
-Seed the framework library into the database:
-
-```bash
 npm run seed:frameworks
 ```
+
+The header shows which store is active, so this is never a guess.
+
+## Using it
+
+**Write.** Type a rough sentence and press Build post. The engine works out the audience, pillar, psychology and framework, generates and scores hooks, writes the draft, critiques it, and revises it before you see it. Tick "let me pick the opening" to choose the hook yourself.
+
+The draft is editable in place, with the writing-rules linter running live as you type. The one-click adjustments (shorter, more direct, more technical, stronger opening, add or remove the CTA) each record a preference, so repeated choices shape future drafts.
+
+**Approve and save** stores your version alongside the AI's and extracts what changed. That is the learning loop: the difference between what the engine wrote and what you kept is the signal.
+
+**Settings** holds your positioning, your genuine beliefs and your voice profile. This is what the engine has instead of a blank prompt, and filling it in is the single biggest lever on draft quality.
+
+**History** keeps every post with its full version chain.
 
 ## Commands
 

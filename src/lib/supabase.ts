@@ -6,7 +6,7 @@
  */
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { getPublicEnv, getServerEnv } from "./env";
+import { getPublicEnv, getServerEnv, isSupabaseConfigured } from "./env";
 
 let cachedService: SupabaseClient | null = null;
 
@@ -19,10 +19,17 @@ export function getServiceClient(): SupabaseClient {
   }
   if (cachedService) return cachedService;
 
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      "Supabase is not configured. The engine falls back to the local JSON store, " +
+        "so this client should not have been constructed. Call getStore() instead.",
+    );
+  }
+
   const { NEXT_PUBLIC_SUPABASE_URL } = getPublicEnv();
   const { SUPABASE_SERVICE_ROLE_KEY } = getServerEnv();
 
-  cachedService = createClient(NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  cachedService = createClient(NEXT_PUBLIC_SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   return cachedService;
@@ -31,5 +38,8 @@ export function getServiceClient(): SupabaseClient {
 /** Anon client. Safe in the browser, subject to row level security. */
 export function getAnonClient(): SupabaseClient {
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } = getPublicEnv();
+  if (!NEXT_PUBLIC_SUPABASE_URL || !NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    throw new Error("Supabase is not configured.");
+  }
   return createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }

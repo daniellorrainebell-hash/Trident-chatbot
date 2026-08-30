@@ -69,11 +69,26 @@ Severity guidance:
 
 Add a test with both a violating example and a legitimate example that must not trip it.
 
+## Storage
+
+Two backends behind one interface in `src/store/`. Supabase when all three of its
+env values are set, a local JSON file otherwise. Write against `getStore()`, never
+against Supabase directly.
+
+The one honest difference is semantic retrieval, which needs pgvector. The local
+store returns nothing from `similarPosts` and `searchKnowledge` rather than
+faking a similarity score, and the header reports the active backend so the
+downgrade is never silent.
+
+If you add a store method, add it to both implementations and to
+`tests/local-store.test.ts`.
+
 ## Testing
 
 ```bash
-npm test          # 102 tests
+npm test          # 117 tests
 npm run typecheck
+npm run build
 ```
 
 The tests that matter most are the ones holding the failure conditions closed: framework variation, the story-framework gate, the guarantee gate, and the SLAY attribution guard.

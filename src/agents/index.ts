@@ -9,3 +9,4 @@ export * from "./revision-writer";
 export * from "./fact-checker";
 export * from "./feedback-extractor";
 export * from "./offer-strategist";
+export * from "./adjuster";
