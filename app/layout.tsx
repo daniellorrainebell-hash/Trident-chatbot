@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import "./globals.css";
-import { NavLinks } from "./components/NavLinks";
-import { StatusBadge } from "./components/StatusBadge";
+import { AppNav } from "./components/AppNav";
 
 export const metadata = {
   title: "Socrates | Nexus IQ",
@@ -49,16 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <p className="brand-sub">LinkedIn Content Engine</p>
         </div>
 
-        <nav className="navbar">
-          <div className="navbar-inner">
-            <div className="nav-links">
-              <NavLinks />
-            </div>
-            <div className="nav-right">
-              <StatusBadge />
-            </div>
-          </div>
-        </nav>
+        <AppNav />
 
         {children}
       </body>

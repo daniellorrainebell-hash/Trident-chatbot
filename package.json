@@ -8,14 +8,17 @@
     "node": ">=20.9"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 -p ${PORT:-3000}",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "verify": "npm run typecheck && npm run test",
     "lint:post": "tsx scripts/lint-post.ts",
-    "seed:frameworks": "tsx scripts/seed-frameworks.ts"
+    "seed:frameworks": "tsx scripts/seed-frameworks.ts",
+    "db:push": "tsx scripts/db-push.ts",
+    "secret": "node -e \"console.log(require('crypto').randomBytes(24).toString('base64url'))\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.10",

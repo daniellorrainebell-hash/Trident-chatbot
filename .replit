@@ -1,0 +1,46 @@
+# Replit configuration for Socrates.
+#
+# The dev workflow binds 0.0.0.0 so Replit's webview can reach it. The
+# deployment build runs the test suite first, so a broken build fails at deploy
+# time rather than in front of you.
+
+modules = ["nodejs-22"]
+run = "npm run dev"
+
+[nix]
+channel = "stable-24_05"
+
+[env]
+NEXT_TELEMETRY_DISABLED = "1"
+
+# Replit maps the container's port 3000 to public port 80.
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[deployment]
+# Reserved VM keeps one long-lived instance with a persistent disk.
+# See REPLIT_HANDOVER.md for why that matters if you skip Supabase.
+deploymentTarget = "vm"
+build = ["sh", "-c", "npm ci && npm run verify && npm run build"]
+run = ["sh", "-c", "npm run start"]
+
+[workflows]
+runButton = "Dev"
+
+[[workflows.workflow]]
+name = "Dev"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 3000
+
+[[workflows.workflow]]
+name = "Verify"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run verify"

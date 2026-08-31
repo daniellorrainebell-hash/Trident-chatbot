@@ -23,8 +23,10 @@ Built and usable end to end.
 | API route handlers | Built |
 | Web interface | Built |
 | Local JSON storage (no database needed) | Built |
+| Passkey access control | Built |
+| Replit deployment config | Built |
 
-117 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
+131 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
 
 ## Setup
 
@@ -70,6 +72,19 @@ The draft is editable in place, with the writing-rules linter running live as yo
 **Settings** holds your positioning, your genuine beliefs and your voice profile. This is what the engine has instead of a blank prompt, and filling it in is the single biggest lever on draft quality.
 
 **History** keeps every post with its full version chain.
+
+## Hosting it
+
+`REPLIT_HANDOVER.md` is the complete deployment brief: secrets, Supabase setup,
+deployment target, custom domain and an acceptance checklist.
+
+Two things matter most:
+
+- **Set `NEXUS_ACCESS_PASSKEY`.** Without it the app serves localhost only and
+  refuses remote traffic. That is deliberate: an open deployment spends money on
+  every request.
+- **Use Supabase for anything hosted.** The local JSON store is for a laptop. It
+  also cannot do semantic retrieval over your previous posts.
 
 ## Commands
 
