@@ -1,4 +1,6 @@
-# Nexus IQ LinkedIn Content Engine
+# Socrates
+
+**The Nexus IQ LinkedIn Content Engine.**
 
 A specialist LinkedIn content intelligence system. It takes a rough idea, works out what the post is trying to achieve, chooses the psychology, hook and narrative framework that fit, retrieves the user's own knowledge and previous writing, generates and scores multiple openings, builds the post, critiques it, fact-checks claims where required, and returns a first draft that gets more aligned to the user over time.
 
@@ -49,7 +51,7 @@ The header shows which store is active, so this is never a guess.
 
 ## Using it
 
-**Write.** Type a rough sentence and press Build post. The engine works out the audience, pillar, psychology and framework, generates and scores hooks, writes the draft, critiques it, and revises it before you see it. Tick "let me pick the opening" to choose the hook yourself.
+**Write.** Type a rough sentence and press Build post. Socrates works out the audience, pillar, psychology and framework, generates and scores hooks, writes the draft, critiques it, and revises it before you see it. Tick "let me pick the opening" to choose the hook yourself.
 
 The draft is editable in place, with the writing-rules linter running live as you type. The one-click adjustments (shorter, more direct, more technical, stronger opening, add or remove the CTA) each record a preference, so repeated choices shape future drafts.
 

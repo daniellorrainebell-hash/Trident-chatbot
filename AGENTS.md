@@ -1,5 +1,7 @@
 # Working in this repository
 
+The product is **Socrates**. Nexus IQ Systems is the company.
+
 Read this before changing anything. The constraints below are not style preferences; several of them are the product.
 
 ## What this system is

@@ -38,7 +38,7 @@ export function StatusBadge() {
 
   return (
     <span
-      className="chip chip-neutral"
+      className="chip chip-neutral chip-mono"
       title={
         status.storage === "local"
           ? "Saving to a local JSON file. Semantic retrieval over past posts is off until Supabase is configured."

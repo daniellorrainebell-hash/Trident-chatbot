@@ -124,12 +124,12 @@ export default function Composer() {
 
       {step === "idea" && (
         <div className="page-narrow" style={{ margin: "0 auto" }}>
-          <div className="card">
+          <div className="card card-lg">
             <div className="card-head">
               <h1>What&rsquo;s the idea?</h1>
             </div>
-            <p className="muted" style={{ marginTop: "-0.4rem" }}>
-              A rough sentence is enough. The engine works out the audience,
+            <p className="card-note">
+              A rough sentence is enough. Socrates works out the audience,
               structure and hook from your positioning and past writing.
             </p>
 
@@ -150,15 +150,11 @@ export default function Composer() {
                 {working && <span className="spinner" />}
                 Build post
               </button>
-              <label
-                className="small muted"
-                style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
-              >
+              <label className="check">
                 <input
                   type="checkbox"
                   checked={pickHook}
                   onChange={(event) => setPickHook(event.target.checked)}
-                  style={{ width: "auto" }}
                 />
                 Let me pick the opening
               </label>
@@ -167,7 +163,7 @@ export default function Composer() {
             <details className="advanced">
               <summary>Advanced</summary>
               <div>
-                <p className="small muted">
+                <p className="card-note" style={{ margin: "0 0 1.1rem" }}>
                   All optional. Anything left blank is decided by the strategist.
                 </p>
                 <div className="field-row">
@@ -199,15 +195,11 @@ export default function Composer() {
                     />
                   </div>
                 </div>
-                <label
-                  className="small"
-                  style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}
-                >
+                <label className="check">
                   <input
                     type="checkbox"
                     checked={forceResearch}
                     onChange={(event) => setForceResearch(event.target.checked)}
-                    style={{ width: "auto" }}
                   />
                   Verify the facts before writing (slower)
                 </label>

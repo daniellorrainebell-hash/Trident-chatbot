@@ -64,7 +64,10 @@ export default function History() {
 
   return (
     <main className="page page-narrow">
-      <h1 style={{ marginBottom: "1.25rem" }}>History</h1>
+      <div className="page-head">
+        <h1>History</h1>
+        <p>Every post, with the full chain of versions behind it.</p>
+      </div>
 
       {error && <div className="notice notice-error">{error}</div>}
 
@@ -72,7 +75,8 @@ export default function History() {
 
       {posts?.length === 0 && !error && (
         <div className="empty">
-          <p>Nothing written yet.</p>
+          <h3>Nothing written yet</h3>
+          <p>Your posts and their version history will collect here.</p>
           <a className="btn btn-primary" href="/">
             Write the first post
           </a>
@@ -81,22 +85,16 @@ export default function History() {
 
       {posts?.map((post) => (
         <div key={post.id} style={{ marginBottom: "0.6rem" }}>
-          <button
-            className="post-row"
-            onClick={() => openPost(post.id)}
-            style={{ width: "100%", textAlign: "left", cursor: "pointer", font: "inherit" }}
-          >
-            <div style={{ fontWeight: 600, marginBottom: "0.35rem" }}>
-              {post.topic || "Untitled"}
-            </div>
-            <div className="small muted" style={{ marginBottom: "0.5rem" }}>
-              {post.selectedHook}
-            </div>
+          <button className="post-row" onClick={() => openPost(post.id)}>
+            <div className="post-row-title">{post.topic || "Untitled"}</div>
+            <div className="post-row-hook">{post.selectedHook}</div>
             <div className="chip-row">
               <span className="chip chip-neutral">{formatDate(post.createdAt)}</span>
-              {post.frameworkId && <span className="chip">{post.frameworkId}</span>}
+              {post.frameworkId && (
+                <span className="chip chip-mono">{post.frameworkId}</span>
+              )}
               {post.hookFamily && (
-                <span className="chip chip-neutral">{post.hookFamily}</span>
+                <span className="chip chip-neutral chip-mono">{post.hookFamily}</span>
               )}
               {post.criticScore !== null && (
                 <span

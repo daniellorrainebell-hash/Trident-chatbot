@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LintPanel, type LintResult } from "./LintPanel";
 
 const ADJUSTMENTS = [
@@ -13,6 +13,12 @@ const ADJUSTMENTS = [
   { id: "add_cta", label: "Add a CTA" },
   { id: "remove_cta", label: "Remove the CTA" },
 ] as const;
+
+/**
+ * LinkedIn truncates a post past this length.
+ * Kept as a constant so it is one edit if the platform changes it.
+ */
+const LINKEDIN_LIMIT = 3000;
 
 interface CriticReport {
   score: number;
@@ -49,6 +55,18 @@ export function DraftView({
   const [saved, setSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Grow the editor to fit the post. Judging a draft is harder through a
+  // scrollbar than it is on the page.
+  const editor = useRef<HTMLTextAreaElement | null>(null);
+  const resize = useCallback(() => {
+    const element = editor.current;
+    if (!element) return;
+    element.style.height = "auto";
+    element.style.height = `${element.scrollHeight}px`;
+  }, []);
+
+  useEffect(resize, [text, resize]);
 
   // Re-lint as the user edits. Debounced, and no model call, so it is cheap.
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -139,26 +157,34 @@ export function DraftView({
           <div className="card-head">
             <h3>Draft</h3>
             <span className="spacer" />
-            <span className="small muted count">{text.length} characters</span>
+            <span
+              className={`small tnum ${text.length > LINKEDIN_LIMIT ? "count-over" : "muted"}`}
+              title={`LinkedIn truncates past ${LINKEDIN_LIMIT.toLocaleString("en-GB")} characters`}
+            >
+              {text.length.toLocaleString("en-GB")} / {LINKEDIN_LIMIT.toLocaleString("en-GB")}
+            </span>
             {edited && <span className="chip chip-neutral">Edited</span>}
           </div>
 
-          <textarea
-            className="draft-editor"
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            spellCheck
-            aria-label="Post draft"
-          />
+          <div className="draft-column">
+            <textarea
+              ref={editor}
+              className="draft-editor"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              spellCheck
+              aria-label="Post draft"
+            />
 
-          <div className="btn-row" style={{ marginTop: "0.9rem" }}>
+            <div className="btn-row" style={{ marginTop: "0.9rem" }}>
             <button className="btn btn-primary" onClick={approve} disabled={!postId || busy !== null}>
               {busy === "Saving" && <span className="spinner" />}
               Approve and save
             </button>
-            <button className="btn" onClick={copy}>
-              {copied ? "Copied" : "Copy"}
-            </button>
+              <button className="btn" onClick={copy}>
+                {copied ? "Copied" : "Copy"}
+              </button>
+            </div>
           </div>
 
           {saved && (

@@ -150,16 +150,23 @@ export default function Settings() {
           )
         }
       />
-      <span className="small muted">One per line.</span>
+      <span className="field-hint">One per line.</span>
     </div>
   );
 
   return (
     <main className="page page-narrow">
-      <div style={{ display: "flex", alignItems: "center", marginBottom: "1.25rem" }}>
-        <h1>Settings</h1>
-        <span style={{ marginLeft: "auto" }} />
-        <button className="btn btn-primary" onClick={save} disabled={saving}>
+      <div className="page-head" style={{ display: "flex", alignItems: "flex-start" }}>
+        <div>
+          <h1>Settings</h1>
+          <p>What Socrates knows about you, instead of a blank prompt.</p>
+        </div>
+        <button
+          className="btn btn-primary"
+          onClick={save}
+          disabled={saving}
+          style={{ marginLeft: "auto" }}
+        >
           {saving && <span className="spinner" />}
           Save
         </button>
@@ -172,9 +179,9 @@ export default function Settings() {
         <div className="card-head">
           <h2>Who you are</h2>
         </div>
-        <p className="small muted" style={{ marginTop: "-0.4rem" }}>
-          This is what the engine has instead of a blank prompt. The more concrete
-          it is, the less generic every draft will be.
+        <p className="card-note">
+          The more concrete this is, the less generic every draft will be. It is
+          the single biggest lever on quality.
         </p>
 
         {textField("expertise", "Expertise", "What you actually know and do")}
@@ -196,9 +203,9 @@ export default function Settings() {
         <div className="card-head">
           <h2>How you write</h2>
         </div>
-        <p className="small muted" style={{ marginTop: "-0.4rem" }}>
-          These update themselves as you edit drafts. Change them by hand if the
-          engine has read you wrong.
+        <p className="card-note">
+          These update themselves as you edit drafts. Change them by hand if
+          Socrates has read you wrong.
         </p>
 
         <div className="field-row">

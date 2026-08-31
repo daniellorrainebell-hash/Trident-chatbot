@@ -61,8 +61,8 @@ export function LintPanel({ lint }: { lint: LintResult | null }) {
             {finding.message}
             {finding.suggestion ? ` ${finding.suggestion}` : ""}
           </div>
-          <div className="small muted" style={{ marginTop: "0.15rem" }}>
-            {finding.ruleId} · rules section {finding.ruleRef}
+          <div className="finding-rule">
+            {finding.ruleId} · section {finding.ruleRef}
           </div>
         </div>
       ))}

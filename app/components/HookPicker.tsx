@@ -27,10 +27,10 @@ export function HookPicker({
       <div className="card-head">
         <h3>Pick the opening</h3>
         <span className="spacer" />
-        <span className="small muted">{hooks.length} strongest</span>
+        <span className="chip chip-neutral">{hooks.length} strongest</span>
       </div>
 
-      <div className="stack" style={{ gap: "0.6rem" }}>
+      <div className="stack-tight">
         {hooks.map((hook) => (
           <button
             key={hook.candidate.text}
@@ -50,9 +50,7 @@ export function HookPicker({
                 />
               </span>
             </div>
-            <div className="small muted" style={{ marginTop: "0.45rem" }}>
-              Promises: {hook.candidate.promise}
-            </div>
+            <div className="hook-promise">Promises: {hook.candidate.promise}</div>
           </button>
         ))}
       </div>
