@@ -33,6 +33,8 @@ This system moves those decisions out of the prompt and into persistent, inspect
                       |
         [7] Critic + deterministic linter     scores, problems, exact fixes
                       |
+      [10] Distribution Critic               LinkedIn recommendation risk
+                      |
               [8] Revision Writer             applies the fixes
                       |
                 ready for review
@@ -102,6 +104,28 @@ Research runs before drafting when the strategist already knows the idea carries
 A second, post-draft check catches claims the draft introduced that the strategist did not anticipate.
 
 Verified findings reach the writer as usable facts. Findings that were checked and could not be supported reach it as explicit prohibitions, rather than being omitted, because a writer that simply does not see a claim may reconstruct it from the raw idea.
+
+## The distribution check
+
+Runs after editorial critique and fact checking, so it judges the draft a reader
+would actually get rather than an intermediate one.
+
+Its discipline is evidence labelling. Confirmed LinkedIn guidance is enforced;
+anything the critic inferred is returned separately and shown to the user under
+"our judgement, not LinkedIn's rules". The score is the Nexus Distribution
+Score, never presented as a prediction of LinkedIn's ranking, because LinkedIn
+publishes no creator-facing quality formula.
+
+Folklore detection is deterministic rather than delegated to the model. A post
+claiming an optimal posting time, a comment-to-like multiplier or a shadow ban
+is making a factual error, and `MYTH_FIREWALL` catches it regardless of what the
+model believes.
+
+The distribution mode decides which concerns are flagged and which are accepted.
+Profanity in `voice_first` and direct selling in `conversion_first` return
+`PASS_WITH_TRADEOFF` rather than `REVISE`: a trade-off the user chose is not a
+defect. This matters, because the source file is explicit that the module must
+not become an excuse for bland writing.
 
 ## Persistence
 

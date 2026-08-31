@@ -14,6 +14,7 @@
  * exactly three items must not be flagged, so those checks emit warnings only.
  */
 
+import { detectAlgorithmFolklore } from "../frameworks/linkedin-distribution";
 import {
   OPENING_WINDOW,
   PHRASE_RULES,
@@ -382,6 +383,28 @@ function checkDayRule(text: string, options: LintOptions): LintFinding[] {
   return findings;
 }
 
+/**
+ * Algorithm folklore (distribution logic sections 44 and 47).
+ *
+ * A post that asserts a LinkedIn ranking claim with no primary-source evidence
+ * is making a factual error, so this is an error rather than a warning. The
+ * 360Brew claim is the one case where a primary source establishes the claim is
+ * outright false rather than merely unsupported.
+ */
+function checkAlgorithmFolklore(text: string): LintFinding[] {
+  return detectAlgorithmFolklore(text).map((hit) => ({
+    ruleId: "algorithm_folklore",
+    severity: "error" as const,
+    ruleRef: "distribution logic 44, 47",
+    message: `Unsupported platform claim: ${hit.claim}. ${
+      hit.note ?? "There is no primary-source evidence for it."
+    }`,
+    excerpt: hit.excerpt,
+    index: text.indexOf(hit.excerpt),
+    suggestion: "Remove the claim, or restate it as your own observation rather than as platform fact.",
+  }));
+}
+
 /** UK English default (rule 45). */
 function checkBritishEnglish(text: string): LintFinding[] {
   const findings: LintFinding[] = [];
@@ -461,6 +484,7 @@ export function lintPost(text: string, options: LintOptions = {}): LintResult {
     ...checkRepeatedPremise(normalised),
     ...checkDayRule(normalised, options),
     ...checkBritishEnglish(normalised),
+    ...checkAlgorithmFolklore(normalised),
   ].sort((a, b) => a.index - b.index);
 
   const errors = findings.filter((finding) => finding.severity === "error");

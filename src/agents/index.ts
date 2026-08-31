@@ -10,3 +10,4 @@ export * from "./fact-checker";
 export * from "./feedback-extractor";
 export * from "./offer-strategist";
 export * from "./adjuster";
+export * from "./distribution-critic";

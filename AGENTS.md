@@ -42,6 +42,43 @@ These come from the master spec, section 65. Breaking one is a defect regardless
 
 **The linter is the last word on the writing rules.** If a rule can be checked deterministically, it belongs in `src/writing-rules/rules.ts` rather than in a prompt paragraph asking the model to remember it.
 
+## LinkedIn distribution logic
+
+`src/frameworks/linkedin-distribution.ts` encodes
+`docs/framework-sources/linkedin-distribution-logic.md`, which is authoritative
+for LinkedIn distribution behaviour as of 31 August 2026.
+
+Every rule carries an evidence label and the labels are load-bearing:
+
+- `CONFIRMED` LinkedIn states it. May be enforced.
+- `CONFIRMED_CATEGORY` LinkedIn confirms the category, not the mechanics.
+- `IMPLEMENTATION_INFERENCE` our product decision. Never reported to the user as
+  a LinkedIn rule.
+- `UNSUPPORTED` never hardwire it.
+
+Hard constraints when working in this area:
+
+- **Never invent a weight, multiplier or threshold.** No "a comment is worth
+  five likes", no dwell-time target, no posting-time formula. LinkedIn publishes
+  none of these.
+- **Never optimise for 360Brew.** It was an internal test, it was shut down, and
+  it is not the current ranking system.
+- **Never call the score a LinkedIn Algorithm Score.** It is the Nexus
+  Distribution Score. LinkedIn publishes no creator-facing quality formula.
+- **Never diagnose a shadow ban.** Use the approved wording in
+  `VISIBILITY_LANGUAGE`.
+- **Never let this module flatten the author.** Source section 55 is explicit.
+  LinkedIn permits opinion, disagreement and humour. The threshold is
+  evidence-based recommendation risk, not generic caution. A trade-off the user
+  chose knowingly is `PASS_WITH_TRADEOFF`, not `REVISE`.
+
+`MYTH_FIREWALL` catches folklore deterministically, so it holds whatever a model
+believes. Add a claim there rather than to a prompt, and add a test.
+
+When LinkedIn's published guidance materially changes: re-verify against primary
+sources, bump `DISTRIBUTION_KNOWLEDGE_VERSION`, update the rules, and rerun the
+tests.
+
 ## The two SLAY frameworks
 
 There are two, they share an acronym, and they are not the same framework.

@@ -24,9 +24,10 @@ Built and usable end to end.
 | Web interface | Built |
 | Local JSON storage (no database needed) | Built |
 | Master-password access control | Built |
+| LinkedIn distribution logic | Built |
 | Replit deployment config | Built |
 
-131 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
+166 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
 
 ## Setup
 
@@ -125,6 +126,7 @@ idea
   -> writer              first draft
   -> critic + linter     scores, problems, exact fixes
   -> fact checker        only when the claims require it
+  -> distribution check  LinkedIn recommendation risk, evidence-labelled
   -> revision writer     applies the fixes
   -> ready for review
 ```
@@ -136,6 +138,13 @@ The user edits it, and every edit becomes retrievable editorial memory.
 **Framework choice is deterministic, not vibes.** The strategist model reports signals about the idea ("did the user supply a real event?"). Pure code in `src/frameworks/selection.ts` turns those signals into a ranking using the preference orders from the spec. The model can override with a reason, but it cannot select a framework the integrity gates have blocked.
 
 **Integrity is enforced in code, not requested in prose.** A story framework is unavailable without a real event. A guarantee cannot be quoted unless the offer record marks it approved. Scarcity needs an active flag and a verification date. These are gates, so compliance is not left to the model's judgement.
+
+**Distribution logic is evidence-labelled.** LinkedIn's published guidance is
+encoded with a label on every rule: confirmed, confirmed-category, our own
+inference, or unsupported. Unsupported claims are never hardwired, and a
+deterministic myth firewall catches algorithm folklore (posting times, engagement
+multipliers, shadow bans) whatever a model believes. The score is ours and is
+labelled as ours.
 
 **Frameworks are data.** Adding one means adding a record in `src/frameworks/`. No prompt changes, no agent changes.
 

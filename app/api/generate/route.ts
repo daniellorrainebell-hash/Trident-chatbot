@@ -51,14 +51,28 @@ const requestSchema = z.object({
     })
     .optional(),
   lintOptions: lintOptionsSchema,
+  /** Which trade-offs this post is willing to make. Source section 54. */
+  distributionMode: z
+    .enum(["broad_reach", "balanced", "voice_first", "conversion_first", "network_first"])
+    .default("balanced"),
+  /** Description of attached media, for the alignment check. */
+  mediaDescription: z.string().optional(),
 });
 
 export async function POST(request: Request): Promise<NextResponse> {
   const parsed = await parseBody(request, requestSchema);
   if ("response" in parsed) return parsed.response;
 
-  const { idea, mode, pauseForHookSelection, selectedHook, overrides, lintOptions } =
-    parsed.data;
+  const {
+    idea,
+    mode,
+    pauseForHookSelection,
+    selectedHook,
+    overrides,
+    lintOptions,
+    distributionMode,
+    mediaDescription,
+  } = parsed.data;
 
   try {
     const context = await buildContext(idea);
@@ -67,8 +81,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     const result = await generatePost(context, {
       mode,
       pauseForHookSelection,
+      distributionMode,
       ...(selectedHook ? { selectedHook } : {}),
       ...(lintOptions ? { lintOptions } : {}),
+      ...(mediaDescription ? { mediaDescription } : {}),
     });
 
     // Only persist a run that produced a draft. A hook-selection pause is a

@@ -18,6 +18,15 @@ import { runWriter } from "../agents/writer";
 import { runCritic } from "../agents/critic";
 import { runRevisionWriter } from "../agents/revision-writer";
 import { requiresResearch, runFactChecker } from "../agents/fact-checker";
+import {
+  runDistributionCritic,
+  renderDistributionFindings,
+  type DistributionResult,
+} from "../agents/distribution-critic";
+import {
+  DEFAULT_DISTRIBUTION_MODE,
+  type DistributionMode,
+} from "../frameworks/linkedin-distribution";
 import { runOfferStrategist } from "../agents/offer-strategist";
 import { retrieveFrameworksForPost } from "../retrieval/framework-retrieval";
 import { lintPost, type LintOptions, type LintResult } from "../writing-rules/linter";
@@ -37,6 +46,10 @@ export interface GeneratePostOptions {
   /** Maximum revision passes. Each pass costs a model call. */
   maxRevisions?: number;
   lintOptions?: LintOptions;
+  /** Which trade-offs this post is willing to make. Source section 54. */
+  distributionMode?: DistributionMode;
+  /** Description of attached media, for the alignment check. */
+  mediaDescription?: string;
   /**
    * Stop after hooks are scored and return them for the user to choose.
    * Used by the hook screen.
@@ -58,6 +71,7 @@ export interface GeneratePostResult {
   draft?: string;
   criticReport?: CriticReport;
   research?: FactCheckReport;
+  distribution?: DistributionResult;
   lint?: LintResult;
   revisionCount: number;
   /** Populated when the pipeline returned a draft that still fails the linter. */
@@ -73,6 +87,8 @@ export async function generatePost(
     mode = "quick_draft",
     maxRevisions = 2,
     lintOptions,
+    distributionMode = DEFAULT_DISTRIBUTION_MODE,
+    mediaDescription,
     pauseForHookSelection = false,
     selectedHook,
     onStateChange,
@@ -207,7 +223,21 @@ export async function generatePost(
       report.contains_invented_experience ||
       !lint.passed;
 
-    if (clean && !blocking) break;
+    // Distribution check runs after editorial critique and fact checking, so
+    // it judges the draft the reader would actually get.
+    const distribution = await runDistributionCritic({
+      draft,
+      analysis,
+      mode: distributionMode,
+      ...(mediaDescription ? { mediaDescription } : {}),
+    });
+    result.distribution = distribution;
+
+    const distributionBlocking =
+      distribution.check.status === "BLOCK_PLATFORM_RISK" ||
+      distribution.check.status === "REVISE";
+
+    if (clean && !blocking && !distributionBlocking) break;
     if (revisions === maxRevisions) break;
 
     draft = await runRevisionWriter({
@@ -215,6 +245,7 @@ export async function generatePost(
       draft,
       report,
       research: research ?? null,
+      distributionNotes: renderDistributionFindings(distribution),
       ...(lintOptions ? { lintOptions } : {}),
     });
     result.draft = draft;

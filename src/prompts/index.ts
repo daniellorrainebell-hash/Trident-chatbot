@@ -56,6 +56,15 @@ Identify the single claim the whole post supports. Every paragraph will be check
 CTA
 One CTA maximum. Use "none" where the post has not earned an ask. Match the ask to the reader stage: an awareness-stage reader is not ready for a booking link.
 
+DISTRIBUTION
+LinkedIn recommends professionally relevant content, and recommends it beyond the author's network when a stranger can follow it. So determine, before drafting:
+
+- The professional subject, the professional audience, and why it matters to them. If the idea is personal, humorous or lifestyle-led, judge whether a genuine professional context exists. Do not fabricate a business lesson to make a post qualify.
+- The distribution goal. "network" for personal milestones, announcements and community context that need no universal framing. "broad" when the post should reach people who have never heard of the user. "commercial" when conversion outranks reach. "hybrid" when both matter.
+- What makes the post original: a view, an analysis, an application, a criticism, an experience or a consequence for the audience. LinkedIn reduces recycled content that adds no new angle, so if nothing here is original, say so plainly rather than inventing an angle.
+
+Do not apply algorithm folklore. There is no optimal posting time, no engagement multiplier, no hashtag count and no dwell-time target that LinkedIn has published. Never let one influence the strategy.
+
 ${INTEGRITY_BLOCK}
 `.trim();
 

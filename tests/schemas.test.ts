@@ -170,6 +170,14 @@ describe("idea analysis schema", () => {
       research_required: false,
       research_questions: [],
       risk_level: "medium",
+      distribution_goal: "broad",
+      professional_relevance: {
+        primary_topic: "AI governance",
+        professional_context: "Deploying AI systems that touch client data",
+        target_professional_audience: "AI agencies",
+        why_this_matters_to_them: "They carry the obligation they are not describing.",
+      },
+      original_angle: "Governance framed from the deployment rather than the policy.",
       cta_type: "none",
       tone_notes: [],
     };
@@ -211,6 +219,14 @@ describe("idea analysis schema", () => {
       research_required: false,
       research_questions: [],
       risk_level: "low",
+      distribution_goal: "broad",
+      professional_relevance: {
+        primary_topic: "AI governance",
+        professional_context: "Deploying AI systems that touch client data",
+        target_professional_audience: "AI agencies",
+        why_this_matters_to_them: "They carry the obligation they are not describing.",
+      },
+      original_angle: "Governance framed from the deployment rather than the policy.",
       cta_type: "none",
       tone_notes: [],
     });

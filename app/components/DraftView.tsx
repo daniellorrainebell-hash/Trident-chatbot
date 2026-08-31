@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LintPanel, type LintResult } from "./LintPanel";
+import { DistributionPanel, type DistributionResult } from "./DistributionPanel";
 
 const ADJUSTMENTS = [
   { id: "shorter", label: "Shorter" },
@@ -39,6 +40,7 @@ export function DraftView({
   aiDraft,
   criticReport,
   initialLint,
+  distribution,
   revisionCount,
   unresolvedErrors,
 }: {
@@ -46,6 +48,7 @@ export function DraftView({
   aiDraft: string;
   criticReport: CriticReport | null;
   initialLint: LintResult | null;
+  distribution: DistributionResult | null;
   revisionCount: number;
   unresolvedErrors: string[];
 }) {
@@ -229,6 +232,8 @@ export function DraftView({
 
       <div className="stack">
         <LintPanel lint={lint} />
+
+        <DistributionPanel result={distribution} />
 
         {criticReport && (
           <div className="card">

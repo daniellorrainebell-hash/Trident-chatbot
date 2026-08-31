@@ -37,6 +37,34 @@ export const objectiveSchema = z.enum([
 export const riskLevelSchema = z.enum(["low", "medium", "high"]);
 
 /**
+ * Who this post is for, in distribution terms (source section 39).
+ *
+ * LinkedIn confirms some posts are relevant to an author's network without
+ * being broadly useful outside it. Forcing a personal milestone into
+ * broad-discovery framing serves nobody.
+ */
+export const distributionGoalSchema = z.enum([
+  "network",
+  "broad",
+  "commercial",
+  "hybrid",
+]);
+
+/**
+ * Professional relevance (source section 6).
+ *
+ * LinkedIn confirms it recommends professionally relevant content. Naming the
+ * subject, the audience and why it matters is how a post qualifies. It is not a
+ * prompt for inventing a business lesson that is not there.
+ */
+export const professionalRelevanceSchema = z.object({
+  primary_topic: z.string(),
+  professional_context: z.string(),
+  target_professional_audience: z.string(),
+  why_this_matters_to_them: z.string(),
+});
+
+/**
  * Signals describing the shape of the idea.
  *
  * These are the inputs to deterministic framework selection. The model reports
@@ -99,6 +127,13 @@ export const ideaAnalysisSchema = z.object({
   research_questions: z.array(z.string()),
   risk_level: riskLevelSchema,
 
+  distribution_goal: distributionGoalSchema,
+  professional_relevance: professionalRelevanceSchema,
+  /** Named honestly. If nothing here is original, say so rather than inventing. */
+  original_angle: z
+    .string()
+    .describe("What makes this post original. LinkedIn reduces recycled content with no new angle."),
+
   cta_type: z
     .string()
     .describe("One CTA maximum. Use \"none\" where the post has not earned an ask."),
@@ -110,4 +145,6 @@ export type ContentPillar = z.infer<typeof contentPillarSchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type RiskLevel = z.infer<typeof riskLevelSchema>;
 export type IdeaAnalysis = z.infer<typeof ideaAnalysisSchema>;
+export type DistributionGoal = z.infer<typeof distributionGoalSchema>;
+export type ProfessionalRelevance = z.infer<typeof professionalRelevanceSchema>;
 export type IdeaSignalsPayload = z.infer<typeof ideaSignalsSchema>;

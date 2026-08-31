@@ -32,7 +32,7 @@ specifically to stop the model fabricating, and those parts are load-bearing.
 | AI provider | OpenAI, Responses API |
 | Database | Supabase / Postgres with pgvector (optional, see section 6) |
 | Node | 22 |
-| Tests | 131, all passing |
+| Tests | 166, all passing |
 | Package manager | npm |
 
 ---
@@ -46,6 +46,8 @@ Everything below is built, typechecked and covered by tests.
   strategist and a draft adjuster.
 - A data-driven framework library of 30 frameworks.
 - Deterministic framework selection with integrity gates.
+- LinkedIn distribution logic, evidence-labelled and verified through 31 August
+  2026, with a distribution check stage and a deterministic myth firewall.
 - A deterministic writing-rules linter (no model call).
 - Zod schemas at every agent boundary.
 - Full web interface: composer, hook picker, draft editor, history, settings.
@@ -58,7 +60,7 @@ Verify all of it in one command:
 
 ```bash
 npm ci
-npm run verify      # typecheck + 131 tests
+npm run verify      # typecheck + 166 tests
 npm run build
 ```
 
@@ -348,6 +350,11 @@ If a model ID is wrong, change the environment variable.
 and `getServiceClient()` both throw if reached from client code. Do not
 "fix" that by removing the guard.
 
+**Never invent LinkedIn ranking mechanics.** No weights, no multipliers, no dwell
+thresholds, no posting-time formulas. LinkedIn publishes none of them, and
+`src/frameworks/linkedin-distribution.ts` documents what is actually confirmed.
+Do not optimise for 360Brew: it was an internal test and was shut down.
+
 **Never weaken the writing rules or the integrity gates.** The linter, the
 blocked-framework logic and the offer gates exist to stop the model fabricating
 personal stories, client results, statistics, guarantees and scarcity. If
@@ -385,7 +392,7 @@ version genuinely blocks deployment, say so and stop.
 
 ## 13. Handover summary
 
-**Done:** the entire application, 131 tests, the interface, the access gate, both
+**Done:** the entire application, 166 tests, the interface, the access gate, both
 storage backends, the database schema.
 
 **To do:** import, set secrets, create Supabase and apply the schema, deploy as a

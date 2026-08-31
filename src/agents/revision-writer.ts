@@ -23,6 +23,8 @@ export interface RevisionInput {
   draft: string;
   report: CriticReport;
   research?: FactCheckReport | null;
+  /** Rendered distribution findings, when the distribution check has run. */
+  distributionNotes?: string;
   lintOptions?: LintOptions;
 }
 
@@ -31,6 +33,7 @@ export async function runRevisionWriter({
   draft,
   report,
   research,
+  distributionNotes,
   lintOptions,
 }: RevisionInput): Promise<string> {
   const lint = lintPost(draft, lintOptions);
@@ -50,6 +53,7 @@ export async function runRevisionWriter({
     `# DETERMINISTIC LINTER FINDINGS\n${renderLintFindings(lint)}`,
     `# VOICE PROFILE\n${renderVoiceProfile(context.voiceProfile)}`,
     research ? renderVerifiedFacts(research) : "",
+    distributionNotes ? `# LINKEDIN DISTRIBUTION CHECK\n${distributionNotes}` : "",
     "# TASK\nApply the fixes and return the revised post text only. Do not rewrite what was not raised. Do not introduce new claims while revising.",
   ].filter(Boolean);
 

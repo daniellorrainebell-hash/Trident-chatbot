@@ -6,6 +6,7 @@ import { StrategyPanel } from "./components/StrategyPanel";
 import { HookPicker, type RankedHook } from "./components/HookPicker";
 import { DraftView } from "./components/DraftView";
 import type { LintResult } from "./components/LintPanel";
+import type { DistributionResult } from "./components/DistributionPanel";
 
 interface GenerateResponse {
   postId: string | null;
@@ -16,6 +17,7 @@ interface GenerateResponse {
     draft?: string;
     criticReport?: Parameters<typeof DraftView>[0]["criticReport"];
     lint?: LintResult;
+    distribution?: DistributionResult;
     revisionCount: number;
     unresolvedLintErrors: string[];
     frameworkWarnings: string[];
@@ -39,6 +41,9 @@ export default function Composer() {
   const [tone, setTone] = useState("");
   const [forceResearch, setForceResearch] = useState(false);
   const [pickHook, setPickHook] = useState(true);
+  // Which trade-offs this post is willing to make. Balanced keeps the voice
+  // while removing clear recommendation negatives.
+  const [distributionMode, setDistributionMode] = useState("balanced");
 
   const overrides = () => {
     const value: Record<string, unknown> = {};
@@ -75,6 +80,7 @@ export default function Composer() {
         idea,
         mode: "quick_draft",
         pauseForHookSelection: pickHook,
+        distributionMode,
         overrides: overrides(),
       },
       pickHook ? "Working out the strategy and writing hooks" : "Building the post",
@@ -93,6 +99,7 @@ export default function Composer() {
         idea,
         mode: "quick_draft",
         selectedHook: hook.candidate,
+        distributionMode,
         overrides: overrides(),
       },
       "Writing and critiquing the post",
@@ -166,6 +173,23 @@ export default function Composer() {
                 <p className="card-note" style={{ margin: "0 0 1.1rem" }}>
                   All optional. Anything left blank is decided by the strategist.
                 </p>
+                <div className="field">
+                  <span className="section-label">Distribution</span>
+                  <select
+                    value={distributionMode}
+                    onChange={(event) => setDistributionMode(event.target.value)}
+                  >
+                    <option value="balanced">Balanced. Keep my voice, remove clear negatives</option>
+                    <option value="broad_reach">Broad reach. Prioritise reaching strangers</option>
+                    <option value="voice_first">Voice first. Personality over reach</option>
+                    <option value="conversion_first">Conversion first. Selling matters more than reach</option>
+                    <option value="network_first">Network first. For people who already know me</option>
+                  </select>
+                  <span className="field-hint">
+                    Changes which trade-offs the distribution check accepts rather than flags.
+                  </span>
+                </div>
+
                 <div className="field-row">
                   <div className="field">
                     <span className="section-label">Audience</span>
@@ -243,6 +267,7 @@ export default function Composer() {
             aiDraft={result.draft}
             criticReport={result.criticReport ?? null}
             initialLint={result.lint ?? null}
+            distribution={result.distribution ?? null}
             revisionCount={result.revisionCount}
             unresolvedErrors={result.unresolvedLintErrors}
           />

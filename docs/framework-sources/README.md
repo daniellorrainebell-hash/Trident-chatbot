@@ -8,6 +8,7 @@ The source documents this engine was built from. They are kept in the repository
 | `writing-rules.md` | The hard constraints. Encoded in `src/writing-rules/`. Overrides framework conventions where they conflict. |
 | `nexus-hook-library.md` | The seven hook types, their formulas and 42 examples. Encoded in `src/frameworks/nexus-hooks.ts`. |
 | `hormozi-framework-library.md` | Commercial and offer mechanisms. Encoded in `src/frameworks/hormozi.ts`. |
+| `linkedin-distribution-logic.md` | **Authoritative** for LinkedIn distribution behaviour as of 31 August 2026. Encoded in `src/frameworks/linkedin-distribution.ts`. Re-verify against primary sources before changing hardwired logic. |
 
 ## Not included
 
