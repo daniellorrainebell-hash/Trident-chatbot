@@ -49,6 +49,16 @@ npm run seed:frameworks
 
 The header shows which store is active, so this is never a guess.
 
+## Interface
+
+Black surface, electric blue structure, white text. Every box carries a blue
+edge, so the layout is drawn in blue rather than left to float in empty space.
+The blue is graded: hairline on resting surfaces, brighter on anything
+interactive, brightest plus a glow on whatever currently has focus.
+
+The Nexus IQ mark sits top left, the Socrates wordmark centred above the
+navigation. The wordmark scrolls away and the nav stays.
+
 ## Using it
 
 **Write.** Type a rough sentence and press Build post. Socrates works out the audience, pillar, psychology and framework, generates and scores hooks, writes the draft, critiques it, and revises it before you see it. Tick "let me pick the opening" to choose the hook yourself.

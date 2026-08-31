@@ -21,6 +21,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en-GB">
       <body>
         <div className="brandbar">
+          <a
+            className="brandbar-mark"
+            href="https://www.nexus-iq.co.uk"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Nexus IQ Systems"
+          >
+            <Image
+              src="/nexus-iq-logo.png"
+              alt="Nexus IQ Systems"
+              width={4096}
+              height={900}
+              className="nexus-mark"
+              priority
+            />
+          </a>
+
           <Image
             src="/socrates-logo.png"
             alt="Socrates"
@@ -29,11 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             className="wordmark"
             priority
           />
-          <p className="brand-sub">
-            LinkedIn Content Engine
-            <span className="sep" aria-hidden />
-            Nexus IQ Systems
-          </p>
+          <p className="brand-sub">LinkedIn Content Engine</p>
         </div>
 
         <nav className="navbar">
