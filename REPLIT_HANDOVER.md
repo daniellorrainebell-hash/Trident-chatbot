@@ -50,7 +50,7 @@ Everything below is built, typechecked and covered by tests.
 - Zod schemas at every agent boundary.
 - Full web interface: composer, hook picker, draft editor, history, settings.
 - Two storage backends behind one interface: Supabase, or a local JSON file.
-- Passkey access control with signed session cookies.
+- Master-password access control with a signed session cookie.
 - API routes for generate, adjust, approve, profile, posts, lint, frameworks,
   status, health and auth.
 
@@ -124,13 +124,13 @@ already carry that prefix.
 | Secret | What it is |
 |---|---|
 | `OPENAI_API_KEY` | OpenAI API key. Server-side only. |
-| `NEXUS_ACCESS_PASSKEY` | The passkey that unlocks the app. Generate a strong one. |
+| `NEXUS_ACCESS_PASSKEY` | The master password that unlocks the app. Daniel will give you the value. |
 
-Generate a passkey:
+There is one password and one user. Do not build accounts, roles, password
+reset or email verification on top of it.
 
-```bash
-npm run secret
-```
+The value is not in this repository and must not be added to it. Ask Daniel for
+it and put it straight into Replit Secrets.
 
 ### Required once Supabase exists
 
@@ -149,7 +149,6 @@ npm run secret
 | `OPENAI_MODEL_DEEP` | `gpt-5.6-sol` | Research and fact checking |
 | `OPENAI_MODEL_FAST` | `gpt-5.6-luna` | Classification and hook scoring |
 | `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Retrieval vectors |
-| `NEXUS_SESSION_SECRET` | falls back to the passkey | Separate key for signing cookies |
 | `APP_ENV` | `development` | Set to `production` on the deployment |
 
 > **Check the model IDs before the first run.** The three `gpt-5.6-*` IDs come
@@ -281,7 +280,7 @@ Work through this in order. Stop at the first failure and report it.
 - [ ] `GET /api/health` returns `status: "ok"` with all three checks true.
 - [ ] Visiting any page while signed out redirects to `/login`.
 - [ ] `GET /api/posts` while signed out returns 401, not a redirect.
-- [ ] The wrong passkey is rejected. The right one signs you in.
+- [ ] The wrong password is rejected. The right one signs you in.
 - [ ] The header shows the "Supabase" chip, not "Local storage".
 
 **The first real generation**
@@ -373,7 +372,7 @@ version genuinely blocks deployment, say so and stop.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| 503 with "NEXUS_ACCESS_PASSKEY is not set" | The gate failing closed on a public host | Set the secret and redeploy |
+| 503 with "NEXUS_ACCESS_PASSKEY is not set" | Failing closed on a public host | Set the password secret and redeploy |
 | Every page redirects to `/login` in a loop | Cookie not being set | Confirm the deployment is served over HTTPS |
 | Header says "Local storage" | One of the three Supabase values missing | All three are required together |
 | Generation fails with an unknown model | The `gpt-5.6-*` IDs are unverified | Set the model env vars to current IDs |

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const [passkey, setPasskey] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +19,7 @@ function LoginForm() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passkey }),
+        body: JSON.stringify({ passkey: password }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Login failed.");
@@ -38,17 +38,17 @@ function LoginForm() {
   return (
     <form className="card card-lg login-card" onSubmit={submit}>
       <h1>Sign in</h1>
-      <p className="card-note">This workspace is private.</p>
+      <p className="card-note">Private workspace.</p>
 
       <div className="field">
-        <label className="section-label" htmlFor="passkey">
-          Passkey
+        <label className="section-label" htmlFor="password">
+          Password
         </label>
         <input
-          id="passkey"
+          id="password"
           type="password"
-          value={passkey}
-          onChange={(event) => setPasskey(event.target.value)}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
           autoFocus
           autoComplete="current-password"
           style={{
@@ -68,7 +68,7 @@ function LoginForm() {
       <button
         className="btn btn-primary btn-lg"
         type="submit"
-        disabled={busy || passkey.length === 0}
+        disabled={busy || password.length === 0}
         style={{ width: "100%" }}
       >
         {busy && <span className="spinner" />}

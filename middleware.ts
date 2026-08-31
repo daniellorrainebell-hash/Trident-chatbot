@@ -40,8 +40,7 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  const secret = process.env.NEXUS_SESSION_SECRET || passkey;
-  const valid = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
+  const valid = await verifySessionToken(passkey, request.cookies.get(SESSION_COOKIE)?.value);
   if (valid) return NextResponse.next();
 
   // An API caller wants a status code, not a redirect to an HTML page.

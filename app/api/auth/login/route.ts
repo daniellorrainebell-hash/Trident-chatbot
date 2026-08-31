@@ -21,7 +21,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const configured = process.env.NEXUS_ACCESS_PASSKEY;
   if (!configured) {
     return NextResponse.json(
-      { error: "No passkey is configured on this deployment." },
+      { error: "No password is configured on this deployment." },
       { status: 503 },
     );
   }
@@ -35,17 +35,16 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success || !passkeyMatches(configured, parsed.data.passkey)) {
-    // One message for both cases. A distinct "no passkey supplied" reply would
+    // One message for both cases. A distinct "no password supplied" reply would
     // tell a prober which half of the request it got right.
-    return NextResponse.json({ error: "That passkey is not correct." }, { status: 401 });
+    return NextResponse.json({ error: "That password is not correct." }, { status: 401 });
   }
 
-  const secret = process.env.NEXUS_SESSION_SECRET || configured;
   const response = NextResponse.json({ ok: true });
 
   response.cookies.set({
     name: SESSION_COOKIE,
-    value: await createSessionToken(secret),
+    value: await createSessionToken(configured),
     httpOnly: true,
     sameSite: "lax",
     // Replit terminates TLS in front of the app, so trust the forwarded scheme

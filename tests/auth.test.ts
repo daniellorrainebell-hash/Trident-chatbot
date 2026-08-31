@@ -62,23 +62,23 @@ describe("session tokens", () => {
     expect(await verifySessionToken(SECRET, ".onlysignature")).toBe(false);
   });
 
-  it("rotating the passkey invalidates existing sessions", async () => {
-    const token = await createSessionToken("old-passkey");
-    expect(await verifySessionToken("new-passkey", token)).toBe(false);
+  it("changing the password invalidates existing sessions", async () => {
+    const token = await createSessionToken("old-password");
+    expect(await verifySessionToken("new-password", token)).toBe(false);
   });
 });
 
-describe("passkey comparison", () => {
-  it("matches an identical passkey", () => {
+describe("password comparison", () => {
+  it("matches an identical password", () => {
     expect(passkeyMatches("correct-horse", "correct-horse")).toBe(true);
   });
 
-  it("rejects a wrong passkey", () => {
+  it("rejects a wrong password", () => {
     expect(passkeyMatches("correct-horse", "correct-hors")).toBe(false);
     expect(passkeyMatches("correct-horse", "CORRECT-HORSE")).toBe(false);
   });
 
-  it("never matches when no passkey is configured", () => {
+  it("never matches when no password is configured", () => {
     expect(passkeyMatches("", "")).toBe(false);
     expect(passkeyMatches("", "anything")).toBe(false);
   });

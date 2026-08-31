@@ -23,7 +23,7 @@ Built and usable end to end.
 | API route handlers | Built |
 | Web interface | Built |
 | Local JSON storage (no database needed) | Built |
-| Passkey access control | Built |
+| Master-password access control | Built |
 | Replit deployment config | Built |
 
 131 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
@@ -80,9 +80,9 @@ deployment target, custom domain and an acceptance checklist.
 
 Two things matter most:
 
-- **Set `NEXUS_ACCESS_PASSKEY`.** Without it the app serves localhost only and
-  refuses remote traffic. That is deliberate: an open deployment spends money on
-  every request.
+- **Set `NEXUS_ACCESS_PASSKEY`.** One master password, one user. Without it the
+  app serves localhost only and refuses remote traffic, because an open
+  deployment spends money on every request.
 - **Use Supabase for anything hosted.** The local JSON store is for a laptop. It
   also cannot do semantic retrieval over your previous posts.
 

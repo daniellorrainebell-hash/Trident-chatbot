@@ -9,9 +9,12 @@
  * because the middleware that enforces it runs on the Edge.
  *
  * The session cookie is `<base64url payload>.<hmac>`, where the payload carries
- * an expiry and the HMAC is keyed on the passkey. Rotating the passkey therefore
- * invalidates every existing session, which is the behaviour you want when the
- * reason you are rotating it is that it leaked.
+ * an expiry and the HMAC is keyed on the password itself. There is deliberately
+ * no second signing secret to configure: one password is the whole system.
+ *
+ * Keying on the password means changing it invalidates every existing session,
+ * which is the behaviour you want when the reason you are changing it is that it
+ * leaked.
  */
 
 export const SESSION_COOKIE = "socrates_session";
