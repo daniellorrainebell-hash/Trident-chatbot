@@ -16,7 +16,15 @@ let cachedClient: OpenAI | null = null;
 
 export function getOpenAI(): OpenAI {
   if (cachedClient) return cachedClient;
+
   const env = getServerEnv();
+  if (!env.OPENAI_API_KEY) {
+    throw new Error(
+      "OPENAI_API_KEY is not set, so nothing can be generated. Add it to .env.local " +
+        "locally, or to Secrets on a deployment. Settings and history work without it.",
+    );
+  }
+
   cachedClient = new OpenAI({ apiKey: env.OPENAI_API_KEY });
   return cachedClient;
 }

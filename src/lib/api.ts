@@ -87,6 +87,7 @@ export async function buildContext(idea: string): Promise<GenerationContext> {
     recentPosts,
     feedbackPreferences,
     offer,
+    signOff: identity.signOff || null,
   };
 }
 

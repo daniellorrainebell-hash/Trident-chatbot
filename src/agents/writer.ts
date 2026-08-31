@@ -16,6 +16,8 @@ import { renderContextBlock, type GenerationContext } from "./types";
 import type { IdeaAnalysis } from "../schemas/strategy";
 import type { Outline } from "../schemas/outline";
 import type { FactCheckReport } from "../schemas/factcheck";
+import { renderRequirements } from "../schemas/requirements";
+import { characterBudget, renderBudgetInstruction } from "../lib/compose";
 
 export interface WriterInput {
   context: GenerationContext;
@@ -49,6 +51,15 @@ export async function runWriter({
       .join("\n")}\nCTA: ${outline.cta}`,
     `# STRATEGY NOTES\nCore claim: ${analysis.core_claim}\nTone notes: ${analysis.tone_notes.join("; ") || "none"}`,
     `# PROOF GAPS (do not fill these by invention)\n${analysis.proof_missing.join("\n") || "none"}`,
+    context.requirements
+      ? `# REQUIREMENTS FOR THIS POST\n${renderRequirements(context.requirements, {
+          signOff: context.signOff,
+          hasOffer: Boolean(context.offer),
+        })}`
+      : "",
+    `# LENGTH\n${renderBudgetInstruction(
+      characterBudget(context.requirements?.includeSignOff ? context.signOff : null),
+    )}`,
     research ? renderVerifiedFacts(research) : "",
     "# TASK\nWrite the post. Open with the hook exactly as given. Close the promise it made. Return the post text only.",
   ].filter(Boolean);

@@ -22,6 +22,7 @@ const identitySchema = z.object({
   offers: z.string().default(""),
   goals: z.string().default(""),
   beliefs: z.array(z.string()).default([]),
+  signOff: z.string().default(""),
 });
 
 const updateSchema = z.object({

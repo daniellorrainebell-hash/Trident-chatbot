@@ -27,7 +27,7 @@ Built and usable end to end.
 | LinkedIn distribution logic | Built |
 | Replit deployment config | Built |
 
-166 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
+195 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
 
 ## Setup
 
@@ -64,7 +64,13 @@ navigation. The wordmark scrolls away and the nav stays.
 
 ## Using it
 
-**Write.** Type a rough sentence and press Build post. Socrates works out the audience, pillar, psychology and framework, generates and scores hooks, writes the draft, critiques it, and revises it before you see it. Tick "let me pick the opening" to choose the hook yourself.
+**Write.** Type a rough sentence, add a brief if you have supporting material, and tick what the post needs. Not every post needs a CTA, an offer or a sign-off, so nothing is ticked by default and an unticked box is an instruction: leaving the CTA off tells the writer to end on substance.
+
+Several ticks are the honest input to the integrity gates. "I have a real story to tell" is what unlocks the story frameworks, and it is a tick rather than an inference because a model reading an idea that *sounds* like a story is exactly where fabrication starts.
+
+Ticking the sign-off appends it verbatim and subtracts it from the character budget before writing, so the finished post never exceeds 3,000 characters. The sign-off is appended by code, never written by the model, so your branding comes out identical every time.
+
+Press Build post. Socrates works out the audience, pillar, psychology and framework, generates and scores hooks, writes the draft, critiques it, and revises it before you see it. Tick "let me pick the opening" to choose the hook yourself.
 
 The draft is editable in place, with the writing-rules linter running live as you type. The one-click adjustments (shorter, more direct, more technical, stronger opening, add or remove the CTA) each record a preference, so repeated choices shape future drafts.
 

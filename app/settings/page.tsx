@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 interface Identity {
+  signOff: string;
   bio: string;
   expertise: string;
   targetAudience: string;
@@ -197,6 +198,38 @@ export default function Settings() {
           "What does your industry get wrong?\nWhat would you never recommend?",
           (beliefs) => setIdentity({ ...identity, beliefs }),
         )}
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <h2>Sign-off</h2>
+        </div>
+        <p className="card-note">
+          Tick &ldquo;Add my sign-off&rdquo; on a post and this is appended exactly as
+          written, then counted into the 3,000 character limit. Socrates reproduces
+          it rather than rewriting it, so your branding stays identical every time.
+        </p>
+
+        <div className="field">
+          <span className="section-label">Your sign-off</span>
+          <textarea
+            rows={4}
+            value={identity.signOff}
+            placeholder={
+              "For daily AI insights or to work with me at Nexus IQ / Nexus Academy connect with the AI Architect.\n\nDaniel - Nexus IQ - The AI Architect."
+            }
+            onChange={(event) => setIdentity({ ...identity, signOff: event.target.value })}
+          />
+          <span className="field-hint">
+            {identity.signOff.trim().length > 0
+              ? `${identity.signOff.trim().length + 2} characters including the blank line before it, leaving ${(
+                  3000 -
+                  identity.signOff.trim().length -
+                  2
+                ).toLocaleString("en-GB")} for the post.`
+              : "Left empty, the sign-off option stays switched off."}
+          </span>
+        </div>
       </div>
 
       <div className="card">

@@ -15,6 +15,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generatePost } from "../../../src/pipeline/generate-post";
 import { getStore } from "../../../src/store";
+import { postRequirementsSchema } from "../../../src/schemas/requirements";
 import {
   buildContext,
   errorResponse,
@@ -57,6 +58,10 @@ const requestSchema = z.object({
     .default("balanced"),
   /** Description of attached media, for the alignment check. */
   mediaDescription: z.string().optional(),
+  /** Supporting material: notes, evidence, raw thoughts. */
+  brief: z.string().optional(),
+  /** The checklist ticked before generating. */
+  requirements: postRequirementsSchema.optional(),
 });
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -72,11 +77,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     lintOptions,
     distributionMode,
     mediaDescription,
+    brief,
+    requirements,
   } = parsed.data;
 
   try {
     const context = await buildContext(idea);
     if (overrides) context.overrides = overrides;
+    if (brief?.trim()) context.brief = brief.trim();
+    if (requirements) context.requirements = requirements;
 
     const result = await generatePost(context, {
       mode,

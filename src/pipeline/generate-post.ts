@@ -30,6 +30,8 @@ import {
 import { runOfferStrategist } from "../agents/offer-strategist";
 import { retrieveFrameworksForPost } from "../retrieval/framework-retrieval";
 import { lintPost, type LintOptions, type LintResult } from "../writing-rules/linter";
+import { runAdjuster } from "../agents/adjuster";
+import { characterBudget, composePost, type ComposedPost } from "../lib/compose";
 import { CRITIC_PASS_THRESHOLD, type CriticReport } from "../schemas/critic";
 import type { GenerationContext } from "../agents/types";
 import type { IdeaAnalysis } from "../schemas/strategy";
@@ -72,6 +74,8 @@ export interface GeneratePostResult {
   criticReport?: CriticReport;
   research?: FactCheckReport;
   distribution?: DistributionResult;
+  /** The finished post: body plus sign-off, with its verified length. */
+  composed?: ComposedPost;
   lint?: LintResult;
   revisionCount: number;
   /** Populated when the pipeline returned a draft that still fails the linter. */
@@ -253,11 +257,39 @@ export async function generatePost(
     result.revisionCount = revisions;
   }
 
+  // --- Assembly and the character limit -------------------------------------
+  // The sign-off is appended by code rather than written by the model, so the
+  // branding is exact and the length is arithmetic rather than an estimate.
+  const signOff = context.requirements?.includeSignOff ? context.signOff : null;
+  const budget = characterBudget(signOff);
+
+  let composed = composePost(draft, signOff);
+
+  // One shortening pass if the finished post would be truncated. The writer was
+  // given the budget up front, so this is a fallback rather than the mechanism.
+  if (!composed.withinLimit) {
+    draft = await runAdjuster({
+      draft: composed.body,
+      adjustment: "shorter",
+      voiceProfile: context.voiceProfile,
+      customInstruction:
+        `Cut this to under ${budget.bodyTarget} characters. It is currently ${composed.body.length}. ` +
+        "Remove whole paragraphs that only restate another, and remove qualifiers that do not change whether a claim is true. " +
+        "Do not remove evidence, specificity or the payoff. Do not add a sign-off.",
+      ...(lintOptions ? { lintOptions } : {}),
+    }).then((result) => result.text);
+
+    composed = composePost(draft, signOff);
+    result.revisionCount += 1;
+  }
+
+  result.composed = composed;
+  result.draft = composed.text;
+
   // Final deterministic gate. A draft that still trips a hard rule is returned
   // with the failures named rather than silently presented as finished.
-  const finalLint = lintPost(draft, lintOptions);
+  const finalLint = lintPost(composed.text, lintOptions);
   result.lint = finalLint;
-  result.draft = draft;
   result.unresolvedLintErrors = finalLint.errors.map(
     (error) => `${error.ruleId}: "${error.excerpt}" (writing rules section ${error.ruleRef})`,
   );

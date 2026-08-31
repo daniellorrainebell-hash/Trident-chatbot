@@ -28,6 +28,12 @@ export interface IdentityRecord {
   goals: string;
   /** Genuine beliefs, from onboarding step 2. Used by belief and opinion posts. */
   beliefs: string[];
+  /**
+   * A fixed sign-off appended when the checklist asks for it.
+   * Stored verbatim: it is branding, so the engine reproduces it rather than
+   * rewriting it.
+   */
+  signOff: string;
 }
 
 export const EMPTY_IDENTITY: IdentityRecord = {
@@ -38,6 +44,7 @@ export const EMPTY_IDENTITY: IdentityRecord = {
   offers: "",
   goals: "",
   beliefs: [],
+  signOff: "",
 };
 
 export interface StoredVersion {

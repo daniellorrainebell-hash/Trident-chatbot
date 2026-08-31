@@ -7,6 +7,7 @@
  */
 
 import type { Offer, VoiceProfile } from "../schemas";
+import type { PostRequirements } from "../schemas/requirements";
 import type { FrameworkDefinition } from "../frameworks/types";
 import { renderFrameworksForPrompt } from "../frameworks/registry";
 
@@ -35,6 +36,15 @@ export interface PastPostSummary {
 export interface GenerationContext {
   /** The user's raw idea, unedited. */
   idea: string;
+  /**
+   * Supporting material: notes, evidence, links, raw thoughts.
+   * Everything the post is allowed to draw on beyond retrieval.
+   */
+  brief?: string;
+  /** The checklist ticked before generating. */
+  requirements?: PostRequirements;
+  /** The author's saved sign-off, appended when the checklist asks for it. */
+  signOff?: string | null;
   /** Rendered identity and positioning. Namespace B. */
   identity: string;
   voiceProfile: VoiceProfile;
@@ -90,8 +100,15 @@ export function renderContextBlock(
 ): string {
   const sections: string[] = [
     `# RAW IDEA\n${context.idea}`,
-    `# USER IDENTITY AND POSITIONING\n${context.identity || "(not supplied)"}`,
   ];
+
+  if (context.brief?.trim()) {
+    sections.push(
+      `# BRIEF\nSupporting material for this post. Everything factual in the draft must trace back to here, to the retrieved material, or to verified research.\n\n${context.brief.trim()}`,
+    );
+  }
+
+  sections.push(`# USER IDENTITY AND POSITIONING\n${context.identity || "(not supplied)"}`);
 
   if (context.feedbackPreferences.length) {
     sections.push(

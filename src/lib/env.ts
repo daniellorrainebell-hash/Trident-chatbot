@@ -16,7 +16,12 @@ const nonEmpty = (label: string) =>
   z.string().min(1, `${label} is required. See .env.example.`);
 
 const serverSchema = z.object({
-  OPENAI_API_KEY: nonEmpty("OPENAI_API_KEY"),
+  // Optional here, checked at the point of use in lib/openai.ts.
+  //
+  // Requiring it at validation time meant Settings, History and the sign-off
+  // editor all refused to load without a key, even though none of them calls a
+  // model. Configuration should fail where it is actually needed.
+  OPENAI_API_KEY: z.string().optional(),
 
   // Model IDs carry the spec defaults but remain overridable per environment.
   OPENAI_MODEL_PRIMARY: z.string().min(1).default("gpt-5.6-terra"),

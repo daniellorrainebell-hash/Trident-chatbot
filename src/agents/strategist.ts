@@ -105,9 +105,23 @@ export function buildSignals(
   context: GenerationContext,
 ): IdeaSignals {
   const offer = context.offer;
+  const requirements = context.requirements;
 
   return {
     ...analysis.signals,
+
+    // The checklist overrides inference. The author saying they have a real
+    // story is better evidence than a model reading the idea text and deciding
+    // one sounds likely, and this is the exact point where fabrication starts.
+    ...(requirements
+      ? {
+          hasTruePersonalEvent: requirements.hasPersonalStory,
+          isProofLed: requirements.includeProof,
+          isTacticalOrEducational: requirements.teachSomething,
+          isStrongOpinion: requirements.statePosition,
+          isDirectlyCommercial: requirements.includeOffer,
+        }
+      : {}),
     hasApprovedGuarantee: isGuaranteeUsable(offer?.guarantee),
     hasTieredOffer: offer?.delivery_mode === "mixed",
     hasVerifiedScarcityOrUrgency:

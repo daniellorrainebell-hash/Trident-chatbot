@@ -216,12 +216,14 @@ describe("durability", () => {
       offers: "o",
       goals: "g",
       beliefs: ["Templates cannot know your data flows."],
+      signOff: "Daniel - Nexus IQ - The AI Architect.",
     });
 
     const reopened = new LocalStore(dir);
     const identity = await reopened.loadIdentity(USER);
     expect(identity.expertise).toBe("AI governance");
     expect(identity.beliefs).toHaveLength(1);
+    expect(identity.signOff).toContain("The AI Architect");
   });
 
   it("does not lose writes issued concurrently", async () => {

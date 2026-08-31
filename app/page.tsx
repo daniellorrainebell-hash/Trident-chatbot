@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Stepper, type StepId } from "./components/Stepper";
 import { StrategyPanel } from "./components/StrategyPanel";
 import { HookPicker, type RankedHook } from "./components/HookPicker";
 import { DraftView } from "./components/DraftView";
 import type { LintResult } from "./components/LintPanel";
 import type { DistributionResult } from "./components/DistributionPanel";
+import { RequirementsChecklist } from "./components/RequirementsChecklist";
 
 interface GenerateResponse {
   postId: string | null;
@@ -45,6 +46,30 @@ export default function Composer() {
   // while removing clear recommendation negatives.
   const [distributionMode, setDistributionMode] = useState("balanced");
 
+  // Supporting material. Everything factual in the draft must trace back to
+  // here, to retrieval, or to verified research.
+  const [brief, setBrief] = useState("");
+
+  // The checklist. Several of these are the honest input to the integrity
+  // gates: the engine will not write a story unless you say you have one.
+  const [requirements, setRequirements] = useState<Record<string, boolean>>({});
+  const [profile, setProfile] = useState<{ signOff: string; hasOffer: boolean } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((response) => response.json())
+      .then((data) =>
+        setProfile({
+          signOff: data?.identity?.signOff ?? "",
+          hasOffer: Boolean(data?.offer),
+        }),
+      )
+      .catch(() => setProfile({ signOff: "", hasOffer: false }));
+  }, []);
+
+  const toggle = (key: string) =>
+    setRequirements((current) => ({ ...current, [key]: !current[key] }));
+
   const overrides = () => {
     const value: Record<string, unknown> = {};
     if (audience.trim()) value.audience = audience.trim();
@@ -81,6 +106,8 @@ export default function Composer() {
         mode: "quick_draft",
         pauseForHookSelection: pickHook,
         distributionMode,
+        brief,
+        requirements,
         overrides: overrides(),
       },
       pickHook ? "Working out the strategy and writing hooks" : "Building the post",
@@ -100,6 +127,8 @@ export default function Composer() {
         mode: "quick_draft",
         selectedHook: hook.candidate,
         distributionMode,
+        brief,
+        requirements,
         overrides: overrides(),
       },
       "Writing and critiquing the post",
@@ -148,7 +177,32 @@ export default function Composer() {
               aria-label="Your idea"
             />
 
-            <div className="btn-row" style={{ marginTop: "1rem", alignItems: "center" }}>
+            <div className="field" style={{ marginTop: "1.1rem" }}>
+              <span className="section-label">Brief (optional)</span>
+              <textarea
+                rows={5}
+                value={brief}
+                onChange={(event) => setBrief(event.target.value)}
+                placeholder={
+                  "Anything the post should draw on. Notes, the story, numbers you have, links, what you want to land, who it is for, what to avoid. Paste as much as you like."
+                }
+                aria-label="Brief"
+              />
+              <span className="field-hint">
+                Everything factual in the draft has to trace back to here, your saved
+                knowledge, or verified research.
+              </span>
+            </div>
+
+            <RequirementsChecklist
+              values={requirements}
+              onToggle={toggle}
+              hasSignOff={Boolean(profile?.signOff)}
+              hasOffer={Boolean(profile?.hasOffer)}
+              signOff={profile?.signOff ?? ""}
+            />
+
+            <div className="btn-row" style={{ marginTop: "1.25rem", alignItems: "center" }}>
               <button
                 className="btn btn-primary btn-lg"
                 onClick={build}

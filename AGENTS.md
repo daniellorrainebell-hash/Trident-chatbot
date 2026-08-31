@@ -108,6 +108,25 @@ Severity guidance:
 
 Add a test with both a violating example and a legitimate example that must not trip it.
 
+## The checklist and the character budget
+
+`src/schemas/requirements.ts` is the pre-generation checklist. It is not only a
+convenience: several ticks are the honest input to the integrity gates in
+`frameworks/selection.ts`, and where a tick and a model inference disagree, the
+tick wins. `hasPersonalStory` is the important one, because a model reading an
+idea that sounds like a story is exactly where fabrication starts.
+
+An unticked box is an instruction, not an absence. `renderRequirements` tells the
+writer explicitly what to leave out, which is why a post with no CTA ends on
+substance rather than drifting into one.
+
+`src/lib/compose.ts` owns the character budget. The sign-off is appended by code,
+never written by the model, for two reasons: a model asked to reproduce fixed
+branding will eventually paraphrase it, and the budget has to be arithmetic
+rather than an estimate. The writer is told its body ceiling up front; assembly
+and verification happen afterwards. Keep both properties if you change it, and
+keep `composePost` idempotent, because the user edits drafts by hand.
+
 ## Storage
 
 Two backends behind one interface in `src/store/`. Supabase when all three of its

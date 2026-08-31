@@ -7,3 +7,4 @@ export * from "./feedback";
 export * from "./voice";
 export * from "./offer";
 export * from "./distribution";
+export * from "./requirements";

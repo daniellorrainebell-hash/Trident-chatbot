@@ -35,8 +35,11 @@ export class SupabaseStore implements EngineStore {
     if (error) throw new Error(`Failed to load profile: ${error.message}`);
     if (!data) return EMPTY_IDENTITY;
 
-    const beliefs =
-      ((data.voice_profile_json as Record<string, unknown> | null)?.beliefs as string[]) ?? [];
+    // Beliefs and the sign-off ride along in the profile JSON, so adding them
+    // needed no migration.
+    const profileJson = (data.voice_profile_json as Record<string, unknown> | null) ?? {};
+    const beliefs = (profileJson.beliefs as string[]) ?? [];
+    const signOff = (profileJson.signOff as string) ?? "";
 
     return {
       bio: (data.bio as string) ?? "",
@@ -46,13 +49,31 @@ export class SupabaseStore implements EngineStore {
       offers: (data.offers as string) ?? "",
       goals: (data.goals as string) ?? "",
       beliefs,
+      signOff,
     };
   }
 
   async saveIdentity(userId: string, identity: IdentityRecord): Promise<void> {
-    const { error } = await getServiceClient().from("profiles").upsert(
+    const client = getServiceClient();
+
+    // Read, merge and write the profile JSON so saving identity does not drop
+    // the voice profile stored alongside it.
+    const { data: existing } = await client
+      .from("profiles")
+      .select("voice_profile_json")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const profileJson = {
+      ...((existing?.voice_profile_json as Record<string, unknown> | null) ?? {}),
+      beliefs: identity.beliefs,
+      signOff: identity.signOff,
+    };
+
+    const { error } = await client.from("profiles").upsert(
       {
         user_id: userId,
+        voice_profile_json: profileJson,
         bio: identity.bio,
         expertise: identity.expertise,
         target_audience: identity.targetAudience,

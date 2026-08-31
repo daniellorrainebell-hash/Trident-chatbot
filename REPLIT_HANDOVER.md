@@ -32,7 +32,7 @@ specifically to stop the model fabricating, and those parts are load-bearing.
 | AI provider | OpenAI, Responses API |
 | Database | Supabase / Postgres with pgvector (optional, see section 6) |
 | Node | 22 |
-| Tests | 166, all passing |
+| Tests | 195, all passing |
 | Package manager | npm |
 
 ---
@@ -60,7 +60,7 @@ Verify all of it in one command:
 
 ```bash
 npm ci
-npm run verify      # typecheck + 166 tests
+npm run verify      # typecheck + 195 tests
 npm run build
 ```
 
@@ -287,8 +287,10 @@ Work through this in order. Stop at the first failure and report it.
 
 **The first real generation**
 
-- [ ] Open Settings. Fill in expertise, audience, positioning and at least one
-      genuine belief. Save. Reload and confirm it persisted.
+- [ ] Open Settings. Fill in expertise, audience, positioning, at least one
+      genuine belief and the sign-off. Save. Reload and confirm it persisted.
+- [ ] On Write, tick "Add my sign-off" and confirm the preview shows the exact
+      text and the remaining character budget.
 - [ ] On Write, enter: *People are vibe coding AI products and selling them
       without understanding governance.* Tick "let me pick the opening". Press
       Build post.
@@ -392,7 +394,7 @@ version genuinely blocks deployment, say so and stop.
 
 ## 13. Handover summary
 
-**Done:** the entire application, 166 tests, the interface, the access gate, both
+**Done:** the entire application, 195 tests, the interface, the access gate, both
 storage backends, the database schema.
 
 **To do:** import, set secrets, create Supabase and apply the schema, deploy as a
