@@ -21,6 +21,7 @@
     "secret": "node -e \"console.log(require('crypto').randomBytes(24).toString('base64url'))\""
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
     "@supabase/supabase-js": "^2.47.10",
     "next": "^15.1.6",
     "openai": "^4.80.1",

@@ -62,22 +62,46 @@ export function errorResponse(context: string, error: unknown): NextResponse {
   );
 }
 
+/**
+ * Retrieval that cannot take a generation down with it.
+ *
+ * Semantic retrieval makes drafts better; it is not required to produce one. A
+ * missing pgvector function, an embedding provider that cannot embed, or a
+ * transient database error should cost the run its context, not the run itself.
+ * The failure is logged so it does not pass unnoticed.
+ */
+async function optional<T>(label: string, work: Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await work;
+  } catch (error) {
+    console.warn(
+      `[retrieval] ${label} unavailable, continuing without it:`,
+      error instanceof Error ? error.message : error,
+    );
+    return fallback;
+  }
+}
+
 /** Assemble the generation context from whichever store is active. */
 export async function buildContext(idea: string): Promise<GenerationContext> {
   const store = getStore();
   const userId = getCurrentUserId();
 
-  const [identity, voiceProfile, feedbackPreferences, recentPosts, knowledge, similar] =
-    await Promise.all([
-      store.loadIdentity(userId),
-      store.loadVoiceProfile(userId),
-      store.feedbackPreferences(userId),
-      store.recentPosts(userId),
-      store.searchKnowledge(userId, idea),
-      store.similarPosts(userId, idea),
-    ]);
+  // Identity and the voice profile are the two the engine should not run
+  // without: they are what stop the output being generic. Everything else is
+  // an enhancement and degrades quietly.
+  const [identity, voiceProfile] = await Promise.all([
+    store.loadIdentity(userId),
+    store.loadVoiceProfile(userId),
+  ]);
 
-  const offer = await store.loadOffer(userId);
+  const [feedbackPreferences, recentPosts, knowledge, similar, offer] = await Promise.all([
+    optional("feedback preferences", store.feedbackPreferences(userId), [] as string[]),
+    optional("recent posts", store.recentPosts(userId), []),
+    optional("knowledge search", store.searchKnowledge(userId, idea), []),
+    optional("similar posts", store.similarPosts(userId, idea), []),
+    optional("offer record", store.loadOffer(userId), null),
+  ]);
 
   return {
     idea,

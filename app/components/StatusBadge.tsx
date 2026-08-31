@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 
 interface Status {
-  openaiConfigured: boolean;
+  modelProvider: { id: string; label: string; models: Record<string, string> } | null;
+  availableProviders: string[];
+  providerError: string | null;
   supabaseConfigured: boolean;
   storage: "supabase" | "local";
   semanticRetrieval: boolean;
@@ -28,24 +30,40 @@ export function StatusBadge() {
 
   if (!status) return null;
 
-  if (!status.openaiConfigured) {
+  if (!status.modelProvider) {
     return (
-      <span className="chip chip-danger" title="Set OPENAI_API_KEY in .env.local">
-        No OpenAI key
+      <span
+        className="chip chip-danger"
+        title={
+          status.providerError ??
+          "Set OPENAI_API_KEY, ANTHROPIC_API_KEY or GOOGLE_API_KEY."
+        }
+      >
+        No model key
       </span>
     );
   }
 
   return (
-    <span
-      className="chip chip-neutral chip-mono"
-      title={
-        status.storage === "local"
-          ? "Saving to a local JSON file. Semantic retrieval over past posts is off until Supabase is configured."
-          : "Saving to Supabase. Semantic retrieval is on."
-      }
-    >
-      {status.storage === "local" ? "Local storage" : "Supabase"}
-    </span>
+    <>
+      <span
+        className="chip chip-mono"
+        title={`Primary: ${status.modelProvider.models.primary}. Fast: ${status.modelProvider.models.fast}.`}
+      >
+        {status.modelProvider.label}
+      </span>
+      <span
+        className="chip chip-neutral chip-mono"
+        title={
+          status.storage === "local"
+            ? "Saving to a local JSON file. Semantic retrieval over past posts is off until Supabase is configured."
+            : status.semanticRetrieval
+              ? "Saving to Supabase. Semantic retrieval is on."
+              : "Saving to Supabase, but no configured provider can embed, so semantic retrieval is off."
+        }
+      >
+        {status.storage === "local" ? "Local storage" : "Supabase"}
+      </span>
+    </>
   );
 }

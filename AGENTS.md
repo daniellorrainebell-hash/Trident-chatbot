@@ -144,7 +144,7 @@ If you add a store method, add it to both implementations and to
 ## Testing
 
 ```bash
-npm test          # 117 tests
+npm test          # 223 tests
 npm run typecheck
 npm run build
 ```

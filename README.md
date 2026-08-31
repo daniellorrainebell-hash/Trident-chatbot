@@ -24,18 +24,19 @@ Built and usable end to end.
 | Web interface | Built |
 | Local JSON storage (no database needed) | Built |
 | Master-password access control | Built |
+| Multi-provider model layer (OpenAI, Anthropic, Google) | Built |
 | LinkedIn distribution logic | Built |
 | Replit deployment config | Built |
 
-195 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
+223 tests pass. `tsc --noEmit` is clean. `next build` succeeds.
 
 ## Setup
 
-You need one thing: an OpenAI key.
+You need one thing: a model key. OpenAI, Anthropic or Google, whichever you have.
 
 ```bash
 npm install
-cp .env.example .env.local     # add OPENAI_API_KEY
+cp .env.example .env.local     # add one of the three model keys
 npm run dev                    # http://localhost:3000
 ```
 

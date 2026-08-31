@@ -3,39 +3,44 @@
  *
  * Vectors are stored in Postgres with pgvector. The application's own database
  * stays the canonical store for the user's history, so the product is never
- * dependent on a hosted file store it does not control (spec section 39).
+ * dependent on a hosted file store it does not control.
+ *
+ * Not every provider offers embeddings. Anthropic does not, so an
+ * Anthropic-only deployment cannot do semantic retrieval. That degrades to off
+ * and is reported, rather than failing a generation.
  */
 
-import { getModel, getOpenAI } from "../lib/openai";
+import { getEmbeddingProvider } from "../lib/providers";
+
+/** Can this deployment embed at all? */
+export function embeddingsAvailable(): boolean {
+  return getEmbeddingProvider() !== null;
+}
 
 export async function embed(text: string): Promise<number[]> {
-  const client = getOpenAI();
-  const response = await client.embeddings.create({
-    model: getModel("embedding"),
-    input: text,
-    encoding_format: "float",
-  });
-
-  const vector = response.data[0]?.embedding;
+  const vectors = await embedMany([text]);
+  const vector = vectors[0];
   if (!vector) throw new Error("Embedding response contained no vector.");
   return vector;
 }
 
-/** Batch embed. The API accepts an array and returns vectors in input order. */
+/** Batch embed. Returns vectors in input order. */
 export async function embedMany(texts: readonly string[]): Promise<number[][]> {
   if (texts.length === 0) return [];
 
-  const client = getOpenAI();
-  const response = await client.embeddings.create({
-    model: getModel("embedding"),
-    input: [...texts],
-    encoding_format: "float",
-  });
+  const provider = getEmbeddingProvider();
+  if (!provider) {
+    throw new Error(
+      "No configured provider offers embeddings, so semantic retrieval is unavailable. " +
+        "Anthropic has no embeddings endpoint: add an OpenAI or Google key alongside it.",
+    );
+  }
 
-  return response.data
-    .slice()
-    .sort((a, b) => a.index - b.index)
-    .map((item) => item.embedding);
+  const vectors = await provider.embed(texts);
+  if (!vectors) {
+    throw new Error(`${provider.label} returned no embeddings.`);
+  }
+  return vectors;
 }
 
 export function cosineSimilarity(a: readonly number[], b: readonly number[]): number {

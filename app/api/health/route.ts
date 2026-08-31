@@ -13,8 +13,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<NextResponse> {
+  const modelProvider =
+    (process.env.OPENAI_API_KEY && "openai") ||
+    (process.env.ANTHROPIC_API_KEY && "anthropic") ||
+    (process.env.GOOGLE_API_KEY && "google") ||
+    null;
+
   const checks = {
-    openaiKey: Boolean(process.env.OPENAI_API_KEY),
+    modelProvider,
+    modelKey: Boolean(modelProvider),
     accessPasskey: Boolean(process.env.NEXUS_ACCESS_PASSKEY),
     supabase: Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -24,7 +31,7 @@ export async function GET(): Promise<NextResponse> {
   };
 
   return NextResponse.json({
-    status: checks.openaiKey ? "ok" : "misconfigured",
+    status: checks.modelKey ? "ok" : "misconfigured",
     checks,
     uptimeSeconds: Math.round(process.uptime()),
   });

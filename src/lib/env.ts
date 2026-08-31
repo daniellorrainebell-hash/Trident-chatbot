@@ -16,18 +16,33 @@ const nonEmpty = (label: string) =>
   z.string().min(1, `${label} is required. See .env.example.`);
 
 const serverSchema = z.object({
-  // Optional here, checked at the point of use in lib/openai.ts.
+  // Optional here, checked at the point of use in lib/providers.
   //
   // Requiring it at validation time meant Settings, History and the sign-off
   // editor all refused to load without a key, even though none of them calls a
   // model. Configuration should fail where it is actually needed.
   OPENAI_API_KEY: z.string().optional(),
 
+  // Anthropic and Google are alternatives. Whichever key is present is used;
+  // MODEL_PROVIDER breaks the tie when more than one is set.
+  ANTHROPIC_API_KEY: z.string().optional(),
+  GOOGLE_API_KEY: z.string().optional(),
+  MODEL_PROVIDER: z.enum(["openai", "anthropic", "google"]).optional(),
+
   // Model IDs carry the spec defaults but remain overridable per environment.
   OPENAI_MODEL_PRIMARY: z.string().min(1).default("gpt-5.6-terra"),
   OPENAI_MODEL_DEEP: z.string().min(1).default("gpt-5.6-sol"),
   OPENAI_MODEL_FAST: z.string().min(1).default("gpt-5.6-luna"),
   OPENAI_EMBEDDING_MODEL: z.string().min(1).default("text-embedding-3-small"),
+
+  ANTHROPIC_MODEL_PRIMARY: z.string().min(1).default("claude-opus-5"),
+  ANTHROPIC_MODEL_DEEP: z.string().min(1).default("claude-opus-5"),
+  ANTHROPIC_MODEL_FAST: z.string().min(1).default("claude-haiku-4-5"),
+
+  GOOGLE_MODEL_PRIMARY: z.string().min(1).default("gemini-2.5-pro"),
+  GOOGLE_MODEL_DEEP: z.string().min(1).default("gemini-2.5-pro"),
+  GOOGLE_MODEL_FAST: z.string().min(1).default("gemini-2.5-flash"),
+  GOOGLE_EMBEDDING_MODEL: z.string().min(1).default("text-embedding-004"),
 
   OPENAI_VECTOR_STORE_ID: z.string().optional(),
 
