@@ -121,8 +121,8 @@ export const Scene5Services: React.FC = () => {
       >
         <div
           style={{
-            marginTop: 330,
-            marginBottom: 100,
+            marginTop: 260,
+            marginBottom: 80,
             fontFamily: display,
             textTransform: "uppercase",
             lineHeight: 1,
@@ -147,6 +147,9 @@ export const Scene5Services: React.FC = () => {
         <ServiceRow index="04" at={46} highlightAt={112}>
           ANIMATED SOCIAL ADS
         </ServiceRow>
+        <ServiceRow index="05" at={54} highlightAt={126}>
+          INTERACTIVE 3D WEB
+        </ServiceRow>
 
         <div
           style={{
@@ -156,11 +159,11 @@ export const Scene5Services: React.FC = () => {
             fontSize: 44,
             letterSpacing: 10,
             color: colors.ice,
-            opacity: interpolate(frame, [128, 140], [0, 1], {
+            opacity: interpolate(frame, [140, 150], [0, 1], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
             }),
-            translate: interpolate(frame, [128, 144], ["0px 30px", "0px 0px"], {
+            translate: interpolate(frame, [140, 156], ["0px 30px", "0px 0px"], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
               easing: Easing.spring({ damping: 200 }),
@@ -179,11 +182,13 @@ export const Scene5Services: React.FC = () => {
       <Sfx name="whip" at={30} volume={0.3} />
       <Sfx name="whip" at={38} volume={0.3} />
       <Sfx name="whip" at={46} volume={0.3} />
+      <Sfx name="whip" at={54} volume={0.3} />
       <Sfx name="switch" at={70} volume={0.3} />
       <Sfx name="switch" at={84} volume={0.3} />
       <Sfx name="switch" at={98} volume={0.3} />
       <Sfx name="switch" at={112} volume={0.3} />
-      <Sfx name="shutter-modern" at={128} volume={0.25} />
+      <Sfx name="switch" at={126} volume={0.3} />
+      <Sfx name="shutter-modern" at={140} volume={0.25} />
     </AbsoluteFill>
   );
 };

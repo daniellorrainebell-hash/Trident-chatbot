@@ -5,6 +5,7 @@ import { Scene1Hook } from "./NexusAdvert/scenes/Scene1Hook";
 import { Scene2Turn } from "./NexusAdvert/scenes/Scene2Turn";
 import { Scene3Brand } from "./NexusAdvert/scenes/Scene3Brand";
 import { Scene4Proof } from "./NexusAdvert/scenes/Scene4Proof";
+import { Scene4bWeb3D } from "./NexusAdvert/scenes/Scene4bWeb3D";
 import { Scene5Services } from "./NexusAdvert/scenes/Scene5Services";
 import { Scene6CallToAction } from "./NexusAdvert/scenes/Scene6CallToAction";
 
@@ -14,7 +15,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="NexusAdvert"
         component={NexusAdvert}
-        durationInFrames={900}
+        durationInFrames={940}
         fps={30}
         width={1080}
         height={1920}
@@ -31,7 +32,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene2-Turn"
           component={Scene2Turn}
-          durationInFrames={150}
+          durationInFrames={140}
           fps={30}
           width={1080}
           height={1920}
@@ -39,7 +40,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene3-Brand"
           component={Scene3Brand}
-          durationInFrames={140}
+          durationInFrames={130}
           fps={30}
           width={1080}
           height={1920}
@@ -47,7 +48,15 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene4-Proof"
           component={Scene4Proof}
-          durationInFrames={180}
+          durationInFrames={150}
+          fps={30}
+          width={1080}
+          height={1920}
+        />
+        <Composition
+          id="Scene4b-Web3D"
+          component={Scene4bWeb3D}
+          durationInFrames={120}
           fps={30}
           width={1080}
           height={1920}
@@ -63,7 +72,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene6-CallToAction"
           component={Scene6CallToAction}
-          durationInFrames={208}
+          durationInFrames={190}
           fps={30}
           width={1080}
           height={1920}
