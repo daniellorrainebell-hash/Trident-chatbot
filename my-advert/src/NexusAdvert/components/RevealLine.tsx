@@ -8,6 +8,8 @@ type Props = {
   exitAt?: number;
   /** Direction the text enters from. */
   from?: "bottom" | "left" | "right";
+  /** Extra room (px) around the mask so glows and shadows are not clipped. */
+  bleed?: number;
   children: React.ReactNode;
   style?: React.CSSProperties;
 };
@@ -18,6 +20,7 @@ export const RevealLine: React.FC<Props> = ({
   delay,
   exitAt,
   from = "bottom",
+  bleed = 0,
   children,
   style,
 }) => {
@@ -39,7 +42,13 @@ export const RevealLine: React.FC<Props> = ({
   const offset = (enter + exit) * 110;
 
   return (
-    <div style={{ overflow: "hidden", paddingBottom: "0.04em" }}>
+    <div
+      style={{
+        overflow: "hidden",
+        padding: `${bleed}px ${bleed}px calc(0.04em + ${bleed}px)`,
+        margin: -bleed,
+      }}
+    >
       <div
         style={{
           ...style,

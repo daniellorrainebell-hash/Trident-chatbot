@@ -31,7 +31,7 @@ export const colors = {
 
 // Brushed-chrome fill for headline text (used with background-clip: text).
 export const chromeGradient =
-  "linear-gradient(180deg, #FFFFFF 0%, #DDE3EC 38%, #8C96A8 50%, #F4F7FB 62%, #B9C3D3 100%)";
+  "linear-gradient(180deg, #FFFFFF 0%, #DDE3EC 38%, #6A7488 50%, #F4F7FB 62%, #B9C3D3 100%)";
 
 export const contact = {
   phone: "0800 193 5055",
