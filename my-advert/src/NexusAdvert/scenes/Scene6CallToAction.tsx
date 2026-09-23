@@ -195,7 +195,7 @@ export const Scene6CallToAction: React.FC = () => {
             fontSize: 84,
             letterSpacing: 3,
             color: "#FFFFFF",
-            boxShadow: `0 0 ${interpolate(frame, [60, 90, 120, 150, 180, 208], [30, 70, 30, 70, 30, 70])}px rgba(30,107,255,0.8), inset 0 2px 0 rgba(255,255,255,0.35)`,
+            boxShadow: `0 0 ${interpolate(frame, [60, 90, 120, 150, 180, 210], [30, 70, 30, 70, 30, 70])}px rgba(30,107,255,0.8), inset 0 2px 0 rgba(255,255,255,0.35)`,
             opacity: interpolate(frame, [50, 58], [0, 1], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",

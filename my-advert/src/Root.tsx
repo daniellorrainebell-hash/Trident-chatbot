@@ -15,7 +15,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="NexusAdvert"
         component={NexusAdvert}
-        durationInFrames={940}
+        durationInFrames={1050}
         fps={30}
         width={1080}
         height={1920}
@@ -32,7 +32,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene2-Turn"
           component={Scene2Turn}
-          durationInFrames={140}
+          durationInFrames={150}
           fps={30}
           width={1080}
           height={1920}
@@ -40,7 +40,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene3-Brand"
           component={Scene3Brand}
-          durationInFrames={130}
+          durationInFrames={140}
           fps={30}
           width={1080}
           height={1920}
@@ -48,7 +48,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene4-Proof"
           component={Scene4Proof}
-          durationInFrames={150}
+          durationInFrames={180}
           fps={30}
           width={1080}
           height={1920}
@@ -56,7 +56,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene4b-Web3D"
           component={Scene4bWeb3D}
-          durationInFrames={120}
+          durationInFrames={150}
           fps={30}
           width={1080}
           height={1920}
@@ -72,7 +72,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="Scene6-CallToAction"
           component={Scene6CallToAction}
-          durationInFrames={190}
+          durationInFrames={220}
           fps={30}
           width={1080}
           height={1920}

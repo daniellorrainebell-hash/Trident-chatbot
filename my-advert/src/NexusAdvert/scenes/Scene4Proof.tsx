@@ -131,7 +131,7 @@ export const Scene4Proof: React.FC = () => {
               extrapolateRight: "clamp",
               easing: Easing.spring({ damping: 200 }),
             }),
-            rotate: interpolate(frame, [0, 150], ["y -10deg", "y 6deg"], {
+            rotate: interpolate(frame, [0, 180], ["y -10deg", "y 6deg"], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
               easing: Easing.bezier(0.33, 1, 0.68, 1),

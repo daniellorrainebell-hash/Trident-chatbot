@@ -23,7 +23,7 @@ export const Scene4bWeb3D: React.FC = () => {
     <AbsoluteFill name="Web 3D" style={{ backgroundColor: "#000000" }}>
       <AbsoluteFill
         style={{
-          scale: interpolate(frame, [0, 120], [1.02, 1.14]),
+          scale: interpolate(frame, [0, 150], [1.02, 1.16]),
           translate: "0px 110px",
           opacity: interpolate(frame, [0, 10], [0, 1], {
             extrapolateLeft: "clamp",
