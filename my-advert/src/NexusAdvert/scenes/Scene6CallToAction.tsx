@@ -86,7 +86,8 @@ const ContactRow: React.FC<{
 // Layout keeps everything above ~1640px so the Reels/TikTok caption area
 // at the bottom of the screen never covers the contact details.
 // Scene 6 — Call to action. "YOUR BRAND. IN 3D." + logo, quote button and
-// contact details, with Nexus IQ's core AI services listed underneath.
+// contact details, with Nexus IQ's core AI services for service businesses listed underneath
+// (3D shown last, as an extra).
 export const Scene6CallToAction: React.FC = () => {
   const frame = useCurrentFrame();
 
@@ -235,14 +236,14 @@ export const Scene6CallToAction: React.FC = () => {
           name="Core services"
           style={{
             position: "absolute",
-            top: 1545,
+            top: 1515,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 12,
+            gap: 8,
             fontFamily: body,
             fontWeight: 800,
-            fontSize: 32,
+            fontSize: 30,
             letterSpacing: 5,
             color: colors.ice,
             opacity: interpolate(frame, [100, 116], [0, 1], {
@@ -251,8 +252,9 @@ export const Scene6CallToAction: React.FC = () => {
             }),
           }}
         >
-          <div>AI VOICE AGENTS · AUTOMATION</div>
-          <div style={{ color: colors.steel }}>AI CONSULTANCY · 3D VISUALS</div>
+          <div style={{ color: colors.chrome }}>AI FOR SERVICE BUSINESSES</div>
+          <div>AUDITS · AUTOMATION · VOICE AGENTS</div>
+          <div style={{ color: colors.steel }}>+ 3D VISUALS</div>
         </Interactive.Div>
       </AbsoluteFill>
 
