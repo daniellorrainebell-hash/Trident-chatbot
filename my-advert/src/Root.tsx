@@ -4,6 +4,7 @@ import { NexusAdvert } from "./NexusAdvert/NexusAdvert";
 import { Scene1Hook } from "./NexusAdvert/scenes/Scene1Hook";
 import { Scene2Turn } from "./NexusAdvert/scenes/Scene2Turn";
 import { Scene3Brand } from "./NexusAdvert/scenes/Scene3Brand";
+import { Scene4Proof } from "./NexusAdvert/scenes/Scene4Proof";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -11,7 +12,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="NexusAdvert"
         component={NexusAdvert}
-        durationInFrames={378}
+        durationInFrames={546}
         fps={30}
         width={1080}
         height={1920}
@@ -37,6 +38,14 @@ export const RemotionRoot: React.FC = () => {
           id="Scene3-Brand"
           component={Scene3Brand}
           durationInFrames={140}
+          fps={30}
+          width={1080}
+          height={1920}
+        />
+        <Composition
+          id="Scene4-Proof"
+          component={Scene4Proof}
+          durationInFrames={180}
           fps={30}
           width={1080}
           height={1920}
