@@ -5,6 +5,7 @@ import { Scene1Hook } from "./scenes/Scene1Hook";
 import { Scene2Turn } from "./scenes/Scene2Turn";
 import { Scene3Brand } from "./scenes/Scene3Brand";
 import { Scene4Proof } from "./scenes/Scene4Proof";
+import { Scene5Services } from "./scenes/Scene5Services";
 
 // Nexus IQ — 3D Visuals advert (9:16, 30s).
 // Story: problem (flat) → turn (3D) → brand → proof → services → call to action.
@@ -34,6 +35,13 @@ export const NexusAdvert: React.FC = () => {
       />
       <TransitionSeries.Sequence durationInFrames={180} name="4 Proof">
         <Scene4Proof />
+      </TransitionSeries.Sequence>
+      <TransitionSeries.Transition
+        presentation={fade()}
+        timing={linearTiming({ durationInFrames: 12 })}
+      />
+      <TransitionSeries.Sequence durationInFrames={170} name="5 Services">
+        <Scene5Services />
       </TransitionSeries.Sequence>
     </TransitionSeries>
   );
