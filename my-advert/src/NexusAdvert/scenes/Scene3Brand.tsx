@@ -124,7 +124,7 @@ export const Scene3Brand: React.FC = () => {
               }),
             }}
           />
-          PREMIUM 3D VISUALS
+          NOW OFFERING 3D VISUALS
           <div
             style={{
               height: 3,
