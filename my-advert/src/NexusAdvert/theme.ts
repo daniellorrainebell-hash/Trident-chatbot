@@ -24,18 +24,10 @@ export const colors = {
   blue: "#1E6BFF",
   electric: "#3D8BFF",
   ice: "#A9C8FF",
-  chrome: "#E8ECF2",
+  chrome: "#E9EDF3",
   steel: "#8A93A3",
   flat: "#5B6270",
 };
-
-// Brushed-chrome fill for headline text (used with background-clip: text).
-export const chromeGradient =
-  "linear-gradient(180deg, #F4F7FB 0%, #C4CEDD 20%, #7D899E 40%, #2A3346 49%, #9FB0CA 53%, #E6EEF9 66%, #8FB0EA 82%, #3E6FE0 94%, #1B47BF 100%)";
-
-// Electric-blue anodised metal for accent lines.
-export const blueChromeGradient =
-  "linear-gradient(180deg, #E4F0FF 0%, #8DB8FF 24%, #3772F0 44%, #0A2A85 50%, #3F82FF 58%, #A9CBFF 76%, #4C86FF 92%, #1C4FD0 100%)";
 
 export const contact = {
   phone: "0800 193 5055",

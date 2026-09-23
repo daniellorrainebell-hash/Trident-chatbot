@@ -1,6 +1,6 @@
 import React from "react";
 import { Easing, interpolate, useCurrentFrame } from "remotion";
-import { chromeGradient } from "../theme";
+import { colors } from "../theme";
 
 type Props = {
   children: React.ReactNode;
@@ -10,22 +10,21 @@ type Props = {
   sweepAt?: number;
   /** Frames between repeated sweeps after the first one. Omit to sweep once. */
   sweepEvery?: number;
-  /** Override the metal fill, e.g. blueChromeGradient. */
-  gradient?: string;
+  /** Solid text colour. */
+  color?: string;
   style?: React.CSSProperties;
 };
 
 const SWEEP_FRAMES = 22;
 
-// Glossy chrome headline text, matching the logo: polished bands with a blue
-// reflection at the base, a bright bevel edge, a moving specular sweep and a
-// star glint where the sweep exits.
+// Glossy headline text: a solid fill with a blue 3D edge and glow, a moving
+// specular light sweep and a star glint where the sweep exits.
 export const ChromeText: React.FC<Props> = ({
   children,
   glow = 1,
   sweepAt,
   sweepEvery,
-  gradient = chromeGradient,
+  color = colors.chrome,
   style,
 }) => {
   const frame = useCurrentFrame();
@@ -47,17 +46,22 @@ export const ChromeText: React.FC<Props> = ({
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
+  // Brief bloom while the light passes over the letters.
+  const sweepBloom = interpolate(t, [0, SWEEP_FRAMES / 2, SWEEP_FRAMES], [0, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
       <span
         style={{
           display: "inline-block",
-          backgroundImage: `linear-gradient(105deg, transparent ${sweep - 16}%, rgba(255,255,255,0.35) ${sweep - 7}%, #FFFFFF ${sweep}%, rgba(255,255,255,0.35) ${sweep + 7}%, transparent ${sweep + 16}%), ${gradient}`,
+          backgroundImage: `linear-gradient(105deg, transparent ${sweep - 16}%, rgba(255,255,255,0.35) ${sweep - 7}%, #FFFFFF ${sweep}%, rgba(255,255,255,0.35) ${sweep + 7}%, transparent ${sweep + 16}%), linear-gradient(${color}, ${color})`,
           backgroundClip: "text",
           WebkitBackgroundClip: "text",
           color: "transparent",
-          WebkitTextStroke: "2px rgba(255,255,255,0.55)",
-          filter: `drop-shadow(0 -1px 0 rgba(255,255,255,0.8)) drop-shadow(0 5px 0 rgba(30,107,255,${0.95 * glow})) drop-shadow(0 0 ${30 * glow}px rgba(30,107,255,${0.7 * glow}))`,
+          filter: `drop-shadow(0 0 ${sweepBloom * 22}px rgba(255,255,255,${sweepBloom * 0.6})) drop-shadow(0 5px 0 rgba(30,107,255,${0.95 * glow})) drop-shadow(0 0 ${30 * glow}px rgba(30,107,255,${0.7 * glow}))`,
           ...style,
         }}
       >

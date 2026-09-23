@@ -13,7 +13,7 @@ import { ChromeText } from "../components/ChromeText";
 import { Grid } from "../components/Grid";
 import { RevealLine } from "../components/RevealLine";
 import { Sfx } from "../components/Sfx";
-import { blueChromeGradient, body, colors, display } from "../theme";
+import { body, colors, display } from "../theme";
 
 const logo = staticFile("img/nexus-logo.png");
 
@@ -162,12 +162,12 @@ export const Scene3Brand: React.FC = () => {
             </ChromeText>
           </RevealLine>
           <RevealLine delay={72} bleed={30} style={{ fontSize: 150, marginTop: 36 }}>
-            <ChromeText gradient={blueChromeGradient} glow={1} sweepAt={96}>
+            <ChromeText color={colors.electric} glow={0.3} sweepAt={96}>
               Intelligence
             </ChromeText>
           </RevealLine>
           <RevealLine delay={78} bleed={30} style={{ fontSize: 150 }}>
-            <ChromeText gradient={blueChromeGradient} glow={1} sweepAt={102}>
+            <ChromeText color={colors.electric} glow={0.3} sweepAt={102}>
               that evolves.
             </ChromeText>
           </RevealLine>
