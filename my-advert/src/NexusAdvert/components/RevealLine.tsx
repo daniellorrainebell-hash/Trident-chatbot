@@ -39,7 +39,9 @@ export const RevealLine: React.FC<Props> = ({
           extrapolateRight: "clamp",
           easing: Easing.bezier(0.7, 0, 0.84, 0),
         });
-  const offset = (enter + exit) * 110;
+  const progress = enter + exit;
+  // Travel far enough to clear the bleed area as well as the text itself.
+  const offset = `calc(${progress * 110}% + ${progress * bleed * 2}px)`;
 
   return (
     <div
@@ -54,8 +56,10 @@ export const RevealLine: React.FC<Props> = ({
           ...style,
           translate:
             from === "bottom"
-              ? `0 ${offset}%`
-              : `${from === "left" ? -offset : offset}% 0`,
+              ? `0 ${offset}`
+              : from === "left"
+                ? `calc(-1 * ${offset}) 0`
+                : `${offset} 0`,
         }}
       >
         {children}

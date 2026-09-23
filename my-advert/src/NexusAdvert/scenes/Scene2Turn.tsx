@@ -81,8 +81,10 @@ export const Scene2Turn: React.FC = () => {
           textTransform: "uppercase",
         }}
       >
-        <RevealLine delay={6} style={{ fontSize: 190, color: colors.chrome }}>
-          They stop
+        <RevealLine delay={6} bleed={30} style={{ fontSize: 190 }}>
+          <ChromeText glow={0.5} sweepAt={20}>
+            They stop
+          </ChromeText>
         </RevealLine>
         <Interactive.Div
           name="FOR 3D"
@@ -99,11 +101,13 @@ export const Scene2Turn: React.FC = () => {
             }),
           }}
         >
-          <RevealLine delay={18} style={{ fontSize: 190, color: colors.chrome }}>
-            for
+          <RevealLine delay={18} bleed={30} style={{ fontSize: 190 }}>
+            <ChromeText glow={0.5}>for</ChromeText>
           </RevealLine>
           <RevealLine delay={48} bleed={60} style={{ fontSize: 470, letterSpacing: -6 }}>
             <ChromeText
+              sweepAt={56}
+              sweepEvery={40}
               glow={interpolate(frame, [48, 60, 150], [0, 1.4, 1], {
                 extrapolateLeft: "clamp",
                 extrapolateRight: "clamp",
