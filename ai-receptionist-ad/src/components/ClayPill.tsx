@@ -41,9 +41,9 @@ export const ClayPill: React.FC<Props> = ({
         gap: 26,
         padding: "24px 34px 24px 24px",
         borderRadius: 999,
-        backgroundColor: colors.creamLight,
+        backgroundColor: colors.white,
         boxShadow:
-          "inset 0 3px 0 rgba(255,255,255,0.9), inset 0 -6px 12px rgba(150,110,80,0.14), 0 24px 44px rgba(92,62,40,0.24)",
+          "0 0 0 2px rgba(10,102,255,0.28), inset 0 3px 0 rgba(255,255,255,0.9), inset 0 -6px 12px rgba(10,80,220,0.14), 0 24px 44px rgba(12,40,110,0.24)",
         opacity: interpolate(frame, [start, start + 0.6 * fps], [0, 1], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
@@ -93,10 +93,10 @@ export const PhoneIcon: React.FC<{ missed?: boolean }> = ({ missed = false }) =>
   <svg width={50} height={50} viewBox="0 0 24 24" fill="none">
     <path
       d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"
-      fill="#FFF8EE"
+      fill="#FFFFFF"
     />
     {missed ? (
-      <path d="M15 3l6 6M21 3l-6 6" stroke="#FFF8EE" strokeWidth={2.2} strokeLinecap="round" />
+      <path d="M15 3l6 6M21 3l-6 6" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" />
     ) : null}
   </svg>
 );

@@ -18,7 +18,7 @@ type Props = {
 };
 
 // A clip presented like a framed print resting on the clay set:
-// cream mat border, soft layered shadow, gentle rise-in and slow push-in.
+// white mat border, soft layered shadow, gentle rise-in and slow push-in.
 export const ClipCard: React.FC<Props> = ({
   src,
   top,
@@ -41,9 +41,9 @@ export const ClipCard: React.FC<Props> = ({
         height,
         borderRadius: 48,
         padding: 10,
-        backgroundColor: "#FBF6EE",
+        backgroundColor: "#FFFFFF",
         boxShadow:
-          "0 2px 0 rgba(255,255,255,0.8) inset, 0 30px 60px rgba(92,62,40,0.22), 0 8px 18px rgba(92,62,40,0.14)",
+          "0 0 0 3px rgba(10,102,255,0.35), 0 2px 0 rgba(255,255,255,0.8) inset, 0 30px 60px rgba(12,40,110,0.22), 0 8px 18px rgba(12,40,110,0.14)",
         opacity: interpolate(frame, [0, 0.8 * fps], [0, 1], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
@@ -99,7 +99,7 @@ export const ClipCard: React.FC<Props> = ({
             position: "absolute",
             inset: 0,
             borderRadius: 38,
-            boxShadow: "inset 0 0 40px rgba(60,40,25,0.18)",
+            boxShadow: "inset 0 0 40px rgba(8,30,90,0.18)",
           }}
         />
       </div>

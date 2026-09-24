@@ -12,7 +12,7 @@ export const FADE = 18;
 
 export const Advert: React.FC = () => {
   return (
-    <AbsoluteFill style={{ backgroundColor: "#F4EBDD" }}>
+    <AbsoluteFill style={{ backgroundColor: "#F4F8FF" }}>
       <TransitionSeries>
         <TransitionSeries.Sequence durationInFrames={90} name="Intro">
           <Intro />

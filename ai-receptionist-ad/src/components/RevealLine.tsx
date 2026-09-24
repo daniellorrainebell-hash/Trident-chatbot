@@ -48,7 +48,7 @@ export const RevealLine: React.FC<Props> = ({
         textAlign: "center",
         // Clay emboss: light catch on top, soft cast shadow below
         textShadow:
-          "0 2px 0 rgba(255,255,255,0.55), 0 8px 18px rgba(92,62,40,0.16)",
+          "0 2px 0 rgba(255,255,255,0.55), 0 8px 18px rgba(12,40,110,0.16)",
         opacity: interpolate(frame, [start, start + 0.8 * fps], [0, 1], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",

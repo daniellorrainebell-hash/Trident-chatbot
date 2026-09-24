@@ -15,7 +15,7 @@ import { Accent, RevealLine } from "../components/RevealLine";
 import { colors, sans } from "../theme";
 
 const stroke = {
-  stroke: "#FFF8EE",
+  stroke: "#FFFFFF",
   strokeWidth: 2,
   strokeLinecap: "round",
   strokeLinejoin: "round",
@@ -33,7 +33,7 @@ const PhoneIcon = () => (
   <svg width={32} height={32} viewBox="0 0 24 24">
     <path
       d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"
-      fill="#FFF8EE"
+      fill="#FFFFFF"
     />
   </svg>
 );
@@ -200,12 +200,12 @@ export const EndCard: React.FC = () => {
           width: 860,
           padding: "56px 64px",
           borderRadius: 52,
-          backgroundColor: colors.creamLight,
+          backgroundColor: colors.white,
           display: "flex",
           flexDirection: "column",
           gap: 40,
           boxShadow:
-            "inset 0 3px 0 rgba(255,255,255,0.9), inset 0 -8px 16px rgba(150,110,80,0.12), 0 30px 60px rgba(92,62,40,0.2)",
+            "0 0 0 2px rgba(10,102,255,0.28), inset 0 3px 0 rgba(255,255,255,0.9), inset 0 -8px 16px rgba(10,80,220,0.12), 0 30px 60px rgba(12,40,110,0.2)",
           opacity: interpolate(frame, [2.6 * fps, 3.3 * fps], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",

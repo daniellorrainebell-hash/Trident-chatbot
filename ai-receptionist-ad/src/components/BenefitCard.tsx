@@ -22,14 +22,14 @@ export const BenefitCard: React.FC<Props> = ({ name, delay, icon, children }) =>
         width: 312,
         height: 206,
         borderRadius: 40,
-        backgroundColor: colors.creamLight,
+        backgroundColor: colors.white,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: 14,
         boxShadow:
-          "inset 0 3px 0 rgba(255,255,255,0.9), inset 0 -6px 12px rgba(150,110,80,0.12), 0 18px 34px rgba(92,62,40,0.18)",
+          "0 0 0 2px rgba(10,102,255,0.28), inset 0 3px 0 rgba(255,255,255,0.9), inset 0 -6px 12px rgba(10,80,220,0.12), 0 18px 34px rgba(12,40,110,0.18)",
         opacity: interpolate(frame, [start, start + 0.6 * fps], [0, 1], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
@@ -72,7 +72,7 @@ export const BenefitCard: React.FC<Props> = ({ name, delay, icon, children }) =>
   );
 };
 
-const stroke = { stroke: "#FFF8EE", strokeWidth: 2.2, strokeLinecap: "round", strokeLinejoin: "round", fill: "none" } as const;
+const stroke = { stroke: "#FFFFFF", strokeWidth: 2.2, strokeLinecap: "round", strokeLinejoin: "round", fill: "none" } as const;
 
 export const ClockIcon = () => (
   <svg width={38} height={38} viewBox="0 0 24 24">

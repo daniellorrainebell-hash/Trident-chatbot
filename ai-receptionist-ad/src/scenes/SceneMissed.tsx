@@ -30,7 +30,7 @@ export const SceneMissed: React.FC = () => {
           But you&apos;re on a job,
         </RevealLine>
         <RevealLine name="Line 2" delay={0.8} size={120} weight={600}>
-          and it <Accent color={colors.terracotta}>rings out.</Accent>
+          and it <Accent>rings out.</Accent>
         </RevealLine>
       </div>
       <ClipCard src="assets/clip2.mp4" top={400} width={900} height={1138} volume={1} />
@@ -39,7 +39,7 @@ export const SceneMissed: React.FC = () => {
         delay={5.8}
         top={1360}
         width={720}
-        iconBg={colors.terracotta}
+        iconBg={colors.navy}
         icon={<PhoneIcon missed />}
         title="Missed call"
         subtitle="Job lost"

@@ -46,7 +46,7 @@ export const Intro: React.FC = () => {
           style={{
             height: 5,
             borderRadius: 4,
-            backgroundColor: colors.terracotta,
+            backgroundColor: colors.blue,
             margin: "22px 0 34px",
             width: interpolate(frame, [0.4 * fps, 1.4 * fps], [0, 180], {
               extrapolateLeft: "clamp",
