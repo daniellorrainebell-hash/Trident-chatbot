@@ -8,6 +8,7 @@ import { SceneMissed } from "./scenes/SceneMissed";
 import { SceneAnswered } from "./scenes/SceneAnswered";
 import { SceneWon } from "./scenes/SceneWon";
 import { EndCard } from "./scenes/EndCard";
+import { SceneCustom } from "./scenes/SceneCustom";
 
 export const FADE = 18;
 
@@ -45,6 +46,13 @@ export const Advert: React.FC = () => {
         />
         <TransitionSeries.Sequence durationInFrames={240} name="Scene 4 - Won">
           <SceneWon />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: 18 })}
+        />
+        <TransitionSeries.Sequence durationInFrames={225} name="Scene 5 - Custom built">
+          <SceneCustom />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={fade()}
