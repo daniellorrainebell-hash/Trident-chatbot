@@ -62,6 +62,10 @@ export const SceneAnswered: React.FC = () => {
       <Sequence from={Math.round(1.1 * fps)} name="Receptionist voice">
         <Audio src={staticFile("assets/receptionist-voice.wav")} volume={0.9} />
       </Sequence>
+      {/* Caller replies after a short pause; ends just before the fade to scene 4 */}
+      <Sequence from={Math.round(4.95 * fps)} name="Caller voice">
+        <Audio src={staticFile("assets/caller-voice.wav")} volume={0.9} />
+      </Sequence>
       <Sequence from={Math.round(1.0 * fps)} name="SFX answered chime">
         <Audio src={staticFile("sfx/confirmation_001.ogg")} volume={0.4} />
       </Sequence>
