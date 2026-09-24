@@ -12,7 +12,7 @@ import {
 import { ClayBackground } from "../components/ClayBackground";
 import { LogoBug } from "../components/LogoBug";
 import { Accent, RevealLine } from "../components/RevealLine";
-import { colors, sans, serif } from "../theme";
+import { colors, sans } from "../theme";
 
 const stroke = {
   stroke: "#FFFFFF",
@@ -90,65 +90,6 @@ const SetupRow: React.FC<{ delay: number; children: React.ReactNode }> = ({ dela
   );
 };
 
-// Business type that eases in, holds, then drifts up and out.
-const Industry: React.FC<{ from: number; to: number | null; children: React.ReactNode }> = ({
-  from,
-  to,
-  children,
-}) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const a = from * fps;
-  const inOpacity = interpolate(frame, [a, a + 0.4 * fps], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-  const outOpacity =
-    to === null
-      ? 1
-      : interpolate(frame, [to * fps, (to + 0.3) * fps], [1, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.7, 0, 0.84, 0),
-        });
-  const rise = interpolate(frame, [a, a + 0.6 * fps], [28, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.spring({ damping: 200 }),
-  });
-  const lift =
-    to === null
-      ? 0
-      : interpolate(frame, [to * fps, (to + 0.3) * fps], [0, -22], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.7, 0, 0.84, 0),
-        });
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        justifyContent: "center",
-        fontFamily: serif,
-        fontStyle: "italic",
-        fontWeight: 700,
-        fontSize: 112,
-        color: colors.blue,
-        whiteSpace: "nowrap",
-        textShadow: "0 2px 0 rgba(255,255,255,0.55), 0 8px 18px rgba(12,40,110,0.16)",
-        opacity: inOpacity * outOpacity,
-        translate: `0px ${rise + lift}px`,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
 // Scene 5: every receptionist is custom built around the business.
 export const SceneCustom: React.FC = () => {
   const frame = useCurrentFrame();
@@ -161,7 +102,7 @@ export const SceneCustom: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          top: 110,
+          top: 170,
           left: 60,
           right: 60,
           display: "flex",
@@ -174,10 +115,7 @@ export const SceneCustom: React.FC = () => {
           Every receptionist is
         </RevealLine>
         <RevealLine name="Line 2" delay={0.55} size={140} weight={600}>
-          <Accent>custom built</Accent>
-        </RevealLine>
-        <RevealLine name="Line 3" delay={0.8} size={88} weight={500}>
-          around your business.
+          <Accent>custom built.</Accent>
         </RevealLine>
       </div>
 
@@ -185,7 +123,7 @@ export const SceneCustom: React.FC = () => {
         name="Setup panel"
         style={{
           position: "absolute",
-          top: 530,
+          top: 500,
           left: 80,
           width: 920,
           padding: "44px 56px 52px",
@@ -241,16 +179,24 @@ export const SceneCustom: React.FC = () => {
         <SetupRow delay={rowDelays[3]}>Speaks in your brand voice</SetupRow>
       </Interactive.Div>
 
-      <div style={{ position: "absolute", top: 1290, left: 60, right: 60 }}>
-        <RevealLine name="Built for" delay={3.5} size={64} weight={500} color={colors.inkSoft}>
-          Built for
+      <div
+        style={{
+          position: "absolute",
+          top: 1270,
+          left: 60,
+          right: 60,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
+        <RevealLine name="Built around you" delay={3.5} size={92} weight={500}>
+          Built around <Accent>you</Accent>
         </RevealLine>
-      </div>
-      <div style={{ position: "absolute", top: 1370, left: 0, right: 0, height: 140 }}>
-        <Industry from={3.65} to={4.35}>plumbers</Industry>
-        <Industry from={4.55} to={5.25}>salons</Industry>
-        <Industry from={5.45} to={6.15}>dental clinics</Industry>
-        <Industry from={6.35} to={null}>garages</Industry>
+        <RevealLine name="and your business" delay={3.8} size={92} weight={500}>
+          and <Accent>your business.</Accent>
+        </RevealLine>
       </div>
 
       <LogoBug delay={1.0} />
