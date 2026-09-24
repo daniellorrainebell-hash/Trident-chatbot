@@ -6,6 +6,7 @@ import { SceneLeak } from "./scenes/SceneLeak";
 import { SceneMissed } from "./scenes/SceneMissed";
 import { SceneAnswered } from "./scenes/SceneAnswered";
 import { SceneWon } from "./scenes/SceneWon";
+import { EndCard } from "./scenes/EndCard";
 
 export const FADE = 18;
 
@@ -43,6 +44,13 @@ export const Advert: React.FC = () => {
         />
         <TransitionSeries.Sequence durationInFrames={240} name="Scene 4 - Won">
           <SceneWon />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: 18 })}
+        />
+        <TransitionSeries.Sequence durationInFrames={210} name="End card">
+          <EndCard />
         </TransitionSeries.Sequence>
       </TransitionSeries>
     </AbsoluteFill>

@@ -6,6 +6,7 @@ import { SceneLeak } from "./scenes/SceneLeak";
 import { SceneMissed } from "./scenes/SceneMissed";
 import { SceneAnswered } from "./scenes/SceneAnswered";
 import { SceneWon } from "./scenes/SceneWon";
+import { EndCard } from "./scenes/EndCard";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="AIReceptionistAd"
         component={Advert}
-        durationInFrames={978}
+        durationInFrames={1170}
         fps={30}
         width={1080}
         height={1920}
@@ -24,6 +25,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition id="Scene2-Missed" component={SceneMissed} durationInFrames={240} fps={30} width={1080} height={1920} />
         <Composition id="Scene3-Answered" component={SceneAnswered} durationInFrames={240} fps={30} width={1080} height={1920} />
         <Composition id="Scene4-Won" component={SceneWon} durationInFrames={240} fps={30} width={1080} height={1920} />
+        <Composition id="EndCard" component={EndCard} durationInFrames={210} fps={30} width={1080} height={1920} />
       </Folder>
     </>
   );
