@@ -58,6 +58,10 @@ export const SceneAnswered: React.FC = () => {
           No lead lost
         </BenefitCard>
       </div>
+      {/* AI receptionist voice; the clip's original voice is faded out at 1.0s */}
+      <Sequence from={Math.round(1.1 * fps)} name="Receptionist voice">
+        <Audio src={staticFile("assets/receptionist-voice.wav")} volume={0.9} />
+      </Sequence>
       <Sequence from={Math.round(1.0 * fps)} name="SFX answered chime">
         <Audio src={staticFile("sfx/confirmation_001.ogg")} volume={0.4} />
       </Sequence>
