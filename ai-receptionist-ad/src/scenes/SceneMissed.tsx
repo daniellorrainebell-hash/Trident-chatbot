@@ -45,9 +45,6 @@ export const SceneMissed: React.FC = () => {
         subtitle="Job lost"
       />
       <LogoBug />
-      <Sequence from={Math.round(0.45 * fps)} name="SFX whoosh">
-        <Audio src={staticFile("sfx/whoosh.wav")} volume={0.12} />
-      </Sequence>
       <Sequence from={Math.round(5.8 * fps)} name="SFX missed">
         <Audio src={staticFile("sfx/minimize_001.ogg")} volume={0.45} />
       </Sequence>
