@@ -1,6 +1,7 @@
 import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
-import { AbsoluteFill } from "remotion";
+import { Audio } from "@remotion/media";
+import { AbsoluteFill, Sequence, staticFile } from "remotion";
 import { Intro } from "./scenes/Intro";
 import { SceneLeak } from "./scenes/SceneLeak";
 import { SceneMissed } from "./scenes/SceneMissed";
@@ -53,6 +54,15 @@ export const Advert: React.FC = () => {
           <EndCard />
         </TransitionSeries.Sequence>
       </TransitionSeries>
+      {/* One consistent ringtone for the unanswered call, laid on the main
+          timeline so ring 1 carries through the fade from her phone (scene 1)
+          to his (scene 2). The clips' own ringing has been removed. */}
+      <Sequence from={267} name="Ring 1 (spans scene 1 to 2)">
+        <Audio src={staticFile("assets/ringtone.wav")} />
+      </Sequence>
+      <Sequence from={372} name="Ring 2 (plumber glances at phone)">
+        <Audio src={staticFile("assets/ringtone.wav")} />
+      </Sequence>
     </AbsoluteFill>
   );
 };

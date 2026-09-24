@@ -33,7 +33,7 @@ export const SceneMissed: React.FC = () => {
           and it <Accent>rings out.</Accent>
         </RevealLine>
       </div>
-      <ClipCard src="assets/clip2.mp4" top={400} width={900} height={1138} volume={1} />
+      <ClipCard src="assets/clip2.mp4" top={400} width={900} height={1138} volume={0} />
       <ClayPill
         name="Missed call"
         delay={5.8}
