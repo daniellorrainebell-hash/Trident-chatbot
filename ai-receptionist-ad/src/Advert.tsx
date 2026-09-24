@@ -3,6 +3,7 @@ import { fade } from "@remotion/transitions/fade";
 import { AbsoluteFill } from "remotion";
 import { Intro } from "./scenes/Intro";
 import { SceneLeak } from "./scenes/SceneLeak";
+import { SceneMissed } from "./scenes/SceneMissed";
 
 export const FADE = 18;
 
@@ -19,6 +20,13 @@ export const Advert: React.FC = () => {
         />
         <TransitionSeries.Sequence durationInFrames={240} name="Scene 1 - Leak">
           <SceneLeak />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: 18 })}
+        />
+        <TransitionSeries.Sequence durationInFrames={240} name="Scene 2 - Missed">
+          <SceneMissed />
         </TransitionSeries.Sequence>
       </TransitionSeries>
     </AbsoluteFill>
