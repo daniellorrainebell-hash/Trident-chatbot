@@ -4,7 +4,6 @@ import { BenefitCard, CalendarIcon, CheckIcon, ClockIcon } from "../components/B
 import { ClayBackground } from "../components/ClayBackground";
 import { ClipCard } from "../components/ClipCard";
 import { Accent, RevealLine } from "../components/RevealLine";
-import { colors } from "../theme";
 
 // Scene 3: the customer tries a second business; its Nexus IQ AI
 // receptionist picks up (call is answered ~1s into the clip).
@@ -17,35 +16,35 @@ export const SceneAnswered: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          top: 150,
-          left: 80,
-          right: 80,
+          top: 110,
+          left: 60,
+          right: 60,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: 4,
         }}
       >
-        <RevealLine name="Line 1" delay={0.3} size={60} color={colors.inkSoft}>
-          So they call someone else.
+        <RevealLine name="Line 1" delay={0.3} size={80} weight={500}>
+          They call someone else.
         </RevealLine>
-        <RevealLine name="Line 2" delay={0.9} size={84}>
+        <RevealLine name="Line 2" delay={0.9} size={92} weight={600}>
           Their AI receptionist
         </RevealLine>
-        <RevealLine name="Line 3" delay={1.15} size={84}>
+        <RevealLine name="Line 3" delay={1.15} size={124} weight={600}>
           <Accent>answers.</Accent>
         </RevealLine>
       </div>
-      <ClipCard src="assets/clip3.mp4" top={500} width={840} height={1062} volume={0.9} />
+      <ClipCard src="assets/clip3.mp4" top={480} width={800} height={1012} volume={0.9} />
       <div
         style={{
           position: "absolute",
-          top: 1620,
+          top: 1540,
           left: 0,
           right: 0,
           display: "flex",
           justifyContent: "center",
-          gap: 22,
+          gap: 16,
         }}
       >
         <BenefitCard name="Benefit 24/7" delay={3.2} icon={<ClockIcon />}>

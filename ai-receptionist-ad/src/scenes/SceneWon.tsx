@@ -19,28 +19,28 @@ export const SceneWon: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          top: 150,
-          left: 80,
-          right: 80,
+          top: 110,
+          left: 60,
+          right: 60,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: 6,
         }}
       >
-        <RevealLine name="Line 1" delay={0.5} size={66} color={colors.inkSoft}>
+        <RevealLine name="Line 1" delay={0.5} size={88} weight={500}>
           The job goes to
         </RevealLine>
-        <RevealLine name="Line 2" delay={0.8} size={104}>
+        <RevealLine name="Line 2" delay={0.8} size={108} weight={600}>
           <Accent>whoever answers.</Accent>
         </RevealLine>
       </div>
-      <ClipCard src="assets/clip4.mp4" top={440} width={900} height={1138} volume={0.9} />
+      <ClipCard src="assets/clip4.mp4" top={400} width={900} height={1138} volume={0.9} />
       <ClayPill
         name="Job won"
         delay={4.2}
-        top={1400}
-        width={680}
+        top={1360}
+        width={720}
         iconBg={colors.blue}
         icon={<CheckIcon />}
         title="Job won"

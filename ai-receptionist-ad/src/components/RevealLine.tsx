@@ -44,6 +44,7 @@ export const RevealLine: React.FC<Props> = ({
         color,
         letterSpacing,
         lineHeight: 1.08,
+        whiteSpace: "nowrap",
         textAlign: "center",
         // Clay emboss: light catch on top, soft cast shadow below
         textShadow:
@@ -71,5 +72,5 @@ export const Accent: React.FC<{ children: React.ReactNode; color?: string }> = (
   children,
   color = colors.blue,
 }) => (
-  <span style={{ fontStyle: "italic", fontWeight: 600, color }}>{children}</span>
+  <span style={{ fontStyle: "italic", fontWeight: 700, color }}>{children}</span>
 );

@@ -33,7 +33,7 @@ export const Intro: React.FC = () => {
         <RevealLine
           name="Eyebrow"
           delay={0.2}
-          size={34}
+          size={46}
           font={sans}
           weight={500}
           color={colors.blueDeep}
@@ -44,21 +44,21 @@ export const Intro: React.FC = () => {
         <Interactive.Div
           name="Rule"
           style={{
-            height: 4,
+            height: 5,
             borderRadius: 4,
             backgroundColor: colors.terracotta,
             margin: "22px 0 34px",
-            width: interpolate(frame, [0.4 * fps, 1.4 * fps], [0, 140], {
+            width: interpolate(frame, [0.4 * fps, 1.4 * fps], [0, 180], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
               easing: Easing.bezier(0.16, 1, 0.3, 1),
             }),
           }}
         />
-        <RevealLine name="Headline line 1" delay={0.55} size={132}>
+        <RevealLine name="Headline line 1" delay={0.55} size={140} weight={600}>
           Every call
         </RevealLine>
-        <RevealLine name="Headline line 2" delay={0.8} size={132}>
+        <RevealLine name="Headline line 2" delay={0.8} size={140} weight={600}>
           is a <Accent>customer.</Accent>
         </RevealLine>
       </AbsoluteFill>

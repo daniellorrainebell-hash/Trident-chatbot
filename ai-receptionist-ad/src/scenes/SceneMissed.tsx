@@ -17,28 +17,28 @@ export const SceneMissed: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          top: 150,
-          left: 80,
-          right: 80,
+          top: 110,
+          left: 60,
+          right: 60,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: 6,
         }}
       >
-        <RevealLine name="Line 1" delay={0.5} size={66} color={colors.inkSoft}>
+        <RevealLine name="Line 1" delay={0.5} size={88} weight={500}>
           But you&apos;re on a job,
         </RevealLine>
-        <RevealLine name="Line 2" delay={0.8} size={104}>
+        <RevealLine name="Line 2" delay={0.8} size={120} weight={600}>
           and it <Accent color={colors.terracotta}>rings out.</Accent>
         </RevealLine>
       </div>
-      <ClipCard src="assets/clip2.mp4" top={440} width={900} height={1138} volume={1} />
+      <ClipCard src="assets/clip2.mp4" top={400} width={900} height={1138} volume={1} />
       <ClayPill
         name="Missed call"
         delay={5.8}
-        top={1400}
-        width={640}
+        top={1360}
+        width={720}
         iconBg={colors.terracotta}
         icon={<PhoneIcon missed />}
         title="Missed call"

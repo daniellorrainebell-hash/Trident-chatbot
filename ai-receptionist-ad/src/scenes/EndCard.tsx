@@ -75,8 +75,8 @@ const DetailRow: React.FC<{ delay: number; icon: React.ReactNode; children: Reac
     >
       <div
         style={{
-          width: 72,
-          height: 72,
+          width: 84,
+          height: 84,
           flexShrink: 0,
           borderRadius: 999,
           backgroundColor: colors.blue,
@@ -88,7 +88,7 @@ const DetailRow: React.FC<{ delay: number; icon: React.ReactNode; children: Reac
       >
         {icon}
       </div>
-      <div style={{ fontFamily: sans, fontSize: 50, fontWeight: 600, color: colors.ink, letterSpacing: -0.3 }}>
+      <div style={{ fontFamily: sans, fontSize: 58, fontWeight: 600, color: colors.ink, letterSpacing: -0.3 }}>
         {children}
       </div>
     </div>
@@ -116,7 +116,7 @@ export const EndCard: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <RevealLine name="Make sure" delay={0.3} size={108}>
+        <RevealLine name="Make sure" delay={0.3} size={104} weight={600}>
           Make sure it&apos;s <Accent>you.</Accent>
         </RevealLine>
       </div>
@@ -126,9 +126,9 @@ export const EndCard: React.FC = () => {
         style={{
           position: "absolute",
           top: 570,
-          left: 110,
-          width: 860,
-          height: 190,
+          left: 90,
+          width: 900,
+          height: 200,
           opacity: interpolate(frame, [1.2 * fps, 2.1 * fps], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
@@ -186,7 +186,7 @@ export const EndCard: React.FC = () => {
       </Interactive.Div>
 
       <div style={{ position: "absolute", top: 840, left: 80, right: 80 }}>
-        <RevealLine name="Promise" delay={2.0} size={64} color={colors.inkSoft}>
+        <RevealLine name="Promise" delay={2.0} size={80} weight={500}>
           Never miss another call.
         </RevealLine>
       </div>
@@ -233,9 +233,9 @@ export const EndCard: React.FC = () => {
         <RevealLine
           name="Tagline"
           delay={4.1}
-          size={34}
+          size={40}
           font={sans}
-          weight={500}
+          weight={600}
           color={colors.inkSoft}
           letterSpacing={1}
         >

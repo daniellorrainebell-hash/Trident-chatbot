@@ -19,8 +19,8 @@ export const BenefitCard: React.FC<Props> = ({ name, delay, icon, children }) =>
     <div
       data-name={name}
       style={{
-        width: 296,
-        height: 186,
+        width: 312,
+        height: 206,
         borderRadius: 40,
         backgroundColor: colors.creamLight,
         display: "flex",
@@ -44,8 +44,8 @@ export const BenefitCard: React.FC<Props> = ({ name, delay, icon, children }) =>
     >
       <div
         style={{
-          width: 72,
-          height: 72,
+          width: 80,
+          height: 80,
           borderRadius: 999,
           backgroundColor: colors.blue,
           display: "flex",
@@ -59,7 +59,7 @@ export const BenefitCard: React.FC<Props> = ({ name, delay, icon, children }) =>
       <div
         style={{
           fontFamily: sans,
-          fontSize: 34,
+          fontSize: 38,
           fontWeight: 700,
           color: colors.ink,
           letterSpacing: -0.3,

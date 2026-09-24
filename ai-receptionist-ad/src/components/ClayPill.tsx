@@ -64,8 +64,8 @@ export const ClayPill: React.FC<Props> = ({
     >
       <div
         style={{
-          width: 96,
-          height: 96,
+          width: 108,
+          height: 108,
           flexShrink: 0,
           borderRadius: 999,
           backgroundColor: iconBg,
@@ -78,9 +78,9 @@ export const ClayPill: React.FC<Props> = ({
         {icon}
       </div>
       <div style={{ fontFamily: sans, color: colors.ink, lineHeight: 1.15 }}>
-        <div style={{ fontSize: 48, fontWeight: 700, letterSpacing: -0.5 }}>{title}</div>
+        <div style={{ fontSize: 58, fontWeight: 700, letterSpacing: -0.5 }}>{title}</div>
         {subtitle ? (
-          <div style={{ fontSize: 36, fontWeight: 500, color: colors.inkSoft, marginTop: 4 }}>
+          <div style={{ fontSize: 42, fontWeight: 600, color: colors.inkSoft, marginTop: 4 }}>
             {subtitle}
           </div>
         ) : null}
