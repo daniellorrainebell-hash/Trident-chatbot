@@ -10,7 +10,9 @@ const {chromium}=require('playwright');const fs=require('fs');const path=require
  await p.goto('file://'+path.resolve('reel.html')); await p.evaluate(()=>document.fonts.ready);
  await p.evaluate(([c,d])=>{window.FRAMECOUNTS=c;window.FRAMEDIR=d},[counts,DIR]);
  const times=extra.length?extra:null;
- const list=times||[...Array(Math.round((b-a)*30)).keys()].filter(i=>i%(+step||1)===0).map(i=>+a+i/30);
+ // whole frame numbers so chunks never overlap, skip or land between frames
+ const f0=Math.round(+a*30), f1=Math.round(+b*30);
+ const list=times||[...Array(f1-f0).keys()].filter(i=>i%(+step||1)===0).map(i=>(f0+i)/30);
  let n=0;
  for(const t of list){await p.evaluate(t=>window.render(t),t);
    const name=times?`t${t}.jpg`:String(Math.round(t*30)+1).padStart(5,'0')+'.jpg';
