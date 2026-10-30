@@ -6,6 +6,14 @@ Vertical (9:16) promotional video for Instagram Reels and Stories.
 |---|---|---|
 | `INOVAITIQ_Reel_60s_4K.mp4` | 2160×3840, H.264, 30 fps | Master: website, YouTube, presentations |
 | `INOVAITIQ_Reel_60s_1080p.mp4` | 1080×1920, H.264, 30 fps | Instagram upload (Reels play at 1080p) |
+| `INOVAITIQ_Reel_60s_4K_services.mp4` | 2160×3840 | **Services version:** full service line-up (see below) |
+| `INOVAITIQ_Reel_60s_1080p_services.mp4` | 1080×1920 | Services version, for Instagram upload |
+
+### Services version
+This version uses the same footage, music and ending, with three changes:
+- **Hook:** "How many **sales** did you miss today?" The notifications are a missed call, an unanswered website enquiry and a voicemail, followed by "Every one cost you. Someone else got there first."
+- **What we build:** the glass cards are replaced with bold headlines that slide in from alternating sides: Voice receptionists (calls 24/7), Speed-to-lead agents, Intelligent chatbots (enquiries 24/7) and Custom automation.
+- **Source:** `source/reel_services.html`; the original is `source/reel.html`.
 
 ## Story (60s)
 1. **0–9s:** "How many calls did you miss today?" Missed-call cards stack up while light pulses race along the board's tracks and die out.
