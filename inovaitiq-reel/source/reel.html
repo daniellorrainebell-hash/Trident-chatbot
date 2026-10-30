@@ -1,0 +1,289 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#2F5BFF;--glow:rgba(47,91,255,.55);--ink:#F4F6FB;--mute:rgba(244,246,251,.84);--edge:rgba(255,255,255,.17)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#05060A;font-family:Manrope,sans-serif;color:var(--ink);text-shadow:0 1px 2px rgba(0,0,0,.5),0 3px 14px rgba(0,0,0,.38)}
+#stage{position:absolute;inset:0;overflow:hidden}
+.bg{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
+#shade{position:absolute;inset:0;pointer-events:none}
+#vig{position:absolute;inset:0;background:radial-gradient(130% 75% at 50% 50%,transparent 35%,rgba(5,6,10,.8) 100%),
+  linear-gradient(to bottom,rgba(5,6,10,.72),rgba(5,6,10,.5) 30%,rgba(5,6,10,.12) 46%,transparent 56%,transparent 68%,rgba(5,6,10,.78))}
+.layer{position:absolute;left:84px;right:84px;will-change:transform,opacity,filter}
+.eyebrow{font-size:38px;letter-spacing:.26em;text-transform:uppercase;color:rgba(244,246,251,.92);font-weight:700}
+.h{text-shadow:0 1px 2px rgba(0,0,0,.45),0 4px 30px rgba(0,0,0,.55);font-weight:300;font-size:104px;line-height:1.03;letter-spacing:-.03em}
+.h b{font-weight:800}
+.h .ac{text-shadow:0 1px 2px rgba(0,0,0,.45),0 0 44px var(--glow)}
+.line{display:block}
+.sub{font-size:44px;color:var(--mute);line-height:1.35;font-weight:500}
+.glass{background:linear-gradient(155deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 45%,rgba(255,255,255,.08)),rgba(12,16,30,.58);
+  backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);
+  border:1px solid rgba(255,255,255,.2);border-radius:38px;position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 30px 80px rgba(0,0,0,.5),0 0 0 .5px rgba(47,91,255,.3)}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.18),transparent 24%)}
+.note{display:flex;gap:28px;align-items:center;padding:32px 36px}
+.ico{width:84px;height:84px;border-radius:24px;flex:none;display:grid;place-items:center;background:rgba(47,91,255,.16);border:1px solid rgba(47,91,255,.5)}
+.ico svg{width:42px;height:42px;stroke:#A9BDFF;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ico.red{background:rgba(255,80,80,.13);border-color:rgba(255,120,120,.45)}.ico.red svg{stroke:#FFA3A3}
+.t{font-size:40px;font-weight:700}.d{font-size:31px;color:var(--mute);margin-top:6px}
+.time{margin-left:auto;font-size:30px;color:var(--mute);align-self:flex-start}
+.ok{margin-left:auto;width:50px;height:50px;border-radius:50%;background:var(--blue);display:grid;place-items:center;box-shadow:0 0 26px var(--glow);flex:none}
+.ok svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.pill{display:inline-flex;gap:14px;align-items:center;padding:18px 30px;border-radius:999px;font-size:28px;font-weight:600;letter-spacing:.04em}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 14px var(--blue)}
+.src{font-size:26px;color:rgba(244,246,251,.72);letter-spacing:.03em}
+.gl{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.12);transform-origin:left}
+.barcol{width:230px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bar{width:100%;border-radius:22px 22px 6px 6px;background:linear-gradient(to top,#1E3FCC,#2F5BFF 55%,#8FA9FF);box-shadow:0 0 40px rgba(47,91,255,.55),inset 0 1px 0 rgba(255,255,255,.5)}
+.val{font-size:84px;font-weight:800;letter-spacing:-.04em;margin-bottom:14px}
+.yr{width:230px;text-align:center;font-size:36px;font-weight:600;color:var(--mute)}
+#fade{position:absolute;inset:0;background:#05060A;pointer-events:none}
+</style></head>
+<body><div id="stage">
+<img id="bgA" class="bg"><canvas id="pulses" class="bg" width="1080" height="1920"></canvas><img id="bgB" class="bg">
+<div id="shade"></div><div id="vig"></div>
+
+<!-- A: hook -->
+<div class="layer" id="a_eb" style="top:282px"><div class="eyebrow">Today</div></div>
+<div class="layer" id="a_h" style="top:360px"><div class="h"><span class="line" id="a_l1">How many calls</span><span class="line" id="a_l2">did you <b>miss</b></span><span class="line" id="a_l3">today?</span></div></div>
+<div class="layer" id="a_c1" style="top:860px"></div>
+<div class="layer" id="a_c2" style="top:1030px"></div>
+<div class="layer" id="a_c3" style="top:1200px"></div>
+<div class="layer" id="a_s1" style="top:820px;text-align:center"><div class="h" style="font-size:96px">Every one<br>was a <b>job.</b></div></div>
+<div class="layer" id="a_s2" style="top:1120px;text-align:center"><div class="sub" style="font-size:46px">Someone else picked up.</div></div>
+
+<!-- C: power on -->
+<div class="layer" id="c_eb" style="top:282px;text-align:center"><div class="eyebrow">Introducing</div></div>
+<div class="layer" id="c_tag" style="top:1500px;text-align:center"><span class="glass pill"><span class="dot"></span>Custom-built AI systems</span></div>
+
+<!-- D: services -->
+<div class="layer" id="d_eb" style="top:282px"><div class="eyebrow">What we build</div></div>
+<div class="layer" id="d_h" style="top:360px"><div class="h" style="font-size:96px">Built to <b class="ac">pick up</b><br>where you can't.</div></div>
+<div class="layer" id="d_c1" style="top:1010px"></div>
+<div class="layer" id="d_c2" style="top:1190px"></div>
+<div class="layer" id="d_c3" style="top:1370px"></div>
+
+<!-- E: flow -->
+<div class="layer" id="e_eb" style="top:282px"><div class="eyebrow">The same 14:32 call</div></div>
+<div class="layer" id="e_h" style="top:360px"><div class="h">Handled <b class="ac">while<br>you work.</b></div></div>
+<div class="layer" id="e_rail" style="top:820px;left:126px;right:auto;width:2px;height:0;background:linear-gradient(var(--blue),rgba(47,91,255,.15))"></div>
+<div class="layer" id="e_c1" style="top:780px"></div>
+<div class="layer" id="e_c2" style="top:960px"></div>
+<div class="layer" id="e_c3" style="top:1140px"></div>
+<div class="layer" id="e_c4" style="top:1320px"></div>
+<div class="layer" id="e_src" style="top:1500px;text-align:right"><div class="src">Illustrative example</div></div>
+
+<!-- F: why now: rising bar chart -->
+<div class="layer" id="f_eb" style="top:282px"><div class="eyebrow">Why now</div></div>
+<div class="layer" id="f_h" style="top:360px"><div class="h" style="font-size:96px">UK AI adoption<br><b class="ac">doubled</b> in a year.</div></div>
+<div class="layer" id="f_chart" style="top:700px">
+  <div class="glass" style="height:700px;padding:0 70px">
+    <div id="f_grid" style="position:absolute;left:70px;right:70px;top:110px;height:440px">
+      <div class="gl" style="top:0"></div><div class="gl" style="top:33.3%"></div><div class="gl" style="top:66.6%"></div><div class="gl" style="top:100%;background:rgba(255,255,255,.28)"></div>
+    </div>
+    <div style="position:absolute;left:70px;right:70px;top:110px;height:440px;display:flex;justify-content:space-around;align-items:flex-end">
+      <div class="barcol"><div class="val" id="f_v1">0%</div><div class="bar" id="f_b1" style="opacity:.55"></div></div>
+      <div class="barcol"><div class="val" id="f_v2">0%</div><div class="bar" id="f_b2"></div></div>
+    </div>
+    <div style="position:absolute;left:70px;right:70px;top:572px;display:flex;justify-content:space-around">
+      <div class="yr">2025</div><div class="yr">2026</div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:34px;text-align:center;font-size:32px;color:var(--mute)">UK businesses using AI</div>
+    <div id="f_badge" class="glass pill" style="position:absolute;right:40px;top:-34px;background:rgba(47,91,255,.35);border-color:rgba(140,170,255,.6)"><span class="dot" style="background:#fff;box-shadow:0 0 12px #fff"></span>2× in one year</div>
+  </div>
+</div>
+<div class="layer" id="f_src" style="top:1420px;text-align:center"><div class="src">Source: UK Government, AI Adoption Survey 2025 &amp; 2026</div></div>
+<div class="layer" id="f_h2" style="top:1490px;text-align:center"><div class="sub" style="font-size:46px;color:var(--ink)">Most still haven't started.<br><b style="font-weight:800">Move first. Take the call.</b></div></div>
+
+<!-- G: built around you -->
+<div class="layer" id="g_h" style="top:360px"><div class="h">Built around<br>how <b class="ac">your</b><br>business runs.</div></div>
+<div class="layer" id="g_p" style="top:1380px;display:flex;flex-wrap:wrap;justify-content:center;gap:18px"></div>
+
+<!-- H: end -->
+<div class="layer" id="h_h" style="top:330px;text-align:center"><div class="h" style="font-size:72px">The city never sleeps.</div><div class="h" style="font-size:90px;margin-top:22px"><b>Now, neither does<br><span class="ac">your business.</span></b></div></div>
+<div class="layer" id="h_logo" style="top:860px;text-align:center"><img id="logo" src="style/logo.png" style="width:880px"></div>
+<div class="layer" id="h_tag" style="top:1020px;text-align:center"><div class="eyebrow">Custom-built AI systems</div></div>
+<div class="layer" id="h_cta" style="top:1180px">
+  <div class="glass" style="padding:46px 56px;text-align:center">
+    <div style="font-size:46px;font-weight:800">Book a consultation</div>
+    <div style="font-size:32px;color:var(--mute);margin-top:12px">Tell us your bottleneck. We'll build the fix.</div>
+    <div style="display:flex;justify-content:center;gap:18px;margin-top:34px">
+      <span class="glass pill" id="h_p1"><span class="dot"></span>inovaitiq.ai</span>
+      <span class="glass pill" id="h_p2"><span class="dot"></span>0800 193 5055</span>
+    </div>
+  </div>
+</div>
+<div id="fade"></div>
+</div>
+<script>
+const FPS=30;
+const PHONE='<svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>';
+const ICONS={phone:PHONE,
+ check:'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+ cal:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+ msg:'<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+ link:'<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>'};
+const OK='<div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div>';
+function note(icon,t,d,right,red){return `<div class="glass note"><div class="ico ${red?'red':''}">${ICONS[icon]}</div><div><div class="t">${t}</div>${d?`<div class="d">${d}</div>`:''}</div>${right||''}</div>`}
+const $=id=>document.getElementById(id);
+$('a_c1').innerHTML=note('phone','Missed call','',`<div class="time">09:14</div>`,1);
+$('a_c2').innerHTML=note('phone','Missed call','',`<div class="time">11:47</div>`,1);
+$('a_c3').innerHTML=note('phone','Missed call · Voicemail','“Hi, I’m looking to book in this week…”',`<div class="time">14:32</div>`,1);
+$('d_c1').innerHTML=note('phone','AI Receptionist','Answers, qualifies &amp; books calls');
+$('d_c2').innerHTML=note('bolt','Instant follow-up','Every enquiry acted on, fast');
+$('d_c3').innerHTML=note('link','Connected systems','Phone, CRM &amp; calendar in sync');
+const okSlot=i=>`<div class="ok" id="ok${i}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div>`;
+$('e_c1').innerHTML=note('phone','Call answered','AI receptionist · 14:32',okSlot(1));
+$('e_c2').innerHTML=note('check','Enquiry qualified','New client · Wants a quote this week',okSlot(2));
+$('e_c3').innerHTML=note('cal','Appointment booked','Thursday · 10:00',okSlot(3));
+$('e_c4').innerHTML=note('msg','CRM updated · Text sent','You’re notified. Nothing to chase.',okSlot(4));
+['Offices','Clinics','Dentists','Trades','Salons','Agencies'].forEach((s,i)=>{$('g_p').insertAdjacentHTML('beforeend',`<span class="glass pill" id="gp${i}"><span class="dot"></span>${s}</span>`)});
+
+// easing
+const cl=x=>Math.max(0,Math.min(1,x));
+const eo=x=>1-Math.pow(1-x,3);
+const eback=x=>{const c=1.4;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+// enter at t0 over d, exit at t1 over e; mode: 'up','down','fade','scale'
+function anim(id,t,t0,t1,{d=.7,e=.45,dy=60,mode='up',back=false}={}){
+  const el=typeof id==='string'?$(id):id; if(!el)return;
+  const pin=cl((t-t0)/d), pout=cl((t-t1)/e);
+  const vin=back?eback(pin):eo(pin), vout=eo(pout);
+  const op=Math.min(eo(pin),1-vout);
+  let tr='';
+  if(mode==='up') tr=`translateY(${(1-vin)*dy - vout*dy*.5}px)`;
+  if(mode==='down') tr=`translateY(${-(1-vin)*dy*2.2 - vout*dy*.5}px)`;
+  if(mode==='scale') tr=`scale(${.94+.06*vin + vout*.04})`;
+  el.style.opacity=op; el.style.transform=tr;
+  el.style.filter=`blur(${(1-eo(pin))*14 + vout*12}px)`;
+  el.style.visibility=op<=0.001?'hidden':'visible';
+}
+
+// footage segments [t0,t1,clipIndex]
+const SEG=[[0,9,0],[9,15,1],[15,24,2],[24,36,3],[36,44,4],[44,50,5],[50,60,6]];
+const XF=0.25; // default crossfade seconds
+const XFS={9:1.6,15:.9,50:.8}; // longer dissolves: into the chip power-on, into the living city
+// background grading over time: [t, brightness, blur]
+const GRADE=[[0,.5,2],[4.8,.45,3],[5.3,.32,6],[7.4,.32,8],[10.4,.85,0],[14.6,.9,0],[15,.6,2],[16,.5,3],[23.8,.5,3],[24,.55,2],[25,.45,3],[35.8,.45,3],[36,.55,2],[37,.4,6],[43.8,.4,6],[44,.75,0],[45.5,.8,0],[52.6,.88,0],[53.6,.58,1.5],[60,.62,1.5]];
+function grade(t){for(let i=0;i<GRADE.length-1;i++){const[a,b1,u1]=GRADE[i],[b,b2,u2]=GRADE[i+1];if(t>=a&&t<=b){const k=(t-a)/(b-a);return[b1+(b2-b1)*k,u1+(u2-u1)*k]}}return GRADE[GRADE.length-1].slice(1)}
+window.FRAMECOUNTS={};
+const TRACES=[[[0, 379], [7, 372], [218, 305], [259, 231]], [[2, 411], [253, 329], [299, 245]], [[1, 463], [5, 458], [280, 369], [341, 259]], [[1, 504], [4, 500], [30, 491], [311, 403], [319, 393], [378, 279], [385, 272]], [[0, 542], [11, 534], [347, 428], [424, 286]], [[0, 606], [3, 592], [16, 584], [373, 469], [389, 446], [459, 311], [470, 298]], [[103, 633], [116, 608], [129, 594], [406, 503], [509, 313]], [[197, 665], [223, 641], [320, 609], [416, 573], [507, 405], [543, 335], [548, 320]], [[260, 683], [271, 664], [280, 657], [417, 609], [441, 597], [578, 336]], [[307, 738], [307, 733], [334, 680], [344, 669], [456, 630], [463, 624], [609, 348]], [[390, 860], [654, 361]], [[572, 790], [571, 787], [603, 726], [599, 711], [564, 636], [564, 625], [682, 394], [695, 376]], [[650, 771], [662, 747], [614, 643], [611, 627], [735, 391]], [[699, 866], [707, 857], [731, 806], [734, 790], [720, 757], [715, 753], [677, 676], [661, 639], [661, 625], [778, 403]], [[814, 949], [818, 947], [838, 909], [841, 891], [779, 767], [733, 684], [721, 654], [715, 649], [710, 628], [802, 448], [821, 417]], [[866, 970], [874, 946], [890, 916], [891, 905], [756, 623], [757, 615], [774, 581], [857, 426]], [[914, 988], [907, 981], [902, 962], [924, 920], [923, 904], [789, 624], [789, 615], [802, 587], [871, 452], [882, 436]], [[923, 1110], [922, 1103], [997, 959], [999, 948], [835, 615], [837, 604], [850, 578], [917, 453]], [[1048, 958], [1052, 940], [1046, 924], [888, 608], [891, 597], [961, 466]], [[1079, 888], [1074, 865], [981, 685], [941, 601], [984, 512], [1005, 478]], [[1079, 789], [1069, 754], [992, 598], [1015, 551], [1019, 524], [1032, 516], [1043, 496], [1042, 492]]];
+const TL=TRACES.map(pts=>{const c=[0];for(let i=1;i<pts.length;i++)c.push(c[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return c});
+function at(pi,d){const pts=TRACES[pi],c=TL[pi];d=Math.max(0,Math.min(c[c.length-1],d));let i=1;while(i<c.length-1&&c[i]<d)i++;
+  const k=(d-c[i-1])/((c[i]-c[i-1])||1);return[pts[i-1][0]+(pts[i][0]-pts[i-1][0])*k,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*k]}
+// deterministic schedule: pulses race toward the chip, flicker and die before they arrive
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const PULSES=[];for(let i=0;i<22;i++){PULSES.push({p:Math.floor(rnd()*TRACES.length),t0:.1+i*.34+rnd()*.25,v:430+rnd()*260,die:.45+rnd()*.42})}
+function drawPulses(t){
+  const cv=$('pulses'),D=window.devicePixelRatio||1;if(cv.width!==1080*D){cv.width=1080*D;cv.height=1920*D}const g=cv.getContext('2d');g.setTransform(D,0,0,D,0,0);g.clearRect(0,0,1080,1920);g.globalCompositeOperation='lighter';g.lineCap='round';
+  for(const P of PULSES){
+    if(t<P.t0)continue; const L=TL[P.p][TL[P.p].length-1], head=(t-P.t0)*P.v, end=P.die*L;
+    let a=1; if(head>end){const f=(head-end)/(P.v*.35); if(f>=1)continue; a=(1-f)*(.45+.55*Math.abs(Math.sin(t*47+P.p)));}
+    a*=Math.min(1,(t-P.t0)/.15);
+    const h=Math.min(head,end+(head-end)*.15), trail=150;
+    for(let j=0;j<16;j++){const d0=h-trail*(j+1)/16,d1=h-trail*j/16; if(d1<0)break;
+      const p0=at(P.p,d0),p1=at(P.p,d1),k=1-j/16;
+      g.strokeStyle=`rgba(120,165,255,${.55*k*a})`;g.lineWidth=9*k+2;g.beginPath();g.moveTo(p0[0],p0[1]);g.lineTo(p1[0],p1[1]);g.stroke();
+      g.strokeStyle=`rgba(225,236,255,${.8*k*a})`;g.lineWidth=3*k+1;g.beginPath();g.moveTo(p0[0],p0[1]);g.lineTo(p1[0],p1[1]);g.stroke();}
+    const q=at(P.p,h),r=g.createRadialGradient(q[0],q[1],0,q[0],q[1],34);
+    r.addColorStop(0,`rgba(255,255,255,${a})`);r.addColorStop(.25,`rgba(150,185,255,${.8*a})`);r.addColorStop(1,'rgba(47,91,255,0)');
+    g.fillStyle=r;g.beginPath();g.arc(q[0],q[1],34,0,Math.PI*2);g.fill();}
+}
+
+window.FRAMEDIR=window.FRAMEDIR||'frames';
+function frameSrc(seg,t){const[s0,s1,c]=SEG[seg];const n=window.FRAMECOUNTS[c]||1;const i=Math.min(n,Math.max(1,Math.floor((t-s0)*FPS)+1));return `${window.FRAMEDIR}/c${c}/${String(i).padStart(4,'0')}.jpg`}
+function load(img,src){return new Promise(r=>{if(img.dataset.src===src){r();return}img.dataset.src=src;img.onload=()=>r();img.onerror=()=>r();img.src=src})}
+
+window.render=async function(t){
+  let si=SEG.findIndex(s=>t>=s[0]&&t<s[1]); if(si<0)si=SEG.length-1;
+  const A=$('bgA'),B=$('bgB');
+  const p=[load(A,frameSrc(si,t))];
+  const [g,bl]=grade(t);
+  const f=`brightness(${g}) blur(${bl}px) saturate(1.1)`;
+  A.style.filter=f; A.style.opacity=1;
+  // crossfade into next segment
+  const nx=SEG[si+1];
+  const xf=XFS[nx?nx[0]:0]||XF;
+  if(nx && t>nx[0]-xf){p.push(load(B,frameSrc(si+1,nx[0])));B.style.filter=f;const k=cl((t-(nx[0]-xf))/xf);B.style.opacity=k*k*(3-2*k);B.style.transform=`scale(${1.06-.04*k})`;}
+  else B.style.opacity=0;
+  // subtle slow push on bg for life
+  const local=t-SEG[si][0];
+  A.style.transform=si===0?`scale(${1.0+local*.011})`:`scale(${1.02+local*.004})`;
+  // 15s match cut: push shot 1 into the chip until it frames exactly like shot 2's first frame (crop zoom 1.758)
+  A.style.transformOrigin='50% 50%'; B.style.webkitMaskImage='none';
+  if(si===1 && t>13.4){
+    // measured: shot 2 frame 1 == shot 1 last frame cropped at scale MS around (MCX,MCY)
+    const MS=1.585, MCX=.502, MCY=.468;
+    const base=1.02+local*.004, ZEND=MS*1.02/(1.02+6*.004);
+    const p=cl((t-13.4)/1.6), z=1+(ZEND-1)*p*p*p, SA=base*z;
+    const SAend=(1.02+6*.004)*ZEND, OX=(.5-SAend*MCX)/(1-SAend), OY=(.5-SAend*MCY)/(1-SAend);
+    A.style.transformOrigin=`${OX*100}% ${OY*100}%`;
+    A.style.transform=`scale(${SA})`;
+    A.style.filter+=` blur(${Math.sin(Math.PI*p)*3}px)`;
+    if(t>15-.9){const k=cl((t-14.1)/.9);
+      const SB=SA/MS, dx=OX*(1-SA)+SA*MCX-.5, dy=OY*(1-SA)+SA*MCY-.5;
+      B.style.transformOrigin='50% 50%'; B.style.transform=`translate(${dx*1080}px,${dy*1920}px) scale(${SB})`;
+      B.style.filter=A.style.filter;
+      const r=48+92*Math.pow(k,6); B.style.webkitMaskImage=`radial-gradient(ellipse ${r}% ${r}% at 50% 50%, #000 40%, transparent 100%)`;}
+  }
+
+
+  // A
+  anim('a_eb',t,.15,4.9,{dy:30});
+  anim('a_l1',t,.25,4.9); anim('a_l2',t,.45,4.9); anim('a_l3',t,.65,4.9);
+  anim('a_c1',t,1.5,4.9,{mode:'down',back:true});
+  anim('a_c2',t,2.3,4.9,{mode:'down',back:true});
+  anim('a_c3',t,3.1,4.9,{mode:'down',back:true});
+  // stack: older cards pushed back
+  const push=(el,k)=>{const e=$(el);e.style.transform+=` translateY(${-k*34}px) scale(${1-k*.05})`;e.style.opacity*= (1-k*.28)};
+  const st=(a)=>eo(cl((t-a)/.6));
+  $('a_c1').style.zIndex=1;$('a_c2').style.zIndex=2;$('a_c3').style.zIndex=3;
+  anim('a_s1',t,5.3,8.5,{mode:'scale'});
+  anim('a_s2',t,6.5,8.5);
+  // C
+  anim('c_eb',t,9.6,14.4);
+  anim('c_tag',t,12.2,14.6,{back:true});
+  // D
+  anim('d_eb',t,15.4,23.4,{dy:30}); anim('d_h',t,15.6,23.4);
+  anim('d_c1',t,16.8,23.5,{dy:120,back:true}); anim('d_c2',t,17.6,23.5,{dy:120,back:true}); anim('d_c3',t,18.4,23.5,{dy:120,back:true});
+  // E
+  anim('e_eb',t,24.4,35.5,{dy:30}); anim('e_h',t,24.6,35.5);
+  [26,27.7,29.4,31.1].forEach((s,i)=>{anim('e_c'+(i+1),t,s,35.5,{dy:90,back:true});
+    const ok=$('ok'+(i+1)); const k=cl((t-(s+.7))/.35); ok.style.transform=`scale(${k<=0?0:eback(k)})`; ok.style.opacity=k>0?1:0;});
+  const r=$('e_rail'); r.style.height=(cl((t-26)/6)*620)+'px'; r.style.opacity=t<35.5?.9:1-cl((t-35.5)/.4);
+  anim('e_src',t,32,35.5,{dy:20});
+  // F: chart
+  anim('f_eb',t,36.3,43.4,{dy:30}); anim('f_h',t,36.5,43.4);
+  anim('f_chart',t,36.9,43.4,{dy:80});
+  document.querySelectorAll('#f_grid .gl').forEach((g,i)=>{g.style.transform=`scaleX(${eo(cl((t-37.1-i*.12)/.6))})`});
+  const io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+  const r1=io(cl((t-37.5)/1.6)), r2=io(cl((t-38.0)/2.3));
+  $('f_b1').style.height=(16/34*440*r1)+'px'; $('f_v1').textContent=Math.round(16*r1)+'%';
+  $('f_b2').style.height=(32/34*440*r2)+'px'; $('f_v2').textContent=Math.round(32*r2)+'%';
+  $('f_v1').style.opacity=cl((t-37.5)/.3); $('f_v2').style.opacity=cl((t-38)/.3);
+  anim('f_badge',t,40.35,43.4,{dy:30,back:true,d:.5});
+  anim('f_src',t,40.6,43.4,{dy:20});
+  anim('f_h2',t,41.0,43.4);
+  // G
+  anim('g_h',t,45,52.4);
+  for(let i=0;i<6;i++) anim('gp'+i,t,47+i*.35,52.4,{dy:50,back:true});
+  // H
+  anim('h_h',t,53.4,99);
+  anim('h_logo',t,54.4,99,{mode:'scale',d:1.1});
+  const pulse=t>54.4?0.35+0.25*Math.sin((t-54.4)*2.2):0;
+  $('logo').style.filter=`drop-shadow(0 0 ${30+pulse*30}px rgba(47,91,255,${.3+pulse*.4}))`;
+  anim('h_tag',t,55,99,{dy:20});
+  anim('h_cta',t,55.6,99,{dy:100,back:true});
+  anim('h_p1',t,56.3,99,{dy:30,back:true}); anim('h_p2',t,56.55,99,{dy:30,back:true});
+  // global fade in from black
+  const fo=cl((t-58.6)/1.3); $('fade').style.opacity=Math.max(1-cl(t/.4),fo*fo*(3-2*fo));
+
+  // scene 1: light pulses that follow the real tracks (paths traced from the board image)
+  const cv=$('pulses');
+  if(si===0){cv.style.display='block';cv.style.transform=A.style.transform;cv.style.filter=`blur(${bl*.5}px) drop-shadow(0 0 10px rgba(80,130,255,.9))`;drawPulses(t);}
+  else cv.style.display='none';
+  await Promise.all(p);
+};
+</script>
+</body></html>
