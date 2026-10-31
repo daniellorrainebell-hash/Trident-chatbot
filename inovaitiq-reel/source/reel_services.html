@@ -255,7 +255,8 @@ window.render=async function(t){
   anim('c_tag',t,12.2,14.6,{back:true});
   // D
   anim('d_eb',t,15.4,23.4,{dy:30}); anim('d_h',t,15.6,23.4);
-  anim('d_c1',t,16.6,23.5,{mode:'left',d:.8}); anim('d_c2',t,17.3,23.5,{mode:'right',d:.8}); anim('d_c3',t,18.0,23.5,{mode:'left',d:.8}); anim('d_c4',t,18.7,23.5,{mode:'right',d:.8});
+  // land each service on a kick: every 2 beats from the bar-4 downbeat (beat grid from music.py: drop at 9.0s, 72 beats to 44.0s)
+  {const BT=35/72, SL=.3; [16,18,20,22].forEach((k,i)=>{const hit=9+k*BT; anim('d_c'+(i+1),t,hit-SL,23.5,{mode:i%2?'right':'left',d:SL});});}
   // E
   anim('e_eb',t,24.4,35.5,{dy:30}); anim('e_h',t,24.6,35.5);
   [26,27.7,29.4,31.1].forEach((s,i)=>{anim('e_c'+(i+1),t,s,35.5,{dy:90,back:true});
