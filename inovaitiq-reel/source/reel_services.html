@@ -14,7 +14,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:#05060A;font-fam
 .eyebrow{font-size:38px;letter-spacing:.26em;text-transform:uppercase;color:rgba(244,246,251,.92);font-weight:700}
 .h{text-shadow:0 1px 2px rgba(0,0,0,.45),0 4px 30px rgba(0,0,0,.55);font-weight:300;font-size:104px;line-height:1.03;letter-spacing:-.03em}
 .h b{font-weight:800}
-.h .ac{text-shadow:0 1px 2px rgba(0,0,0,.45),0 0 44px var(--glow)}
+.h .ac{text-shadow:0 1px 2px rgba(0,0,0,.5),0 4px 30px rgba(0,0,0,.6),0 0 44px var(--glow)}
 .line{display:block}
 .sub{font-size:44px;color:var(--mute);line-height:1.35;font-weight:500}
 .glass{background:linear-gradient(155deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 45%,rgba(255,255,255,.08)),rgba(12,16,30,.58);
@@ -41,6 +41,8 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:#05060A;font-fam
 .svc{position:relative;padding:6px 0 8px 36px}
 .svc::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:4px;background:linear-gradient(#8FA9FF,#2F5BFF);box-shadow:0 0 18px rgba(47,91,255,.9)}
 .svc-t{font-size:66px;font-weight:800;letter-spacing:-.025em;line-height:1.05;text-shadow:0 1px 2px rgba(0,0,0,.5),0 4px 26px rgba(0,0,0,.6)}
+.punch{font-size:104px;font-weight:800;letter-spacing:-.03em;line-height:1.06;text-shadow:0 1px 2px rgba(0,0,0,.5),0 4px 26px rgba(0,0,0,.6)}
+.punch .ac{color:#9DB6FF;text-shadow:0 1px 2px rgba(0,0,0,.5),0 4px 26px rgba(0,0,0,.6),0 0 34px rgba(47,91,255,.85)}
 .svc-d{font-size:35px;font-weight:500;color:var(--mute);margin-top:8px}
 #fade{position:absolute;inset:0;background:#05060A;pointer-events:none}
 </style></head>
@@ -68,6 +70,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:#05060A;font-fam
 <div class="layer" id="d_c2" style="top:1062px"></div>
 <div class="layer" id="d_c3" style="top:1244px"></div>
 <div class="layer" id="d_c4" style="top:1426px"></div>
+<div class="layer" id="d_c5" style="top:800px;text-align:center"><div class="punch">All connected.<br><span class="ac">All working 24/7.</span></div></div>
 
 <!-- E: flow -->
 <div class="layer" id="e_eb" style="top:282px"><div class="eyebrow">The same 14:32 call</div></div>
@@ -254,9 +257,11 @@ window.render=async function(t){
   anim('c_eb',t,9.6,14.4);
   anim('c_tag',t,12.2,14.6,{back:true});
   // D
-  anim('d_eb',t,15.4,23.4,{dy:30}); anim('d_h',t,15.6,23.4);
+  anim('d_eb',t,15.4,9+24*35/72,{dy:30,e:.4}); anim('d_h',t,15.6,9+24*35/72,{e:.4});
   // land each service on a kick: every 2 beats from the bar-4 downbeat (beat grid from music.py: drop at 9.0s, 72 beats to 44.0s)
-  {const BT=35/72, SL=.3; [16,18,20,22].forEach((k,i)=>{const hit=9+k*BT; anim('d_c'+(i+1),t,hit-SL,23.5,{mode:i%2?'right':'left',d:SL});});}
+  {const BT=35/72, SL=.3; const OFF=9+24*BT;                                   // next kick: the stack clears
+   [16,18,20,22].forEach((k,i)=>{const hit=9+k*BT; anim('d_c'+(i+1),t,hit-SL,OFF,{mode:i%2?'right':'left',d:SL,e:.4});});
+   anim('d_c5',t,9+26*BT-SL,23.5,{mode:'scale',d:SL,back:true});}   // punchline pops alone on the kick after
   // E
   anim('e_eb',t,24.4,35.5,{dy:30}); anim('e_h',t,24.6,35.5);
   [26,27.7,29.4,31.1].forEach((s,i)=>{anim('e_c'+(i+1),t,s,35.5,{dy:90,back:true});

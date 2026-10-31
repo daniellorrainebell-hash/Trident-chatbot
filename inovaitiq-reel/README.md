@@ -12,7 +12,7 @@ Vertical (9:16) promotional video for Instagram Reels and Stories.
 ### Services version
 This version uses the same footage, music and ending, with three changes:
 - **Hook:** "How many **sales** did you miss today?" The notifications are a missed call, an unanswered website enquiry and a voicemail, followed by "Every one cost you. Someone else got there first."
-- **What we build:** the glass cards are replaced with bold headlines that slide in from alternating sides: Voice receptionists (calls 24/7), Speed-to-lead agents, Intelligent chatbots (enquiries 24/7) and Custom automation.
+- **What we build:** the glass cards are replaced with bold headlines that slide in from alternating sides, each landing on a kick two beats apart: Voice receptionists (calls 24/7), Speed-to-lead agents, Intelligent chatbots (enquiries 24/7) and Custom automation. They clear on the next kick, and "All connected. All working 24/7." lands on its own on the kick after that.
 - **Source:** `source/reel_services.html`; the original is `source/reel.html`.
 
 ## Story (60s)
